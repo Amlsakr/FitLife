@@ -1,6 +1,10 @@
-# FitLife – Architecture Document (v1)
+# FitLife – Architecture Document (v1.1)
 
 ---
+
+## Change Log
+
+- v1.1 — 2026-05-31 — Added widget module, confirmed v1.0 scope additions, fixed lighting fallback debounce rules, and added Section 14 Data Model Appendix.
 
 ## 1. Module Structure & Gradle Dependency Graph
 
@@ -30,6 +34,8 @@ include(":feature:session:session-ui")
 include(":feature:progress:progress-data")
 include(":feature:progress:progress-domain")
 include(":feature:progress:progress-ui")
+
+include(":feature:widget:widget-ui")
 ```
 
 **Dependency Graph (Mermaid):**
@@ -67,9 +73,13 @@ graph TD
     progress-domain --> core-domain
     progress-ui --> progress-domain
     progress-ui --> core-ui
+
+    widget-ui --> core-ui
+    widget-ui --> workout-domain
+    widget-ui --> progress-domain
 ``` 
 
-*All **core-*** modules are independent of feature modules. Feature modules depend only on core modules and their own sibling layers.
+*All **core-*** modules are independent of feature modules. Feature modules depend only on core modules and their own sibling layers. The `:feature:widget:widget-ui` module is UI-only and hosts the Jetpack Glance 2x2 widget for v1.0.*
 
 ---
 
@@ -263,7 +273,7 @@ flowchart TD
 2. `PoseDetector.process(image)` returns `Pose` (on‑device).
 3. `AnalyzePoseUseCase` extracts joint angles, builds a `PoseData` object.
 4. `DetectFatigueUseCase` compares current rep angles against baseline (first two reps) and flags fatigue when deviation > threshold for ≥3 consecutive reps.
-5. `LightingFallbackChecker` evaluates `pose.confidence` (< 0.6) and ambient light sensor (or frame brightness) to trigger audio‑only mode with a 2‑second debounce.
+5. `LightingFallbackChecker` evaluates `pose.confidence` (< 0.6) and ambient light sensor (or frame brightness). 2 seconds of sustained low confidence or brightness < 10 lux triggers audio-only mode. 3 seconds of stable brightness > 10 lux and pose confidence > 0.6 is required before reverting to visual mode.
 
 ---
 
@@ -280,8 +290,18 @@ flowchart TD
 
 - **Confidence check:** `pose.confidence < 0.6`.
 - **Ambient light:** Compute average pixel brightness; if `< 10 lux`.
-- **Debounce:** Wait 2 seconds of sustained low confidence/light before switching.
+- **Trigger debounce:** 2 seconds of sustained low confidence or brightness < 10 lux triggers audio-only mode.
+- **Revert debounce:** 3 seconds of stable brightness > 10 lux and pose confidence > 0.6 required before reverting to visual mode.
 - **User override:** Bottom‑sheet toggle in UI that forces audio mode or restores visual mode.
+
+---
+
+## 9.1 Confirmed v1.0 Scope Additions
+
+- **WhatsApp badge sharing:** Implemented from the post-session summary with a generated share image card and Android share sheet. Analytics logs `whatsapp_share_tapped`.
+- **Smart reminders:** Implemented with WorkManager from the `:app` module, using adaptive timing based on the user's historical workout times and profile notification preferences.
+- **Home screen widget:** Implemented with Jetpack Glance in `:feature:widget:widget-ui`; 2x2 widget shows today's workout and current streak.
+- **Dynamic equipment rerouting:** Implemented in session flow with a one-tap unavailable action, Gemini alternatives, and local fallback alternatives if Gemini is unavailable.
 
 ---
 
@@ -333,10 +353,166 @@ Deep links are defined for sharing a plan (`app://fitlife/plan/{planId}`) and fo
 |----------|--------|
 | Gradle module versioning | Flat module names as listed in **Q1**. |
 | Gemini API fallback format | Local JSON asset `assets/fallback_workout_plans.json` (see **Q2**). |
-| Pose confidence threshold | 0.6 with 2‑second debounce (**Q3**). |
+| Pose confidence threshold | 0.6; 2 seconds sustained low confidence or brightness < 10 lux triggers audio-only mode; 3 seconds stable brightness > 10 lux and confidence > 0.6 reverts to visual mode (**Q3**). |
 | Background worker for fatigue detection | Handled via coroutine in Session ViewModel (**Q4**). |
 | Hilt module naming | Use `CoreDataModule`, `NetworkModule`, `AuthModule`, `WorkoutModule`, `SessionModule`, `OnboardingModule`, `ProgressModule` (**Q5**). |
 
 ---
+
+## 14. Data Model Appendix
+
+### 14.1 User Profile (Room Entity)
+
+```kotlin
+data class UserEntity(
+    val userId: String,           // Firebase UID
+    val name: String,
+    val email: String,
+    val age: Int,
+    val fitnessLevel: FitnessLevel, // BEGINNER, INTERMEDIATE
+    val goals: List<FitnessGoal>,   // stored as JSON string
+    val equipment: List<Equipment>, // stored as JSON string
+    val weeklyFrequency: Int,       // workouts per week
+    val currentSplit: String?,      // intermediate only
+    val oneRepMax: Map<String, Float>?, // intermediate only
+    val createdAt: Long,
+    val updatedAt: Long
+)
+
+enum class FitnessLevel { BEGINNER, INTERMEDIATE }
+enum class FitnessGoal { WEIGHT_LOSS, STRENGTH, GENERAL_HEALTH }
+enum class Equipment {
+    NONE, RESISTANCE_BANDS, DUMBBELLS, FULL_GYM
+}
+```
+
+### 14.2 Workout Plan (Room Entity)
+
+```kotlin
+data class WorkoutPlanEntity(
+    val planId: String,
+    val userId: String,
+    val generatedAt: Long,
+    val expiresAt: Long,        // createdAt + 24 hours
+    val fitnessLevel: FitnessLevel,
+    val location: WorkoutLocation, // HOME, GYM, OUTDOOR
+    val planJson: String,       // full Gemini response JSON
+    val isFallback: Boolean,    // true if from asset file
+    val weekNumber: Int
+)
+
+enum class WorkoutLocation { HOME, GYM, OUTDOOR }
+```
+
+### 14.3 Workout Day (Parsed From planJson)
+
+```kotlin
+data class WorkoutDayEntity(
+    val dayId: String,
+    val planId: String,
+    val dayNumber: Int,         // 1-7
+    val isRestDay: Boolean,
+    val focusMuscles: String,   // e.g. "Chest, Triceps"
+    val exercises: List<ExerciseEntity> // nested JSON
+)
+```
+
+### 14.4 Exercise Library (Room Entity)
+
+```kotlin
+data class ExerciseEntity(
+    val exerciseId: String,
+    val name: String,
+    val description: String,
+    val muscleGroups: List<String>, // JSON
+    val difficulty: ExerciseDifficulty,
+    val equipmentRequired: Equipment,
+    val lottieAssetPath: String?,   // path in assets/
+    val defaultSets: Int,
+    val defaultReps: Int,
+    val defaultDurationSecs: Int?,  // for timed exercises
+    val formCues: List<String>,     // audio cue text list
+    val poseExerciseType: PoseExerciseType? // null = no pose
+)
+
+enum class ExerciseDifficulty { BEGINNER, INTERMEDIATE, ADVANCED }
+enum class PoseExerciseType {
+    SQUAT, PUSH_UP, LUNGE, PLANK, SHOULDER_PRESS
+    // v1.0 supports 5 pose types only
+}
+```
+
+**Exercise library seed:** Room is pre-populated from `assets/exercises.json` with a minimum of 30 exercises.
+
+| # | Exercise | Equipment Group | Pose Type |
+| --- | --- | --- | --- |
+| 1 | Push-Up | Bodyweight | PUSH_UP |
+| 2 | Squat | Bodyweight | SQUAT |
+| 3 | Lunge | Bodyweight | LUNGE |
+| 4 | Plank | Bodyweight | PLANK |
+| 5 | Mountain Climber | Bodyweight | None |
+| 6 | Burpee | Bodyweight | None |
+| 7 | Jump Squat | Bodyweight | None |
+| 8 | Glute Bridge | Bodyweight | None |
+| 9 | Superman | Bodyweight | None |
+| 10 | Tricep Dip (chair) | Bodyweight | None |
+| 11 | Jumping Jacks | Bodyweight | None |
+| 12 | High Knees | Bodyweight | None |
+| 13 | Donkey Kick | Bodyweight | None |
+| 14 | Fire Hydrant | Bodyweight | None |
+| 15 | Bicycle Crunch | Bodyweight | None |
+| 16 | Banded Row | Resistance Band | None |
+| 17 | Banded Chest Press | Resistance Band | None |
+| 18 | Banded Lateral Walk | Resistance Band | None |
+| 19 | Banded Bicep Curl | Resistance Band | None |
+| 20 | Banded Shoulder Press | Resistance Band | SHOULDER_PRESS |
+| 21 | Barbell Squat | Gym | SQUAT |
+| 22 | Bench Press | Gym | None |
+| 23 | Deadlift | Gym | None |
+| 24 | Dumbbell Lunge | Gym | LUNGE |
+| 25 | Lat Pulldown | Gym | None |
+| 26 | Seated Row | Gym | None |
+| 27 | Dumbbell Shoulder Press | Gym | SHOULDER_PRESS |
+| 28 | Leg Press | Gym | None |
+| 29 | Cable Fly | Gym | None |
+| 30 | Dumbbell Bicep Curl | Gym | None |
+
+### 14.5 Session (Room Entity)
+
+```kotlin
+data class SessionEntity(
+    val sessionId: String,
+    val userId: String,
+    val planId: String,
+    val workoutDayId: String,
+    val startTime: Long,
+    val endTime: Long?,
+    val durationSeconds: Int?,
+    val totalReps: Int,
+    val totalSets: Int,
+    val fatigueEventCount: Int,
+    val audioFallbackUsed: Boolean,
+    val completionPercentage: Float, // 0.0 - 1.0
+    val whatsAppShared: Boolean
+)
+```
+
+### 14.6 Analytics Events Taxonomy
+
+| Event | Parameters |
+| --- | --- |
+| `onboarding_started` | `level: String` |
+| `onboarding_completed` | `level: String`, `duration_ms: Long` |
+| `plan_generated` | `is_fallback: Boolean`, `level: String`, `location: String` |
+| `session_started` | `plan_id: String`, `exercise_count: Int` |
+| `session_completed` | `duration_secs: Int`, `total_reps: Int`, `fatigue_events: Int`, `audio_fallback_used: Boolean`, `completion_pct: Float` |
+| `session_abandoned` | `reason: String`, `completion_pct: Float` |
+| `fatigue_detected` | `exercise_name: String`, `rep_number: Int` |
+| `fatigue_dismissed` | `exercise_name: String` |
+| `lighting_fallback_triggered` | `confidence: Float` |
+| `lighting_fallback_reverted` | `duration_secs: Int` |
+| `equipment_rerouted` | `original: String`, `alternative: String` |
+| `whatsapp_share_tapped` | `session_id: String` |
+| `pose_feedback_rated` | `rating: Int`, `exercise: String` |
 
 **Document generated automatically per user approval.**

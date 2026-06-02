@@ -1,4 +1,4 @@
-package com.aml_sakr.fitnessapp
+package com.aml_sakr.fitlife
 
 import org.junit.Test
 

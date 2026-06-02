@@ -1,4 +1,4 @@
-package com.aml_sakr.fitnessapp.ui.theme
+package com.aml_sakr.fitlife.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

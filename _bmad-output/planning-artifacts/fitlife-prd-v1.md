@@ -1,9 +1,13 @@
-# FitLife — AI Personal Health Coach
+# FitLife — AI Personal Health Coach (v1.2)
 
 ---
 
+## Change Log
+
+- v1.2 — 2026-05-31 — Scope corrections: added 4 features to MVP, resolved module naming, added data models, fixed debounce timing, added security and GDPR stories
+
 ## 1. Executive Summary
-FitLife is an Android‑only AI‑driven personal health coach targeting the Egypt/MENA market. It delivers differentiated onboarding, AI‑generated workout plans via Gemini API, guided sessions with pose‑detection feedback, lighting‑fallback audio, fatigue analysis, progress analytics, and secure user profiles via Firebase. The MVP is built in 8 weeks by a solo developer using Kotlin, Jetpack Compose, MVI, coroutines, Room, Retrofit, Hilt, and ML Kit.
+FitLife is an Android‑only AI‑driven personal health coach targeting the Egypt/MENA market. It delivers differentiated onboarding, AI‑generated workout plans via Gemini API, guided sessions with pose‑detection feedback, lighting‑fallback audio, fatigue analysis, progress analytics, WhatsApp badge sharing, smart reminders, a home screen widget, dynamic equipment rerouting, and secure user profiles via Firebase. The MVP is built in 8 weeks by a solo developer using Kotlin, Jetpack Compose, MVI, coroutines, Room, Retrofit, Hilt, WorkManager, Jetpack Glance, and ML Kit.
 
 ## 2. Problem Statement
 Many fitness‑seeking users in Egypt lack affordable, personalized coaching that adapts to low‑light environments and limited gym space. Existing solutions either require costly subscriptions or provide generic plans without real‑time form feedback. FitLife solves this by offering a free, AI‑powered coach that works offline, provides audio fallback in dark settings, and detects fatigue, enabling safe, effective workouts on mid‑range devices.
@@ -26,6 +30,12 @@ Many fitness‑seeking users in Egypt lack affordable, personalized coaching tha
 | Active users | ≥ 1,000 (within 30 days) |
 | Play Store rating | ≥ 4.0 stars |
 | 30‑day retention rate | ≥ 40% |
+
+### 4.1 Confirmed v1.0 MVP Feature Additions
+- **WhatsApp badge sharing:** Android share sheet with a generated share image card after session completion.
+- **Smart reminders:** WorkManager reminders with adaptive timing based on user's historical workout times.
+- **Home screen widget:** Jetpack Glance 2x2 widget showing today's workout and current streak.
+- **Dynamic equipment rerouting:** One-tap "unavailable" button during session with a bottom sheet showing 3 Gemini alternatives.
 
 ## 5. Feature Requirements (Hard‑Core MVP)
 ### 5.1 Differentiated Onboarding (Beginner / Intermediate)
@@ -64,23 +74,39 @@ Many fitness‑seeking users in Egypt lack affordable, personalized coaching tha
   - Accuracy ≥ 80 % on mid‑range devices (Snapdragon 6xx series) in test suite.
 - **Out of Scope**: Full 3‑D pose reconstruction.
 
+**Edge Case Handling**
+- Camera occluded: show message "Camera blocked — please adjust your phone angle" + audio cue
+- User facing wrong direction: show "Step back — full body not visible" message
+- Very dark room at session start: prompt "Poor lighting detected — switch to audio mode?" before starting pose detection
+
 ### 5.5 Lighting Fallback Mode (Audio When Dark)
 - **User Story**: *As a user exercising in low light, I want the app to switch to audio‑only cues so I can continue safely.*
 - **Acceptance Criteria**:
   - Detects ambient light < 10 lux via camera sensor.
-  - Switches UI to audio‑only mode automatically.
+  - 2 seconds of sustained low confidence or brightness < 10 lux triggers audio-only mode.
   - Provides spoken exercise description and rep count.
   - Users can manually toggle fallback.
 - **Out of Scope**: Night‑vision camera enhancements.
+
+**Edge Case Handling**
+- Revert to visual mode: 3 seconds of stable brightness > 10 lux and pose confidence > 0.6 required before reverting to visual mode (prevents rapid mode switching)
+- Manual override persists for the entire session duration
+- If user manually enabled audio mode, do NOT auto-revert even if lighting improves
 
 ### 5.6 Fatigue Breakdown Detection
 - **User Story**: *As a user, I want the app to warn me when I’m fatigued so I can adjust intensity.*
 - **Acceptance Criteria**:
    - Analyzes pose stability and joint angle consistency across consecutive reps using ML Kit pose data only. No heart rate sensor required. Fatigue is inferred when form deviation exceeds threshold across 3+ consecutive reps.
-  - Issues fatigue warning after ≥ 3 consecutive low‑quality reps.
-  - Logs fatigue events to analytics.
-  - Detection latency ≤ 2 s.
+   - Issues fatigue warning after ≥ 3 consecutive low‑quality reps.
+   - Logs fatigue events to analytics.
+   - Detection latency ≤ 2 s.
 - **Out of Scope**: Integration with external wearables.
+
+**Edge Case Handling**
+- User can dismiss fatigue warning with one tap ("I feel fine, continue")
+- Dismissal is logged to analytics
+- After dismissal, re-trigger only if fatigue detected in next 5 reps
+- Audio alert plays even if phone screen is locked during session
 
 ### 5.7 Progress Analytics + Charts (MPAndroidChart)
 - **User Story**: *As a user, I want to view my workout history and progress trends.*
@@ -100,6 +126,58 @@ Many fitness‑seeking users in Egypt lack affordable, personalized coaching tha
   - GDPR‑compliant data deletion on request.
 - **Out of Scope**: Social login beyond Google, password‑less auth.
 
+### 5.9 WhatsApp Badge Sharing
+- **User Story**: *As a user, I want to share a visual workout badge after completing a session so I can celebrate progress with friends.*
+- **Acceptance Criteria**:
+  - Post-session summary generates a share image card with workout duration, total reps, fatigue events, and FitLife branding.
+  - Android share sheet opens with the generated image card and share text.
+  - WhatsApp share tap is logged to Firebase Analytics.
+  - Sharing is optional and never blocks session completion.
+- **Out of Scope**: WhatsApp bot integration or automated posting.
+
+### 5.10 Smart Reminders
+- **User Story**: *As a user, I want adaptive workout reminders so I stay consistent without configuring a complex schedule.*
+- **Acceptance Criteria**:
+  - WorkManager schedules reminders based on user's preferred days and historical workout times.
+  - Reminder timing adapts after at least 3 completed sessions.
+  - User can enable or disable reminders from profile preferences.
+  - Notification opens FitLife to today's workout.
+- **Out of Scope**: Coach chat reminders or external calendar sync.
+
+### 5.11 Home Screen Widget
+- **User Story**: *As a user, I want a 2x2 home screen widget showing today's workout and streak so I can quickly resume my plan.*
+- **Acceptance Criteria**:
+  - Jetpack Glance widget supports 2x2 size.
+  - Widget displays today's workout focus and current streak.
+  - Tapping the widget opens the Home screen.
+  - Widget refreshes after plan generation, session completion, and daily rollover.
+- **Out of Scope**: Resizable widget layouts beyond 2x2.
+
+### 5.12 Dynamic Equipment Rerouting
+- **User Story**: *As a user, I want a one-tap unavailable option during a session so I can replace exercises when I lack equipment.*
+- **Acceptance Criteria**:
+  - Session screen includes an "unavailable" action for the current exercise.
+  - Bottom sheet presents 3 Gemini-generated alternatives.
+  - Selecting an alternative replaces the current exercise and logs the reroute.
+  - Fallback alternatives are loaded locally if Gemini is unavailable.
+- **Out of Scope**: Full real-time plan regeneration during the workout.
+
+### FR Index
+| ID | Feature | Key Acceptance Criterion |
+|----|---------|--------------------------|
+| FR-1 | Differentiated Onboarding | Completion ≤ 2 min, ≤ 5 screens |
+| FR-2 | AI Workout Plan Generation | Response < 5s, fallback if fails |
+| FR-3 | Guided Workout Session | ≥ 30 exercises, voice prompts |
+| FR-4 | Pose Detection + Form Feedback | ≥ 15fps, accuracy ≥ 80% |
+| FR-5 | Lighting Fallback Mode | 2s trigger below 10 lux or low confidence; 3s stable revert |
+| FR-6 | Fatigue Breakdown Detection | Flag after 3 reps, 15° threshold |
+| FR-7 | Progress Analytics + Charts | Render ≤ 1s, weekly summary |
+| FR-8 | Firebase Auth + User Profile | Google + Email, GDPR deletion |
+| FR-9 | WhatsApp Badge Sharing | Android share sheet with post-session image card |
+| FR-10 | Smart Reminders | WorkManager adaptive timing |
+| FR-11 | Home Screen Widget | Jetpack Glance 2x2 widget with today + streak |
+| FR-12 | Dynamic Equipment Rerouting | One-tap unavailable action with 3 Gemini alternatives |
+
 ## 6. Non‑Functional Requirements
 - **Performance**: UI lag < 100 ms; AI plan generation < 5 s.
 - **Security**: All network traffic over HTTPS; Firebase rules enforce principle of least privilege.
@@ -115,23 +193,19 @@ Many fitness‑seeking users in Egypt lack affordable, personalized coaching tha
 - Market research assumes English‑only UI at launch.
 
 ## 8. Risks & Mitigations
-| Risk | Impact | Mitigation |
+| Risk | Impact | Mitigation | Contingency |
 |------|--------|------------|
-| R1: Pose detection accuracy on mid‑range devices | High | Benchmark on target hardware, fallback to audio cues when confidence < 70 % |
-| R2: Gemini API latency or quota limits | Medium | Cache generated plans, implement exponential back‑off, monitor usage |
-| R3: Light sensor false‑positives causing unwanted audio mode | Medium | Add manual override, debounce sensor readings |
-| R4: Firebase free tier hitting limits | Low | Enable usage alerts, plan migration to paid tier if needed |
-| R5: Regulatory compliance (GDPR) | Medium | Embed consent dialogs, provide data‑deletion endpoint |
+| R1: Pose detection accuracy on mid‑range devices | High | Benchmark on target hardware, fallback to audio cues when pose confidence < 0.6 | If ML Kit accuracy stays below 80% after Week 1 spike, switch to MediaPipe Pose as alternative. If still failing, defer pose detection to v1.1 and launch with audio-only mode. |
+| R2: Gemini API latency or quota limits | Medium | Cache generated plans, implement exponential back‑off, monitor usage | If Gemini free tier proves too slow, implement rule-based plan generator as primary source. Gemini becomes enhancement, not core. |
+| R3: Light sensor false‑positives causing unwanted audio mode | Medium | Add manual override, debounce sensor readings | Disable auto-fallback for first 2 weeks post-launch. Collect telemetry to tune thresholds before enabling auto-mode. |
+| R4: Firebase free tier hitting limits | Low | Enable usage alerts, plan migration to paid tier if needed | Add Firebase usage monitoring alert at 80% of free tier quota. Prepare migration script to Blaze plan if needed. |
+| R5: Regulatory compliance (GDPR) | Medium | Embed consent dialogs, provide data‑deletion endpoint | Conduct privacy review before Play Store submission. If non‑compliant, limit data collection to anonymous device IDs only. |
 
 ## 9. Out‑of‑Scope for v1.0
 - Spatial audio coach
 - Discreet gym mode
-- Dynamic equipment rerouting
 - Anonymous team challenges
-- WhatsApp badge sharing (implementation beyond link generation)
 - Small‑space workout mode beyond basic UI
-- Home screen widget (Glance)
-- Smart reminders (WorkManager)
 
 ## 10. Open Questions for Architect Agent
 | Question | Owner | Rationale |
@@ -139,7 +213,7 @@ Many fitness‑seeking users in Egypt lack affordable, personalized coaching tha
 | Should we employ a local SQLite cache for AI‑generated plans to minimise API calls? | Architect | Reduces latency and cost under free tier |
 | What is the best strategy for handling camera permission prompts to avoid user friction? | Architect | Impacts onboarding conversion |
 | Do we need a separate background service for fatigue detection to keep UI responsive? | Architect | Ensures smooth UX on mid‑range devices |
-**CONFIRMED:** Architecture is MVI + Clean Architecture throughout. No MVVM. Unidirectional data flow: Compose UI → Intent → ViewModel → State → Compose UI
+| **CONFIRMED:** Architecture is MVI + Clean Architecture throughout. No MVVM. Unidirectional data flow: Compose UI → Intent → ViewModel → State → Compose UI |
 | How will we structure the modularization of feature modules for incremental releases? | Architect | Supports parallel development and testing |
 
 ## 11. 8‑Week Sprint Timeline
