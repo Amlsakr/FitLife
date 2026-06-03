@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.aml_sakr.fitlife.core.ui.mvi.BaseMviViewModelTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-06-02T21:16:58.230Z" hostname="AMAL-SAKR" time="0.584">
-  <properties/>
-  <testcase name="onEvent_updatesStateAndEmitsOneTimeAction" classname="com.aml_sakr.fitlife.core.ui.mvi.BaseMviViewModelTest" time="0.56"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

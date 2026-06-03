@@ -1,9 +1,0 @@
-com.aml_sakr.fitlife.core.ui.core-ui-pngs-0 D:\LinkDevProject\FitLife\core\core-ui\build\generated\res\pngs\debug
-com.aml_sakr.fitlife.core.ui.core-ui-updated_navigation_xml-1 D:\LinkDevProject\FitLife\core\core-ui\build\generated\updated_navigation_xml\debug
-com.aml_sakr.fitlife.core.ui.core-ui-mergeDebugResources-2 D:\LinkDevProject\FitLife\core\core-ui\build\intermediates\incremental\debug\mergeDebugResources\merged.dir
-com.aml_sakr.fitlife.core.ui.core-ui-mergeDebugResources-3 D:\LinkDevProject\FitLife\core\core-ui\build\intermediates\incremental\debug\mergeDebugResources\stripped.dir
-com.aml_sakr.fitlife.core.ui.core-ui-debug-4 D:\LinkDevProject\FitLife\core\core-ui\build\intermediates\merged_res\debug\mergeDebugResources
-com.aml_sakr.fitlife.core.ui.core-ui-debug-5 D:\LinkDevProject\FitLife\core\core-ui\build\intermediates\packaged_res\debug\packageDebugResources
-com.aml_sakr.fitlife.core.ui.core-ui-debug-6 D:\LinkDevProject\FitLife\core\core-ui\src\debug\res
-com.aml_sakr.fitlife.core.ui.core-ui-main-7 D:\LinkDevProject\FitLife\core\core-ui\src\main\res
-gradleHome-0 C:\Users\Amal.Sakr\.gradle

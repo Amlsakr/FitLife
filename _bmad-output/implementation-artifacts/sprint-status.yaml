@@ -1,5 +1,5 @@
 # generated: 2026-06-01T13:15:32+03:00
-# last_updated: 2026-06-01T13:15:32+03:00
+# last_updated: 2026-06-03T00:00:00+03:00
 # project: FitnessApp
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,16 +35,16 @@
 # - Dev moves story to 'review', then runs code-review
 
 generated: 2026-06-01T13:15:32+03:00
-last_updated: 2026-06-01T13:15:32+03:00
+last_updated: 2026-06-03T00:00:00+03:00
 project: FitnessApp
 project_key: NOKEY
 tracking_system: file-system
 story_location: D:\LinkDevProject\FitLife\_bmad-output\implementation-artifacts
 
 development_status:
-  epic-0: backlog
+  epic-0: in-progress
   setup-001-create-multi-module-gradle-project: done
-  setup-002-core-domain-core-data-core-ui-boilerplate: backlog
+  setup-002-core-domain-core-data-core-ui-boilerplate: done
   setup-003-firebase-crashlytics-integration: backlog
   setup-004-technical-spike-ml-kit-pose-detection-15-fps: backlog
   setup-005-technical-spike-gemini-api-5-s-latency: backlog

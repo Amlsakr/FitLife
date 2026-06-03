@@ -26,7 +26,10 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
+    api(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.material3)
+    api(libs.androidx.compose.ui)
+    api(libs.androidx.compose.ui.graphics)
     api(libs.androidx.lifecycle.viewmodel.compose)
     api(libs.androidx.lifecycle.viewmodel.ktx)
     testImplementation(libs.junit)
