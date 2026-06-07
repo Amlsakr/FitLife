@@ -46,7 +46,7 @@ development_status:
   setup-001-create-multi-module-gradle-project: done
   setup-002-core-domain-core-data-core-ui-boilerplate: done
   setup-003-firebase-crashlytics-integration: done
-  setup-004-technical-spike-ml-kit-pose-detection-15-fps: backlog
+  setup-004-technical-spike-ml-kit-pose-detection-15-fps: done
   setup-005-technical-spike-gemini-api-5-s-latency: backlog
   setup-006-technical-spike-room-firestore-offline-sync: backlog
   epic-0-retrospective: optional
