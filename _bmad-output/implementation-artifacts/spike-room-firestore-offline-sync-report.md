@@ -17,6 +17,7 @@ The branch now compiles and the full `./gradlew.bat test --no-daemon --console=p
 - An Android test harness now compiles under `:core:core-data` and uses in-memory Room, Firestore configured explicitly for the local emulator, and WorkManager test execution.
 - Firestore writes include a `serverUpdatedAt` server timestamp while preserving the client `lastModified` timestamp used for latest-timestamp-wins reconciliation.
 - Production Firestore wiring no longer defaults to the local emulator unless `fitlife.firestore.useEmulator=true` is explicitly set.
+- The `RoomFirestoreWorkManagerSyncInstrumentedTest` ran successfully on a connected real device with the host Firestore emulator exposed through `adb reverse tcp:8080 tcp:8080`.
 
 ## Current Limitation
 

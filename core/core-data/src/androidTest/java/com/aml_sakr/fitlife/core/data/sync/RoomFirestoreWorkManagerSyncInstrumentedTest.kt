@@ -1,13 +1,16 @@
 package com.aml_sakr.fitlife.core.data.sync
 
 import android.content.Context
+import android.os.Build
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.Configuration
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.NetworkType
+import androidx.work.WorkInfo
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
@@ -49,7 +52,7 @@ class RoomFirestoreWorkManagerSyncInstrumentedTest {
         appName = "sync-spike-${UUID.randomUUID()}"
         idPrefix = "record-${UUID.randomUUID()}"
         firestore = FirebaseFirestore.getInstance(createFirebaseApp(context, appName)).also {
-            it.useEmulator(FIRESTORE_EMULATOR_HOST, FIRESTORE_EMULATOR_PORT)
+            it.useEmulator(resolveFirestoreEmulatorHost(), FIRESTORE_EMULATOR_PORT)
         }
         remoteClient = FirestoreRemoteSyncClient(firestore)
         connectivityMonitor = MutableConnectivityMonitor(isOnline = true)
@@ -118,9 +121,18 @@ class RoomFirestoreWorkManagerSyncInstrumentedTest {
         workManager.enqueue(request).result.get(10, TimeUnit.SECONDS)
         val testDriver = requireNotNull(WorkManagerTestInitHelper.getTestDriver(context))
         testDriver.setAllConstraintsMet(request.id)
-        val workInfo = requireNotNull(workManager.getWorkInfoById(request.id).get(10, TimeUnit.SECONDS))
+        val deadlineMillis = System.currentTimeMillis() + 30_000L
+        while (System.currentTimeMillis() < deadlineMillis) {
+            val workInfo = requireNotNull(workManager.getWorkInfoById(request.id).get(10, TimeUnit.SECONDS))
+            if (workInfo.state.isFinished) {
+                assertEquals("Expected WorkManager sync to succeed", WorkInfo.State.SUCCEEDED, workInfo.state)
+                return
+            }
+            Thread.sleep(500L)
+        }
 
-        assertTrue("Expected WorkManager sync to finish, was ${workInfo.state}", workInfo.state.isFinished)
+        val finalWorkInfo = requireNotNull(workManager.getWorkInfoById(request.id).get(10, TimeUnit.SECONDS))
+        assertEquals("Expected WorkManager sync to succeed", WorkInfo.State.SUCCEEDED, finalWorkInfo.state)
     }
 
     private fun createFirebaseApp(context: Context, name: String): FirebaseApp {
@@ -132,8 +144,24 @@ class RoomFirestoreWorkManagerSyncInstrumentedTest {
         return FirebaseApp.initializeApp(context, options, name)
     }
 
+    private fun resolveFirestoreEmulatorHost(): String {
+        val args = InstrumentationRegistry.getArguments()
+        val override = args.getString("fitlifeFirestoreHost")
+            ?: System.getProperty("fitlife.firestore.host")
+        if (!override.isNullOrBlank()) {
+            return override
+        }
+        return if (Build.FINGERPRINT.contains("generic", ignoreCase = true) ||
+            Build.FINGERPRINT.contains("emulator", ignoreCase = true) ||
+            Build.MODEL.contains("Emulator", ignoreCase = true)
+        ) {
+            "10.0.2.2"
+        } else {
+            "127.0.0.1"
+        }
+    }
+
     companion object {
-        private const val FIRESTORE_EMULATOR_HOST = "10.0.2.2"
         private const val FIRESTORE_EMULATOR_PORT = 8080
         private const val FIRESTORE_EMULATOR_PROJECT_ID = "fitlife-sync-spike"
     }
