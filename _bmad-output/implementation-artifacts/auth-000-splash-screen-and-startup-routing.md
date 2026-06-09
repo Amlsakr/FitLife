@@ -1,6 +1,7 @@
 # Story AUTH-000: Splash Screen and Startup Routing
 
 Status: ready-for-dev
+Design Status: Linked
 
 ## Story
 
@@ -17,6 +18,7 @@ so that the app starts smoothly and predictably.
 5. Given the user is not authenticated, when startup routing finishes, then the app navigates to the login/sign-in flow.
 6. Given camera permission is privacy-sensitive, when the app launches into the splash screen, then no camera permission is requested from splash or startup routing.
 7. Given the app uses MVI + Clean Architecture, when splash routing state is implemented, then UI rendering, events, state, one-time navigation actions, and domain checks remain separated.
+8. Given startup checks fail unexpectedly, when routing cannot be determined, then the user remains on splash, an error is logged, and a retryable fallback action is emitted.
 
 ## Tasks / Subtasks
 
@@ -29,7 +31,7 @@ so that the app starts smoothly and predictably.
   - [ ] Add a ViewModel or equivalent MVI state holder that starts the routing check once.
   - [ ] Emit one-time navigation actions for unauthenticated, onboarding-required, and main/home destinations.
 - [ ] Connect domain checks. (AC: 3, 4, 5, 7)
-  - [ ] Read the current auth session through an auth-domain use case or repository interface.
+  - [ ] Read the current auth session through a dedicated domain use case.
   - [ ] Read onboarding completion through the onboarding-domain boundary or a temporary interface if onboarding persistence is not implemented yet.
   - [ ] Keep Firebase, DataStore, Room, and Android framework details out of domain APIs.
 - [ ] Wire app navigation. (AC: 3, 4, 5)
@@ -68,3 +70,23 @@ so that the app starts smoothly and predictably.
 - Story source: `docs/fitlife-stories-v1.md`
 - Architecture: `_bmad-output/planning-artifacts/fitlife-architecture-v1.md`
 - Project context: `_bmad-output/project-context.md`
+
+## Design References
+
+Stitch Screen:
+- Splash
+
+Design:
+- _bmad-output/design/auth/splash.png
+- https://stitch.withgoogle.com/projects/14149816895860058914?node-id=4ea971a3c33a419c836c6a39e5fe33dc
+
+Required States:
+- Loading
+- NavigateToAuth
+- NavigateToOnboarding
+- NavigateToHome
+
+Implementation Notes:
+- Match spacing and hierarchy from Stitch.
+- Colors and typography must use core-ui tokens.
+- If Stitch conflicts with core-ui tokens, architecture constraints, or acceptance criteria, the story requirements take precedence and Correct Course should be triggered.
