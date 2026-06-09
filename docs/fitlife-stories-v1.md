@@ -103,6 +103,26 @@
 
 ## EPIC 1: AUTH (Weeks 1‑2)
 
+**Story ID**: AUTH-000
+**Title**: Splash Screen and Startup Routing
+**User Story**: *As a user, I want FitLife to open with a branded loading screen and route me to the right next screen so the app starts smoothly and predictably.*
+**Acceptance Criteria**:
+- Splash screen displays the FitLife brand mark or wordmark centered on a fullscreen branded background.
+- Loading state is visible while startup routing checks complete.
+- Authenticated users with completed onboarding route to the main/home flow.
+- Authenticated users without completed onboarding route to onboarding.
+- Unauthenticated users route to the login/sign-in flow.
+- The splash screen has no blocking user interactions and avoids requesting camera permission at launch.
+**Technical Tasks**:
+- Create a Compose splash screen in `:feature:auth:auth-ui`.
+- Add startup routing state/events using the existing MVI pattern.
+- Read auth session state through the auth domain boundary.
+- Read onboarding completion state through the onboarding domain boundary or a temporary interface until onboarding data is implemented.
+- Wire the splash destination as the app's startup destination in the Compose navigation graph.
+**Modules Affected**: `:app`, `:feature:auth:auth-ui`, `:feature:auth:auth-domain`, `:feature:onboarding:onboarding-domain`.
+**Dependencies**: SETUP-001, SETUP-002, SETUP-003.
+**Size**: S
+
 **Story ID**: AUTH-001
 **Title**: Firebase Auth Module Setup
 **User Story**: *As a new user, I want to create an account using email/password or Google so that my data is securely stored.*
