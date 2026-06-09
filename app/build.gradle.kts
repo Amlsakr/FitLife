@@ -46,6 +46,8 @@ android {
 dependencies {
     implementation(project(":core:core-data"))
     implementation(project(":core:core-ui"))
+    implementation(project(":feature:auth:auth-domain"))
+    implementation(project(":feature:auth:auth-ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.activity.compose)
@@ -55,6 +57,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.hilt.android)

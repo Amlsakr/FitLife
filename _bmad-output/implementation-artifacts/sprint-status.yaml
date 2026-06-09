@@ -51,7 +51,7 @@ development_status:
   setup-006-technical-spike-room-firestore-offline-sync: done
   epic-0-retrospective: done
   epic-1: backlog
-  auth-000-splash-screen-and-startup-routing: ready-for-dev
+  auth-000-splash-screen-and-startup-routing: review
   auth-001-firebase-auth-module-setup: backlog
   auth-002-google-sign-in-integration: backlog
   auth-003-forgot-password-account-deletion: backlog
