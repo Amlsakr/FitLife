@@ -113,27 +113,32 @@
 - Authenticated users without completed onboarding route to onboarding.
 - Unauthenticated users route to the login/sign-in flow.
 - The splash screen has no blocking user interactions and avoids requesting camera permission at launch.
+- Splash is the initial serializable Navigation 3 key, and the resolved destination atomically replaces it as the only root entry.
 **Technical Tasks**:
 - Create a Compose splash screen in `:feature:auth:auth-ui`.
 - Add startup routing state/events using the existing MVI pattern.
 - Read auth session state through the auth domain boundary.
 - Read onboarding completion state through the onboarding domain boundary or a temporary interface until onboarding data is implemented.
-- Wire the splash destination as the app's startup destination in the Compose navigation graph.
+- Wire Splash through Navigation 3 `NavDisplay`, `rememberNavBackStack`, typed `NavKey` destinations, and entry-scoped ViewModel decorators.
 **Modules Affected**: `:app`, `:feature:auth:auth-ui`, `:feature:auth:auth-domain`, `:feature:onboarding:onboarding-domain`.
 **Dependencies**: SETUP-001, SETUP-002, SETUP-003.
 **Size**: S
 
 **Story ID**: AUTH-001
 **Title**: Firebase Auth Module Setup
-**User Story**: *As a new user, I want to create an account using email/password or Google so that my data is securely stored.*
+**User Story**: *As a new user, I want to create an account and sign in with email/password so that my account persists securely and workout access remains blocked until email verification.*
 **Acceptance Criteria**:
-- Sign‑up, sign‑in, sign‑out flows work.
-- Email verification required before first workout.
-- Errors displayed for invalid credentials.
+- Email/password sign-up, sign-in, sign-out, resend verification, and verification refresh flows work.
+- Email verification is required before onboarding, home, or workout access.
+- Firebase failures map to explicit domain errors and safe UI messages.
+- AUTH-000 reads the real Firebase session on startup.
+- Verified authentication atomically replaces Auth with Onboarding or Home in the Navigation 3 back stack.
 **Technical Tasks**:
-- Add `firebase-auth-ktx` dependency.
-- Create `AuthRepository` implementing sign‑up/in/out.
-- Expose use‑cases.
+- Add the supported `firebase-auth` main artifact through the Firebase BoM; do not use the removed KTX artifact.
+- Create Firebase-free domain models, errors, `AuthRepository`, and focused use cases.
+- Implement Firebase-backed data sources, repository mapping, session reading, and Hilt bindings.
+- Build email/password and verification-required MVI Compose states.
+- Integrate verified auth with the app-owned Navigation 3 back stack.
 **Modules Affected**: `:feature:auth:auth-data`, `:feature:auth:auth-domain`, `:feature:auth:auth-ui`.
 **Dependencies**: SETUP-001, SETUP-003.
 **Size**: M
@@ -221,13 +226,18 @@
 **Size**: M
 
 **Story ID**: AUTH-007
-**Title**: Auth Navigation Graph
-**User Story**: *As a developer, I need a dedicated navigation graph for auth screens so navigation is isolated from main flow.*
+**Title**: Typed Auth Navigation Contract
+**User Story**: *As a developer, I need typed Navigation 3 destinations for auth screens so auth navigation is modular, restorable, and isolated from the main flow.*
 **Acceptance Criteria**:
-- NavHost includes SignIn, SignUp, ForgotPassword, Splash.
-- Navigation actions defined.
+- Serializable `NavKey` destinations exist for Splash, SignIn, SignUp, ForgotPassword, and verification-required state.
+- Auth destinations are registered through a feature-owned Navigation 3 entry-provider helper.
+- Auth navigation uses callbacks or MVI actions and does not expose app-owned back-stack state to auth screens.
+- Forward, back, root-replacement, and key-restoration behavior is covered by tests.
 **Technical Tasks**:
-- Create `auth_nav_graph.xml` (or Compose NavGraph).
+- Move the temporary app-owned auth keys into `:feature:auth:auth-ui`.
+- Add the auth entry-provider registration helper and destination callbacks.
+- Keep `auth-ui` independent of `:app`, `auth-data`, and other feature modules.
+- Add Navigation 3 tests for auth destination transitions and back-stack behavior.
 **Modules Affected**: `:feature:auth:auth-ui`.
 **Dependencies**: AUTH-001.
 **Size**: S

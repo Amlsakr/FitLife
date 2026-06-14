@@ -1,8 +1,10 @@
-# FitLife – MVP Epics, Stories, Sprint Plan, Critical Path, and Risks (v1.1)
+# FitLife – MVP Epics, Stories, Sprint Plan, Critical Path, and Risks (v1.2)
 
 ---
 
 ## Change Log
+
+- v1.2 - 2026-06-14 - Approved Navigation 3 course correction for AUTH-000, AUTH-001, and AUTH-007. The complete updated story definitions are maintained in `docs/fitlife-stories-v1.md`.
 
 - v1.1 — 2026-05-31 — Confirmed WhatsApp badge sharing, smart reminders, home screen widget, and dynamic equipment rerouting as v1.0 scope; aligned story module names to architecture; added Firebase Security Rules, GDPR deletion, and camera privacy stories; fixed fatigue and lighting edge cases.
 

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.aml_sakr.fitlife.feature.auth.ui"
+    namespace = "com.aml_sakr.fitlife.feature.auth.auth_ui"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
