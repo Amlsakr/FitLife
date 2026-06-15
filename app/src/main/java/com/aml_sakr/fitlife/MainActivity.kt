@@ -49,9 +49,9 @@ import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResendEmailVerificationU
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignOutUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignUpUseCase
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.SplashRoute
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.SplashViewModel
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.StartupRouteErrorLogger
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashRoute
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashViewModel
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.StartupRouteErrorLogger
 import com.aml_sakr.fitlife.feature.auth.auth_ui.screen.AuthRoute
 import com.aml_sakr.fitlife.feature.auth.auth_ui.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint

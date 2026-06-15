@@ -16,7 +16,7 @@
     <string name="auth_new_to_fitlife">New to FitLife?</string>
     <string name="auth_register_button">Register</string>
     <string name="auth_verify_email_instruction">Open the verification message we sent, then return here and check again.</string>
-    <string name="auth_verified_email_button">I've verified my email</string>
+    <string name="auth_verified_email_button">I\'ve verified my email</string>
     <string name="auth_resend_verification_email">Resend verification email</string>
     <string name="auth_sign_out">Sign out</string>
     <string name="auth_message_unable_to_continue">Unable to continue. Please try again.</string>
@@ -39,7 +39,7 @@
     <string name="auth_error_unknown">Authentication failed. Please try again.</string>
     <string name="splash_brand_name">FitLife</string>
     <string name="splash_brand_tagline">PRECISION PERFORMANCE</string>
-    <string name="splash_error_preparing_fitlife">We couldn't finish preparing FitLife.</string>
+    <string name="splash_error_preparing_fitlife">We couldn\'t finish preparing FitLife.</string>
     <string name="splash_initializing_environment">Initializing Arctic AI focus environment...</string>
     <string name="splash_try_again">Try again</string>
 </resources>

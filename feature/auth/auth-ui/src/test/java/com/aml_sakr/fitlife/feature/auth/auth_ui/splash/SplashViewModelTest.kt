@@ -1,10 +1,10 @@
-package com.aml_sakr.fitlife.feature.auth.auth_ui.auth.navigation
+package com.aml_sakr.fitlife.feature.auth.auth_ui.splash
 
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.SplashAction
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.SplashEvent
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.SplashState
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.SplashViewModel
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.StartupRouteErrorLogger
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashAction
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashEvent
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashState
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashViewModel
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.StartupRouteErrorLogger
 import com.aml_sakr.fitlife.feature.auth.domain.startup.StartupDestination
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers

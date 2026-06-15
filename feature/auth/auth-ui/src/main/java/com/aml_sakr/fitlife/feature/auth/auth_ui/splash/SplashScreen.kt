@@ -1,8 +1,8 @@
-package com.aml_sakr.fitlife.feature.auth.splash
+package com.aml_sakr.fitlife.feature.auth.auth_ui.splash
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,21 +30,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.aml_sakr.fitlife.core.ui.theme.FitLifeDimens
+import com.aml_sakr.fitlife.core.ui.R as CoreUiR
 import com.aml_sakr.fitlife.core.ui.theme.FitnessAppTheme
+import com.aml_sakr.fitlife.feature.auth.auth_ui.R
 
 @Composable
 fun SplashRoute(
@@ -103,32 +106,35 @@ fun SplashScreen(
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = FitLifeDimens.SpaceXl, vertical = FitLifeDimens.SpaceXl),
+                .padding(
+                    horizontal = dimensionResource(CoreUiR.dimen.space_xl),
+                    vertical = dimensionResource(CoreUiR.dimen.space_xl)
+                ),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             BrandLockup()
 
-            Spacer(modifier = Modifier.height(FitLifeDimens.SpaceXl))
+            Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.space_xl)))
 
             if (state.isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(dimensionResource(CoreUiR.dimen.splash_progress_indicator_size)),
                     color = MaterialTheme.colorScheme.secondary,
                     trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
-                    strokeWidth = 4.dp
+                    strokeWidth = dimensionResource(CoreUiR.dimen.splash_progress_stroke_width)
                 )
             } else {
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.splash_progress_indicator_size)))
             }
 
-            Spacer(modifier = Modifier.height(FitLifeDimens.SpaceLg))
+            Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.space_lg)))
 
             Text(
                 text = if (state.hasRetryableError) {
-                    "We couldn't finish preparing FitLife."
+                    stringResource(R.string.splash_error_preparing_fitlife)
                 } else {
-                    "Initializing Arctic AI focus environment..."
+                    stringResource(R.string.splash_initializing_environment)
                 },
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.62f),
                 style = MaterialTheme.typography.bodyLarge,
@@ -141,15 +147,15 @@ fun SplashScreen(
             )
 
             if (state.hasRetryableError) {
-                Spacer(modifier = Modifier.height(FitLifeDimens.SpaceMd))
+                Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.space_md)))
                 OutlinedButton(
                     onClick = onRetry,
                     border = BorderStroke(
-                        width = 1.dp,
+                        width = dimensionResource(CoreUiR.dimen.splash_border_width),
                         color = MaterialTheme.colorScheme.secondary
                     )
                 ) {
-                    Text("Try again")
+                    Text(text = stringResource(R.string.splash_try_again))
                 }
             }
         }
@@ -164,22 +170,22 @@ private fun BrandLockup() {
     ) {
         Surface(
             modifier = Modifier
-                .size(120.dp)
+                .size(dimensionResource(CoreUiR.dimen.splash_brand_size))
                 .shadow(
-                    elevation = 18.dp,
-                    shape = RoundedCornerShape(24.dp),
+                    elevation = dimensionResource(CoreUiR.dimen.splash_brand_elevation),
+                    shape = RoundedCornerShape(dimensionResource(CoreUiR.dimen.splash_brand_corner_radius)),
                     ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
                     spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
                 ),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(dimensionResource(CoreUiR.dimen.splash_brand_corner_radius)),
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(
-                width = 1.dp,
+                width = dimensionResource(CoreUiR.dimen.splash_border_width),
                 color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.16f)
             )
         ) {
             Box(
-                modifier = Modifier.padding(FitLifeDimens.SpaceMd),
+                modifier = Modifier.padding(dimensionResource(CoreUiR.dimen.space_md)),
                 contentAlignment = Alignment.Center
             ) {
                 FitLifeBrandMark(
@@ -190,20 +196,20 @@ private fun BrandLockup() {
             }
         }
 
-        Spacer(modifier = Modifier.height(FitLifeDimens.SpaceLg))
+        Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.space_lg)))
 
         Text(
-            text = "FitLife",
+            text = stringResource(R.string.splash_brand_name),
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(FitLifeDimens.SpaceSm))
+        Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.space_sm)))
 
         Text(
-            text = "PRECISION PERFORMANCE",
+            text = stringResource(R.string.splash_brand_tagline),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.64f),
             style = MaterialTheme.typography.labelLarge.copy(
                 letterSpacing = MaterialTheme.typography.labelLarge.fontSize * 0.16f
@@ -300,17 +306,29 @@ private fun DottedBackground(
     dotColor: Color,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current
+    val spacingDp = dimensionResource(CoreUiR.dimen.splash_dot_spacing)
+    val radiusDp = dimensionResource(CoreUiR.dimen.splash_dot_radius)
+    val spacing = with(density) { spacingDp.toPx() }
+    val radius = with(density) { radiusDp.toPx() }
+
     Canvas(modifier = modifier) {
-        drawDotGrid(dotColor = dotColor)
+        drawDotGrid(
+            dotColor = dotColor,
+            spacing = spacing,
+            radius = radius
+        )
     }
 }
 
-private fun DrawScope.drawDotGrid(dotColor: Color) {
-    val spacing = 24.dp.toPx()
-    val radius = 1.25.dp.toPx()
-    var y = 24.dp.toPx()
+private fun DrawScope.drawDotGrid(
+    dotColor: Color,
+    spacing: Float,
+    radius: Float
+) {
+    var y = spacing
     while (y < size.height) {
-        var x = 24.dp.toPx()
+        var x = spacing
         while (x < size.width) {
             drawCircle(
                 color = dotColor,

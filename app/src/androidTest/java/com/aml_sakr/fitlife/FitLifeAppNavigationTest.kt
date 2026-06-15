@@ -14,7 +14,7 @@ import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
 import com.aml_sakr.fitlife.core.ui.theme.FitnessAppTheme
 import com.aml_sakr.fitlife.feature.auth.domain.startup.StartupDestination
-import com.aml_sakr.fitlife.feature.auth.auth_ui.navigation.StartupRouteErrorLogger
+import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.StartupRouteErrorLogger
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
