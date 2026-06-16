@@ -53,7 +53,7 @@ development_status:
   epic-1: in-progress
   auth-000-splash-screen-and-startup-routing: in-progress
   auth-001-firebase-auth-module-setup: done
-  auth-002-google-sign-in-integration: ready-for-dev
+  auth-002-google-sign-in-integration: done
   auth-003-forgot-password-account-deletion: backlog
   auth-004-firebase-security-rules: backlog
   auth-005-gdpr-account-deletion: backlog

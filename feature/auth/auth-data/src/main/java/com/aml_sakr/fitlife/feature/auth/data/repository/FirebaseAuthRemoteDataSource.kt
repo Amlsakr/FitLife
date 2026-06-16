@@ -1,6 +1,7 @@
 package com.aml_sakr.fitlife.feature.auth.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -19,6 +20,11 @@ internal class FirebaseAuthRemoteDataSource @Inject constructor(
         password: String
     ): FirebaseAuthUserData? =
         firebaseAuth.signInWithEmailAndPassword(email, password).await().user?.toData()
+
+    override suspend fun signInWithGoogle(googleIdToken: String): FirebaseAuthUserData? =
+        firebaseAuth.signInWithCredential(
+            GoogleAuthProvider.getCredential(googleIdToken, null)
+        ).await().user?.toData()
 
     override fun signOut() {
         firebaseAuth.signOut()

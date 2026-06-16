@@ -36,6 +36,16 @@ class AuthUseCasesTest {
     }
 
     @Test
+    fun signInWithGoogle_delegatesToRepository() = runTest {
+        val repository = FakeAuthRepository(googleSignInResult = Result.Success(user))
+
+        val result = SignInWithGoogleUseCase(repository)("google-id-token")
+
+        assertEquals(Result.Success(user), result)
+        assertEquals("google-id-token", repository.googleSignInRequest)
+    }
+
+    @Test
     fun signOut_delegatesToRepository() = runTest {
         val repository = FakeAuthRepository(signOutResult = Result.Success(Unit))
 
@@ -70,6 +80,7 @@ class AuthUseCasesTest {
     private class FakeAuthRepository(
         private val signUpResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val signInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
+        private val googleSignInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val signOutResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
         private val currentUserResult: Result<AuthUser?, AuthError> = Result.Success(null),
         private val verificationResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
@@ -77,6 +88,7 @@ class AuthUseCasesTest {
     ) : AuthRepository {
         var signUpRequest: Pair<String, String>? = null
         var signInRequest: Pair<String, String>? = null
+        var googleSignInRequest: String? = null
         var signOutCount = 0
         var verificationCount = 0
         var refreshCount = 0
@@ -95,6 +107,13 @@ class AuthUseCasesTest {
         ): Result<AuthUser, AuthError> {
             signInRequest = email to password
             return signInResult
+        }
+
+        override suspend fun signInWithGoogle(
+            googleIdToken: String
+        ): Result<AuthUser, AuthError> {
+            googleSignInRequest = googleIdToken
+            return googleSignInResult
         }
 
         override suspend fun signOut(): Result<Unit, AuthError> {

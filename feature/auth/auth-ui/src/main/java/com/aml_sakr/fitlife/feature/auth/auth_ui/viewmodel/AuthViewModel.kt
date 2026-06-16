@@ -11,6 +11,7 @@ import com.aml_sakr.fitlife.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.RefreshCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResendEmailVerificationUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInUseCase
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInWithGoogleUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignOutUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignUpUseCase
 import com.aml_sakr.fitlife.feature.auth.auth_ui.action.AuthAction
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 class AuthViewModel(
     private val signUp: SignUpUseCase,
     private val signIn: SignInUseCase,
+    private val signInWithGoogle: SignInWithGoogleUseCase,
     private val signOut: SignOutUseCase,
     private val getCurrentUser: GetCurrentUserUseCase,
     private val resendEmailVerification: ResendEmailVerificationUseCase,
@@ -44,6 +46,15 @@ class AuthViewModel(
                 copy(confirmPassword = event.value, confirmPasswordErrorResId = null)
             }
             AuthEvent.Submit -> submit()
+            AuthEvent.GoogleSignInRequested -> requestGoogleSignIn()
+            is AuthEvent.GoogleSignInTokenReceived -> handleGoogleSignIn(event.token)
+            is AuthEvent.GoogleSignInFailed -> {
+                setState { copy(isLoading = false, isGoogleSignInInProgress = false) }
+                sendError(event.error)
+            }
+            AuthEvent.GoogleSignInDismissed -> setState {
+                copy(isGoogleSignInInProgress = false)
+            }
             AuthEvent.ShowSignIn -> showSignIn()
             AuthEvent.ShowSignUp -> showSignUp()
             AuthEvent.ResendVerification -> resendVerification()
@@ -109,6 +120,29 @@ class AuthViewModel(
                 }
             }
         }
+    }
+
+    private fun handleGoogleSignIn(googleIdToken: String) {
+        if (state.value.isLoading) return
+        setState { copy(isLoading = true, isGoogleSignInInProgress = false) }
+        viewModelScope.launch {
+            when (val result = signInWithGoogle(googleIdToken)) {
+                is Result.Success -> handleAuthenticationSuccess(
+                    user = result.value,
+                    wasSignUp = false
+                )
+                is Result.Failure -> {
+                    setState { copy(isLoading = false) }
+                    sendError(result.error)
+                }
+            }
+        }
+    }
+
+    private fun requestGoogleSignIn() {
+        if (state.value.isLoading || state.value.isGoogleSignInInProgress) return
+        setState { copy(isGoogleSignInInProgress = true) }
+        sendAction(AuthAction.LaunchGoogleSignIn)
     }
 
     private fun handleAuthenticationSuccess(
@@ -198,8 +232,17 @@ class AuthViewModel(
                     sendAction(AuthAction.NavigateToSignIn)
                 }
                 is Result.Failure -> {
-                    setState { copy(isLoading = false) }
-                    sendError(result.error)
+                    when (result.error) {
+                        AuthError.GoogleCredentialStateClearFailed -> {
+                            setState { AuthState() }
+                            sendAction(AuthAction.NavigateToSignIn)
+                            sendError(result.error)
+                        }
+                        else -> {
+                            setState { copy(isLoading = false) }
+                            sendError(result.error)
+                        }
+                    }
                 }
             }
         }
@@ -216,6 +259,7 @@ class AuthViewModel(
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
                 verificationEmail = null,
+                isGoogleSignInInProgress = false,
                 isLoading = false
             )
         }
@@ -232,6 +276,7 @@ class AuthViewModel(
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
                 verificationEmail = null,
+                isGoogleSignInInProgress = false,
                 isLoading = false
             )
         }
@@ -252,6 +297,7 @@ class AuthViewModel(
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
                 verificationEmail = email.takeIf { it.isNotBlank() },
+                isGoogleSignInInProgress = false,
                 isLoading = false
             )
         }

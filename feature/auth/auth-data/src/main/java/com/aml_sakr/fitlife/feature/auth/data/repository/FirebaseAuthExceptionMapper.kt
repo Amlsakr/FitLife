@@ -16,6 +16,17 @@ internal object FirebaseAuthExceptionMapper {
         )
     }
 
+    fun mapGoogleAccountSetupFailure(throwable: Throwable): AuthError {
+        if (throwable === NoAuthenticatedFirebaseUserException) {
+            return AuthError.GoogleAccountSetupFailed
+        }
+        return when {
+            throwable is FirebaseNetworkException -> AuthError.GoogleAccountSetupFailed
+            throwable is FirebaseAuthException -> AuthError.GoogleAccountSetupFailed
+            else -> AuthError.GoogleAccountSetupFailed
+        }
+    }
+
     internal fun mapFailure(
         isNetworkFailure: Boolean,
         errorCode: String?

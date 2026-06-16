@@ -46,6 +46,9 @@ class FirebaseAuthSessionReaderTest {
             password: String
         ): FirebaseAuthUserData? = error("Not used")
 
+        override suspend fun signInWithGoogle(googleIdToken: String): FirebaseAuthUserData? =
+            error("Not used")
+
         override fun signOut() = Unit
 
         override fun currentUser(): FirebaseAuthUserData? = user

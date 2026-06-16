@@ -26,8 +26,10 @@ android {
 dependencies {
     implementation(project(":core:core-data"))
     implementation(project(":feature:auth:auth-domain"))
+    implementation(libs.androidx.credentials)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.coroutines.play.services)
     ksp(libs.hilt.android.compiler)

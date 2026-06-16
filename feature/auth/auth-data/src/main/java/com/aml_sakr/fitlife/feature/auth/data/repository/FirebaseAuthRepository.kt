@@ -9,7 +9,9 @@ import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class FirebaseAuthRepository @Inject internal constructor(
-    private val dataSource: FirebaseAuthDataSource
+    private val dataSource: FirebaseAuthDataSource,
+    private val userDocumentDataSource: FirebaseUserDocumentDataSource,
+    private val googleCredentialStateDataSource: GoogleCredentialStateDataSource
 ) : AuthRepository {
     override suspend fun signUp(
         email: String,
@@ -43,8 +45,44 @@ class FirebaseAuthRepository @Inject internal constructor(
             ?: throw IllegalStateException(AuthDataConstants.ExceptionMessages.NO_AUTHENTICATED_USER)
     }
 
-    override suspend fun signOut(): Result<Unit, AuthError> = authCall {
-        dataSource.signOut()
+    override suspend fun signInWithGoogle(
+        googleIdToken: String
+    ): Result<AuthUser, AuthError> {
+        val signedInUser = when (val result = authCall {
+            dataSource.signInWithGoogle(googleIdToken)?.toDomain()
+                ?: throw IllegalStateException(
+                    AuthDataConstants.ExceptionMessages.NO_AUTHENTICATED_USER
+                )
+        }) {
+            is Result.Failure -> return result
+            is Result.Success -> result.value
+        }
+
+        return try {
+            userDocumentDataSource.upsertAuthenticatedUser(signedInUser.toData())
+            Result.Success(signedInUser)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (throwable: Throwable) {
+            Result.Failure(FirebaseAuthExceptionMapper.mapGoogleAccountSetupFailure(throwable))
+        }
+    }
+
+    override suspend fun signOut(): Result<Unit, AuthError> {
+        val result = authCall {
+            dataSource.signOut()
+        }
+        if (result is Result.Success) {
+            try {
+                googleCredentialStateDataSource.clearCredentialState()
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Throwable) {
+                // Best effort only: Firebase sign-out already succeeded, so do not
+                // turn a credential cleanup issue into a user-visible auth failure.
+            }
+        }
+        return result
     }
 
     override suspend fun currentUser(): Result<AuthUser?, AuthError> = authCall {
@@ -78,4 +116,11 @@ class FirebaseAuthRepository @Inject internal constructor(
             isEmailVerified = isEmailVerified
         )
     }
+
+    private fun AuthUser.toData(): FirebaseAuthUserData =
+        FirebaseAuthUserData(
+            id = id,
+            email = email,
+            isEmailVerified = isEmailVerified
+        )
 }

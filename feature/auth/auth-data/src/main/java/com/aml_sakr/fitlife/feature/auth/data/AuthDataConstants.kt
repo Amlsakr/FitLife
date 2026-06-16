@@ -18,4 +18,14 @@ internal object AuthDataConstants {
         const val NO_AUTHENTICATED_USER = "Firebase returned no authenticated user"
         const val BLANK_USER_ID = "Firebase returned a blank user ID"
     }
+
+    internal object FirestoreCollections {
+        const val USERS = "users"
+    }
+
+    internal object UserDocumentFields {
+        const val ID = "id"
+        const val EMAIL = "email"
+        const val IS_EMAIL_VERIFIED = "isEmailVerified"
+    }
 }

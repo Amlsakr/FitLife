@@ -18,7 +18,11 @@ class FirebaseAuthRepositoryTest {
                 isEmailVerified = true
             )
         )
-        val repository = FirebaseAuthRepository(dataSource)
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
+        )
 
         val result = repository.signUp("amal@example.com", "secret1")
 
@@ -42,7 +46,11 @@ class FirebaseAuthRepositoryTest {
             createdUser = FirebaseAuthUserData("user-1", "amal@example.com", false),
             verificationFailure = IllegalStateException("mail unavailable")
         )
-        val repository = FirebaseAuthRepository(dataSource)
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
+        )
 
         val result = repository.signUp("amal@example.com", "secret1")
 
@@ -54,7 +62,11 @@ class FirebaseAuthRepositoryTest {
         val dataSource = FakeFirebaseAuthDataSource(
             signedInUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
         )
-        val repository = FirebaseAuthRepository(dataSource)
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
+        )
 
         val result = repository.signIn("amal@example.com", "secret1")
 
@@ -75,7 +87,11 @@ class FirebaseAuthRepositoryTest {
         val dataSource = FakeFirebaseAuthDataSource(
             reloadedUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
         )
-        val repository = FirebaseAuthRepository(dataSource)
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
+        )
 
         val result = repository.refreshCurrentUser()
 
@@ -84,9 +100,30 @@ class FirebaseAuthRepositoryTest {
     }
 
     @Test
-    fun signOut_clearsFirebaseSession() = runTest {
+    fun signOut_clearsFirebaseSession_andGoogleCredentialState() = runTest {
         val dataSource = FakeFirebaseAuthDataSource()
-        val repository = FirebaseAuthRepository(dataSource)
+        val googleCredentialStateDataSource = FakeGoogleCredentialStateDataSource()
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            googleCredentialStateDataSource
+        )
+
+        assertEquals(Result.Success(Unit), repository.signOut())
+        assertEquals(1, dataSource.signOutCount)
+        assertEquals(1, googleCredentialStateDataSource.clearCount)
+    }
+
+    @Test
+    fun signOut_ignoresCredentialCleanupFailure_afterFirebaseSessionIsCleared() = runTest {
+        val dataSource = FakeFirebaseAuthDataSource()
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource(
+                clearFailure = IllegalStateException("credential manager unavailable")
+            )
+        )
 
         assertEquals(Result.Success(Unit), repository.signOut())
         assertEquals(1, dataSource.signOutCount)
@@ -97,7 +134,11 @@ class FirebaseAuthRepositoryTest {
         val dataSource = FakeFirebaseAuthDataSource(
             verificationFailure = NoAuthenticatedFirebaseUserException
         )
-        val repository = FirebaseAuthRepository(dataSource)
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
+        )
 
         assertEquals(
             Result.Failure(AuthError.NoAuthenticatedUser),
@@ -143,7 +184,9 @@ class FirebaseAuthRepositoryTest {
     fun repository_rethrowsCancellation() = runTest {
         val cancellation = CancellationException("cancelled")
         val repository = FirebaseAuthRepository(
-            FakeFirebaseAuthDataSource(signInFailure = cancellation)
+            FakeFirebaseAuthDataSource(signInFailure = cancellation),
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
         )
 
         try {
@@ -154,18 +197,69 @@ class FirebaseAuthRepositoryTest {
         }
     }
 
+    @Test
+    fun signInWithGoogle_upsertsUserDocument_andReturnsSignedInUser() = runTest {
+        val authDataSource = FakeFirebaseAuthDataSource(
+            googleSignedInUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
+        )
+        val userDocumentDataSource = FakeFirebaseUserDocumentDataSource()
+        val repository = FirebaseAuthRepository(
+            authDataSource,
+            userDocumentDataSource,
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        val result = repository.signInWithGoogle("google-id-token")
+
+        assertEquals(
+            Result.Success(
+                com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser(
+                    id = "user-1",
+                    email = "amal@example.com",
+                    isEmailVerified = true
+                )
+            ),
+            result
+        )
+        assertEquals("google-id-token", authDataSource.googleSignInToken)
+        assertEquals(
+            FirebaseAuthUserData("user-1", "amal@example.com", true),
+            userDocumentDataSource.upsertedUser
+        )
+    }
+
+    @Test
+    fun signInWithGoogle_returnsAccountSetupFailure_whenUserDocumentWriteFails() = runTest {
+        val repository = FirebaseAuthRepository(
+            FakeFirebaseAuthDataSource(
+                googleSignedInUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
+            ),
+            FakeFirebaseUserDocumentDataSource(
+                upsertFailure = IllegalStateException("firestore unavailable")
+            ),
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        val result = repository.signInWithGoogle("google-id-token")
+
+        assertEquals(Result.Failure(AuthError.GoogleAccountSetupFailed), result)
+    }
+
     private class FakeFirebaseAuthDataSource(
         private val createdUser: FirebaseAuthUserData? = null,
         private val signedInUser: FirebaseAuthUserData? = null,
+        private val googleSignedInUser: FirebaseAuthUserData? = null,
         private val currentUser: FirebaseAuthUserData? = null,
         private val reloadedUser: FirebaseAuthUserData? = null,
         private val createFailure: Throwable? = null,
         private val signInFailure: Throwable? = null,
+        private val googleSignInFailure: Throwable? = null,
         private val signOutFailure: Throwable? = null,
         private val verificationFailure: Throwable? = null,
         private val reloadFailure: Throwable? = null
     ) : FirebaseAuthDataSource {
         var createRequest: Pair<String, String>? = null
+        var googleSignInToken: String? = null
         var verificationCount = 0
         var reloadCount = 0
         var signOutCount = 0
@@ -187,6 +281,12 @@ class FirebaseAuthRepositoryTest {
             return signedInUser
         }
 
+        override suspend fun signInWithGoogle(googleIdToken: String): FirebaseAuthUserData? {
+            googleSignInFailure?.let { throw it }
+            googleSignInToken = googleIdToken
+            return googleSignedInUser
+        }
+
         override fun signOut() {
             signOutFailure?.let { throw it }
             signOutCount += 1
@@ -203,6 +303,28 @@ class FirebaseAuthRepositoryTest {
             reloadCount += 1
             reloadFailure?.let { throw it }
             return reloadedUser
+        }
+    }
+
+    private class FakeFirebaseUserDocumentDataSource(
+        val upsertFailure: Throwable? = null
+    ) : FirebaseUserDocumentDataSource {
+        var upsertedUser: FirebaseAuthUserData? = null
+
+        override suspend fun upsertAuthenticatedUser(user: FirebaseAuthUserData) {
+            upsertFailure?.let { throw it }
+            upsertedUser = user
+        }
+    }
+
+    private class FakeGoogleCredentialStateDataSource(
+        private val clearFailure: Throwable? = null
+    ) : GoogleCredentialStateDataSource {
+        var clearCount = 0
+
+        override suspend fun clearCredentialState() {
+            clearFailure?.let { throw it }
+            clearCount += 1
         }
     }
 }

@@ -6,9 +6,9 @@ import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
 import javax.inject.Inject
 
-class RefreshCurrentUserUseCase @Inject constructor(
+class SignInWithGoogleUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
-    suspend operator fun invoke(): Result<AuthUser?, AuthError> =
-        repository.refreshCurrentUser()
+    suspend operator fun invoke(googleIdToken: String): Result<AuthUser, AuthError> =
+        repository.signInWithGoogle(googleIdToken)
 }

@@ -3,6 +3,10 @@ package com.aml_sakr.fitlife.feature.auth.data.di
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthRemoteDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthRepository
+import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseUserDocumentDataSource
+import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseUserDocumentRemoteDataSource
+import com.aml_sakr.fitlife.feature.auth.data.repository.GoogleCredentialStateDataSource
+import com.aml_sakr.fitlife.feature.auth.data.repository.GoogleCredentialStateRemoteDataSource
 import com.aml_sakr.fitlife.feature.auth.data.startup.FirebaseAuthSessionReader
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
 import com.aml_sakr.fitlife.feature.auth.domain.startup.AuthSessionReader
@@ -22,6 +26,18 @@ internal abstract class AuthBindingsModule {
     abstract fun bindFirebaseAuthDataSource(
         dataSource: FirebaseAuthRemoteDataSource
     ): FirebaseAuthDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindFirebaseUserDocumentDataSource(
+        dataSource: FirebaseUserDocumentRemoteDataSource
+    ): FirebaseUserDocumentDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindGoogleCredentialStateDataSource(
+        dataSource: GoogleCredentialStateRemoteDataSource
+    ): GoogleCredentialStateDataSource
 
     @Binds
     @Singleton
