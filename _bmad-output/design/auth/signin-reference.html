@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife AI - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#1a1a2e",
+                      "session-dark-bg": "#000000",
+                      "surface-elevated": "#E8EEF4",
+                      "on-error": "#ffffff",
+                      "primary-fixed-dim": "#96ccff",
+                      "secondary-fixed": "#a1efff",
+                      "on-primary-container": "#fdfcff",
+                      "surface": "#fcf8ff",
+                      "inverse-on-surface": "#f2efff",
+                      "on-tertiary-fixed": "#001e2b",
+                      "on-primary": "#ffffff",
+                      "background": "#fcf8ff",
+                      "surface-variant": "#e2e0fc",
+                      "on-secondary-fixed": "#001f25",
+                      "surface-container-low": "#f5f2ff",
+                      "on-tertiary": "#ffffff",
+                      "joint-cyan": "#00BCD4",
+                      "surface-bright": "#fcf8ff",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#004a75",
+                      "tertiary-fixed-dim": "#75d1ff",
+                      "on-background": "#1a1a2e",
+                      "tertiary-fixed": "#c2e8ff",
+                      "surface-container": "#efecff",
+                      "on-tertiary-container": "#fbfcff",
+                      "on-secondary-container": "#006573",
+                      "on-primary-fixed": "#001d32",
+                      "divider": "#ECEFF1",
+                      "inverse-primary": "#96ccff",
+                      "secondary-container": "#58e6ff",
+                      "secondary-fixed-dim": "#44d8f1",
+                      "outline": "#707882",
+                      "error": "#C62828",
+                      "surface-tint": "#00639a",
+                      "inverse-surface": "#2f2e43",
+                      "on-surface-variant": "#3f4851",
+                      "primary": "#006096",
+                      "background-arctic": "#F0F4F8",
+                      "success": "#2E7D32",
+                      "error-container": "#ffdad6",
+                      "warning": "#F57C00",
+                      "tertiary": "#006385",
+                      "primary-container": "#007abc",
+                      "surface-dim": "#dad7f3",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e8e5ff",
+                      "on-tertiary-fixed-variant": "#004d67",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-highest": "#e2e0fc",
+                      "on-secondary-fixed-variant": "#004e59",
+                      "primary-fixed": "#cee5ff",
+                      "tertiary-container": "#007ea7",
+                      "outline-variant": "#bfc7d2",
+                      "secondary": "#006876",
+                      "text-secondary": "#546E7A"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "touch-target-large": "64px",
+                      "xs": "4px",
+                      "touch-target": "48px",
+                      "unit": "4px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "sm": "8px",
+                      "lg": "24px",
+                      "margin-tablet": "32px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "session-rep-count": ["Inter"],
+                      "title-md": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "session-rep-count": ["57px", {"lineHeight": "64px", "fontWeight": "800"}],
+                      "title-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-arctic min-h-screen flex flex-col items-center justify-center p-md">
+<!-- Login Container -->
+<div class="w-full max-w-[400px] flex flex-col items-center">
+<!-- Top App Bar Mock (Logo Only as requested) -->
+<header class="mb-xl text-center">
+<div class="flex flex-col items-center gap-sm">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-on-primary text-3xl" data-icon="fitness_center">fitness_center</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">FitLife AI</h1>
+</div>
+</header>
+<!-- Main Login Card -->
+<main class="w-full bg-surface-container-lowest rounded-xl shadow-sm border border-divider p-lg flex flex-col gap-lg">
+<!-- Welcome Header -->
+<div class="space-y-xs">
+<h2 class="font-title-md text-title-md text-on-surface">Welcome back</h2>
+<p class="font-body-md text-body-md text-text-secondary">Please enter your details to login.</p>
+</div>
+<!-- Social Login -->
+<button class="w-full flex items-center justify-center gap-sm h-touch-target border border-outline-variant rounded-lg font-body-md text-on-surface hover:bg-surface-elevated transition-colors active:scale-95 duration-200">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL---2CET-gtNb3JzCb1yoKG7sq51nxLGt5M1k6GrVxBChhZJdAJ2zW3Z4r2mt0EYiyddzjD1u93QUvFHzcpHDLOmx15Kp3M02qD9jPw173NOjgbK9Q-6BF5uEWGcXh9e9Gb9DD4_VGQUmrfzevQGRy7s4K7CMd-AP5GpxDkOjHJEbJ0sPza8OcbWgOTKu8Q5xyFg_hdCNzZdjQA22du9almIfHloNNh9IMvmXLePkEXL4uJPYvuihjgeSacummRf5XD3Elany_ijy"/>
+<span>Sign in with Google</span>
+</button>
+<!-- Divider -->
+<div class="flex items-center gap-md">
+<div class="h-[1px] flex-1 bg-divider"></div>
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-widest">or</span>
+<div class="h-[1px] flex-1 bg-divider"></div>
+</div>
+<!-- Login Form -->
+<form class="flex flex-col gap-md" onsubmit="event.preventDefault();">
+<!-- Email Field -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant px-1" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant" data-icon="mail">mail</span>
+<input class="w-full pl-12 pr-4 h-touch-target rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md outline-none" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center px-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="password">Password</label>
+<a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant" data-icon="lock">lock</span>
+<input class="w-full pl-12 pr-12 h-touch-target rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md outline-none" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Primary Login Button -->
+<button class="w-full h-touch-target bg-primary text-on-primary rounded-lg font-title-md text-body-md font-semibold shadow-md hover:bg-primary-container transition-all active:scale-95 duration-200 mt-sm" type="submit">
+                    Login
+                </button>
+</form>
+<!-- Registration Link -->
+<div class="text-center pt-md border-t border-divider">
+<p class="font-body-md text-body-md text-text-secondary">
+                    Don't have an account? 
+                    <a class="text-primary font-semibold hover:underline" href="#">Register</a>
+</p>
+</div>
+</main>
+<!-- Footer / Branding Background Imagery (Visual Anchor) -->
+<div class="mt-xl w-full flex justify-center opacity-40">
+<div class="grid grid-cols-2 gap-md w-full">
+<div class="aspect-square bg-surface-variant rounded-2xl overflow-hidden relative">
+<img alt="Fitness Environment" class="w-full h-full object-cover mix-blend-multiply" data-alt="A clean, minimalist gym interior with high-end fitness equipment under soft, bright daylight. The scene uses an Arctic Focus palette with cool blue and white tones, creating a calm and professional health-tech environment. A soft morning light streams through large windows, highlighting the precision and cleanliness of the facility." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBHaKs-sAgiasdp8yua2izt7IMq1U7mToc4h1oIatotQfgvbTueXUPrGaMhV1mxreDu9ZWJYHcXOAeP0YCa1tuZ4V1SRPmvtPyvPNu5CAoGjxLZAYIFhEai4kmvFm8roDLpRi6Rk10BjsImRpeGwipxi1-30rHKcbH6KxE5bBeUwHu0kazLxBNMtrnk_7vQxnBI8JslE3D7roErI6Rj2lcJp-BHfMyuw6xWeTFyPTJV8B8NLuJ7RtGn-QNQ2zqX7nL6IQRbRcq1tzV"/>
+</div>
+<div class="aspect-square bg-secondary-container rounded-2xl overflow-hidden relative">
+<img alt="Health Data" class="w-full h-full object-cover mix-blend-multiply" data-alt="A macro shot of a sleek, modern smartwatch displaying health data analytics including heart rate and caloric burn. The device is set against a backdrop of cool, arctic-toned textures. The lighting is crisp and clinical, emphasizing the technological accuracy and precision of the AI-driven data. The mood is sophisticated and focused on high-performance health metrics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3ynESYiB-SNXrFTZKN9e7zdaIpacbyhotideOp7VKQBCOF833wCH9hCjCHAIbsLd4lmNjtiZ9bO9sZxXhJjUdO-5aXbl5qQCVkuxClm2fT0znXzeSHzEmJ54LbfdZzAwfxrGPBaqx1b4scetEjViD7NYI0vJgrqn58Z_RJzi8UCHtLFA2YPilcvRj2LGsGBXONhyWBt-5YposvdqeP9H6TJV8OBCAkrmJPABIjIBvgxIP90E5mjNJFzC676PGyukGIf2nTbQrnSPl"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.querySelector('.material-symbols-outlined').classList.replace('text-outline-variant', 'text-primary');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.querySelector('.material-symbols-outlined').classList.replace('text-primary', 'text-outline-variant');
+            });
+        });
+    </script>
+</body></html>
