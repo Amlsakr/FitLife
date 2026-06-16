@@ -1,10 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.aml_sakr.fitlife.feature.auth.ui"
+    namespace = "com.aml_sakr.fitlife.feature.auth.auth_ui"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -29,5 +31,13 @@ dependencies {
     implementation(project(":core:core-ui"))
     implementation(project(":feature:auth:auth-domain"))
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

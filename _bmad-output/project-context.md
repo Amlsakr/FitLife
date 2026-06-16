@@ -29,6 +29,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
   - AndroidX Core KTX: `1.18.0`
   - Lifecycle Runtime KTX: `2.10.0`
   - Activity Compose: `1.13.0`
+  - Navigation 3 runtime/UI: `1.1.2`
   - Compose BOM: `2026.02.01`
   - JUnit: `4.13.2`
   - AndroidX JUnit: `1.3.0`
@@ -70,7 +71,11 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Keep unidirectional flow: Compose UI -> Event/Intent -> ViewModel -> State -> Compose UI.
 - Model each feature with state, event, and one-time action types; use actions for navigation, snackbars, fatigue warnings, and other non-persistent effects.
 - Compose screens should render from immutable state and send events upward; avoid embedding business logic in composables.
-- `MainActivity` should remain the single Activity host with Compose `setContent`; planned navigation should use a `NavHost` with feature graphs.
+- `MainActivity` remains the single Activity host with Compose `setContent`; navigation uses Navigation 3 `NavDisplay`, typed serializable `NavKey` destinations, and app-owned saveable back stacks.
+- Do not introduce `NavController`, `NavHost`, string routes, `navigation-compose`, or `navigation-testing`.
+- Feature UI modules contribute typed keys and entry-provider registrations. Screens emit callbacks or MVI actions instead of receiving app navigation state.
+- Use saveable-state and ViewModel-store entry decorators when a destination owns Compose state or a ViewModel.
+- Splash, auth, sign-out, and onboarding completion must replace the navigation root atomically so obsolete protected-flow entries cannot be revisited.
 - Use `FitnessAppTheme` and Material3 for app UI; avoid bypassing the theme with ad hoc colors unless adding deliberate design tokens.
 - Room is the planned local source of truth. Write local data first, then sync to Firestore through background work.
 - Gemini plan generation must use cache-first behavior, a 5-second timeout, bounded retry/backoff, and local fallback plans on failure.
@@ -91,6 +96,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - WorkManager sync behavior should use WorkManager test utilities once WorkManager is introduced.
 - CameraX/ML Kit tests should use fake analyzer inputs or golden sample frames; automated tests must not require a physical camera.
 - MVI tests should verify state transitions and one-time actions separately.
+- Navigation 3 Compose tests should assert rendered destinations and the owned typed back stack directly; do not recreate Navigation 2 controller tests.
 
 ### Code Quality & Style Rules
 
@@ -112,6 +118,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - When creating the multi-module structure, update `settings.gradle.kts` and add each module's Gradle file in the same change.
 - Add dependencies only for the story/feature being implemented; avoid preloading every planned library.
 - Before changing shared architecture, module graph, dependency versions, package names, or min/target SDK, update the relevant planning/context docs or call out the mismatch.
+- Navigation keys must remain serializable and free of Android/Firebase types so back-stack state can survive recreation.
 - Run the smallest relevant Gradle verification after changes, such as `./gradlew test`, `./gradlew connectedAndroidTest`, or module-specific test tasks when modules exist.
 - Keep generated build artifacts and IDE files out of commits; respect the existing `.gitignore`.
 - Do not remove or rewrite existing planning docs unless the user explicitly asks; amend them when architecture decisions change.
@@ -148,4 +155,4 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Review periodically for outdated rules.
 - Remove rules that become obvious or obsolete over time.
 
-Last Updated: 2026-06-01
+Last Updated: 2026-06-14

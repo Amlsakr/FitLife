@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fit_life_green">#FF1B7F5A</color>
+    <color name="fit_life_mint">#FF7DD8B6</color>
+    <color name="fit_life_blue">#FF2563A9</color>
+    <color name="fit_life_coral">#FFE66A4E</color>
+    <color name="fit_life_ink">#FF17211D</color>
+    <color name="fit_life_surface">#FFFBFDF9</color>
+    <color name="fit_life_surface_dark">#FF111816</color>
+    <color name="fit_life_outline">#FF8A9690</color>
+</resources>

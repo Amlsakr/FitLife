@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_md">16dp</dimen>
+    <dimen name="space_lg">24dp</dimen>
+    <dimen name="space_xl">32dp</dimen>
+    <dimen name="auth_button_height">52dp</dimen>
+    <dimen name="auth_progress_indicator_size">24dp</dimen>
+    <dimen name="auth_progress_stroke_width">2dp</dimen>
+    <dimen name="splash_progress_indicator_size">48dp</dimen>
+    <dimen name="splash_progress_stroke_width">4dp</dimen>
+    <dimen name="splash_brand_size">120dp</dimen>
+    <dimen name="splash_brand_corner_radius">24dp</dimen>
+    <dimen name="splash_brand_elevation">18dp</dimen>
+    <dimen name="splash_border_width">1dp</dimen>
+    <dimen name="splash_dot_spacing">24dp</dimen>
+    <dimen name="splash_dot_radius">1.25dp</dimen>
+</resources>

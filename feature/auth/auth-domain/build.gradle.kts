@@ -5,5 +5,7 @@ plugins {
 
 dependencies {
     api(project(":core:core-domain"))
+    implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

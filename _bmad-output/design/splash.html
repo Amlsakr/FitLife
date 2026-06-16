@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife AI - Loading</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#1a1a2e",
+                    "session-dark-bg": "#000000",
+                    "surface-elevated": "#E8EEF4",
+                    "on-error": "#ffffff",
+                    "primary-fixed-dim": "#96ccff",
+                    "secondary-fixed": "#a1efff",
+                    "on-primary-container": "#fdfcff",
+                    "surface": "#fcf8ff",
+                    "inverse-on-surface": "#f2efff",
+                    "on-tertiary-fixed": "#001e2b",
+                    "on-primary": "#ffffff",
+                    "background": "#fcf8ff",
+                    "surface-variant": "#e2e0fc",
+                    "on-secondary-fixed": "#001f25",
+                    "surface-container-low": "#f5f2ff",
+                    "on-tertiary": "#ffffff",
+                    "joint-cyan": "#00BCD4",
+                    "surface-bright": "#fcf8ff",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#004a75",
+                    "tertiary-fixed-dim": "#75d1ff",
+                    "on-background": "#1a1a2e",
+                    "tertiary-fixed": "#c2e8ff",
+                    "surface-container": "#efecff",
+                    "on-tertiary-container": "#fbfcff",
+                    "on-secondary-container": "#006573",
+                    "on-primary-fixed": "#001d32",
+                    "divider": "#ECEFF1",
+                    "inverse-primary": "#96ccff",
+                    "secondary-container": "#58e6ff",
+                    "secondary-fixed-dim": "#44d8f1",
+                    "outline": "#707882",
+                    "error": "#C62828",
+                    "surface-tint": "#00639a",
+                    "inverse-surface": "#2f2e43",
+                    "on-surface-variant": "#3f4851",
+                    "primary": "#006096",
+                    "background-arctic": "#F0F4F8",
+                    "success": "#2E7D32",
+                    "error-container": "#ffdad6",
+                    "warning": "#F57C00",
+                    "tertiary": "#006385",
+                    "primary-container": "#007abc",
+                    "surface-dim": "#dad7f3",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e8e5ff",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e2e0fc",
+                    "on-secondary-fixed-variant": "#004e59",
+                    "primary-fixed": "#cee5ff",
+                    "tertiary-container": "#007ea7",
+                    "outline-variant": "#bfc7d2",
+                    "secondary": "#006876",
+                    "text-secondary": "#546E7A"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "touch-target-large": "64px",
+                    "xs": "4px",
+                    "touch-target": "48px",
+                    "unit": "4px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "margin-tablet": "32px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "session-rep-count": ["Inter"],
+                    "title-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "session-rep-count": ["57px", {"lineHeight": "64px", "fontWeight": "800"}],
+                    "title-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+        .circle-loader {
+            border: 4px solid #ECEFF1;
+            border-top: 4px solid #006096;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+    </style>
+</head>
+<body class="bg-background-arctic h-screen w-screen overflow-hidden flex flex-col items-center justify-center relative">
+<div class="absolute inset-0 z-0 opacity-40">
+<div class="h-full w-full bg-gradient-to-tr from-primary-fixed to-background"></div>
+</div>
+<div class="z-10 flex flex-col items-center gap-xl">
+<div class="float-animation flex flex-col items-center">
+<div class="w-[120px] h-[120px] rounded-3xl overflow-hidden shadow-xl bg-white flex items-center justify-center p-sm">
+<img alt="FitLife AI Brand Logo" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDj33jBRdS_Xul4qUahX175Vv5W0sr2nqBxSvzrZcoj8jnZ6pzsawqA2fjIi2S3wYNiwICSVvsgY0UGWliFWC5SyvezNpNP--oUP22r1k9MqBrmTspRN97JzXcSV1qhfkY6YIDYyobtYvr0P85_mA_L52f0q2kKnniqNs6n0E1_ofI4wIPtHwPXpzEJ_E54scQn6w93BWNdS3iaLrodrMGPYX2lLPEpsbZmROutGZCu5WWYu71IVVgdN27fMMO861XmAqRB37vHQpVK"/>
+</div>
+<div class="mt-lg text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">FitLife</h1>
+<p class="font-label-sm text-label-sm text-text-secondary mt-xs uppercase tracking-widest">Precision Performance</p>
+</div>
+</div>
+</div>
+<div class="absolute bottom-xl left-0 w-full flex flex-col items-center gap-md">
+<div class="circle-loader"></div>
+<p class="font-label-sm text-label-sm text-outline animate-pulse">Initializing Arctic AI focus environment...</p>
+</div>
+<div class="absolute inset-0 pointer-events-none opacity-20 z-20">
+<div class="w-full h-full" style="background-image: radial-gradient(#006096 0.5px, transparent 0.5px); background-size: 24px 24px;"></div>
+</div>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('FitLife Arctic Focus Splash Active');
+            
+            const loader = document.querySelector('.circle-loader');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += 1;
+                if (progress > 100) clearInterval(interval);
+            }, 30);
+        });
+    </script>
+</body></html>

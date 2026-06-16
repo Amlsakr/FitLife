@@ -1,8 +1,10 @@
-# FitLife – Architecture Document (v1.1)
+# FitLife – Architecture Document (v1.2)
 
 ---
 
 ## Change Log
+
+- v1.2 - 2026-06-14 - Migrated the navigation architecture from Navigation Compose 2 to Navigation 3 with typed keys, app-owned back stacks, `NavDisplay`, and entry-scoped ViewModels.
 
 - v1.1 — 2026-05-31 — Added widget module, confirmed v1.0 scope additions, fixed lighting fallback debounce rules, and added Section 14 Data Model Appendix.
 
@@ -152,10 +154,8 @@ fun WorkoutScreen(viewModel: WorkoutViewModel = hiltViewModel()) {
                 is WorkoutAction.ShowError -> {
                     // show snackbar with action.message
                 }
-                is WorkoutAction.NavigateToSession -> {
-                    // Navigate to session screen, assuming navController is available
-                    navController.navigate("session/${action.planId}")
-                }
+                is WorkoutAction.NavigateToSession ->
+                    onNavigateToSession(SessionKey(action.planId))
             }
         }
     }
@@ -317,23 +317,30 @@ flowchart TD
 
 ---
 
-## 11. Navigation Graph Structure
+## 11. Navigation 3 Structure
 
-- **Single Activity (`MainActivity`)** hosts a `NavHost`.
-- **Feature NavGraphs** (`auth_graph`, `onboarding_graph`, `workout_graph`, `session_graph`, `progress_graph`).
-- **Bottom Navigation** with four tabs (Home, Session, Progress, Profile) each linked to the top‑level destinations of the corresponding feature graph.
+- **Single Activity (`MainActivity`)** hosts a Navigation 3 `NavDisplay`.
+- The composition root owns navigation state through saveable `NavBackStack<NavKey>` instances.
+- Every destination is represented by a strongly typed, `@Serializable` key implementing `NavKey`; string routes are not used.
+- `NavDisplay` resolves keys through an `entryProvider`.
+- `rememberSaveableStateHolderNavEntryDecorator()` and `rememberViewModelStoreNavEntryDecorator()` preserve destination state and scope ViewModels to individual back-stack entries.
+- Splash, authentication, sign-out, and onboarding completion use atomic root replacement so protected transitions cannot return to obsolete destinations.
+- Feature UI modules own their navigation keys and entry-provider registration helpers. They expose navigation callbacks or MVI actions and do not receive a `NavController`.
+- The initial AUTH-000/AUTH-001 flow uses one app-owned stack. When bottom navigation is implemented, Home, Session, Progress, and Profile each retain an independent top-level back stack.
+- Incoming deep links are parsed at the app boundary and translated into typed keys. Planned links include plan sharing (`app://fitlife/plan/{planId}`) and session resume.
 
 ```mermaid
 flowchart LR
-    MainActivity --> NavHost
-    NavHost --> AuthGraph
-    NavHost --> OnboardingGraph
-    NavHost --> WorkoutGraph
-    NavHost --> SessionGraph
-    NavHost --> ProgressGraph
+    MainActivity --> NavDisplay
+    NavDisplay --> AppBackStack
+    AppBackStack --> AuthEntries
+    AppBackStack --> OnboardingEntries
+    AppBackStack --> WorkoutEntries
+    AppBackStack --> SessionEntries
+    AppBackStack --> ProgressEntries
 ```
 
-Deep links are defined for sharing a plan (`app://fitlife/plan/{planId}`) and for session resume.
+Navigation dependencies are centralized in `gradle/libs.versions.toml`: Navigation 3 runtime/UI `1.1.2`, Lifecycle Navigation 3 integration aligned to Lifecycle `2.10.0`, and Kotlin serialization aligned to Kotlin `2.2.10`.
 
 ---
 
