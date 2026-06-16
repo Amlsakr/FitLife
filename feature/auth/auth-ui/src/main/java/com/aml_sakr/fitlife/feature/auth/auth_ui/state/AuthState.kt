@@ -19,5 +19,6 @@ data class AuthState(
     @param:StringRes val passwordErrorResId: Int? = null,
     @param:StringRes val confirmPasswordErrorResId: Int? = null,
     val verificationEmail: String? = null,
+    val isGoogleSignInInProgress: Boolean = false,
     val isLoading: Boolean = false
 ) : UIState

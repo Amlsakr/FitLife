@@ -48,8 +48,11 @@ import com.aml_sakr.fitlife.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.RefreshCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResendEmailVerificationUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInUseCase
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInWithGoogleUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignOutUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignUpUseCase
+import com.aml_sakr.fitlife.feature.auth.auth_ui.google.DefaultGoogleSignInLauncher
+import com.aml_sakr.fitlife.feature.auth.auth_ui.google.GoogleSignInLauncher
 import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashRoute
 import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashViewModel
 import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.StartupRouteErrorLogger
@@ -76,11 +79,21 @@ class MainActivity : ComponentActivity() {
             FitnessAppTheme {
                 FitLifeApp(
                     authRepository = authRepository,
-                    authSessionReader = authSessionReader
+                    authSessionReader = authSessionReader,
+                    googleClientId = resolveGoogleClientId()
                 )
             }
         }
     }
+}
+
+private fun ComponentActivity.resolveGoogleClientId(): String {
+    val resourceId = resources.getIdentifier(
+        "default_web_client_id",
+        "string",
+        packageName
+    )
+    return if (resourceId == 0) "" else getString(resourceId)
 }
 
 @Composable
@@ -89,6 +102,8 @@ fun FitLifeApp(
     backStack: NavBackStack<NavKey> = rememberNavBackStack(AppRoute.Splash),
     authRepository: AuthRepository = DefaultAuthRepository,
     authSessionReader: AuthSessionReader = DefaultAuthSessionReader,
+    googleClientId: String = "",
+    googleSignInLauncher: GoogleSignInLauncher = DefaultGoogleSignInLauncher,
     determineStartupDestination: (suspend () -> StartupDestination)? = null,
     startupRouteErrorLogger: StartupRouteErrorLogger = AndroidStartupRouteErrorLogger
 ) {
@@ -145,6 +160,7 @@ fun FitLifeApp(
                     AuthViewModel(
                         signUp = SignUpUseCase(authRepository),
                         signIn = SignInUseCase(authRepository),
+                        signInWithGoogle = SignInWithGoogleUseCase(authRepository),
                         signOut = SignOutUseCase(authRepository),
                         getCurrentUser = GetCurrentUserUseCase(authRepository),
                         resendEmailVerification = ResendEmailVerificationUseCase(authRepository),
@@ -153,6 +169,8 @@ fun FitLifeApp(
                 }
                 AuthRoute(
                     viewModel = authViewModel,
+                    googleClientId = googleClientId,
+                    googleSignInLauncher = googleSignInLauncher,
                     onAuthenticated = {
                         try {
                             backStack.navigateAfterAuth(resolveStartupDestination())
@@ -309,6 +327,10 @@ private object DefaultAuthRepository : AuthRepository {
         email: String,
         password: String
     ): Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown)
+
+    override suspend fun signInWithGoogle(
+        googleIdToken: String
+    ): Result<AuthUser, AuthError> = Result.Failure(AuthError.GoogleSignInFailed)
 
     override suspend fun signOut(): Result<Unit, AuthError> = Result.Success(Unit)
 

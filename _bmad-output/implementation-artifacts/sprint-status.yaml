@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review
 
 generated: 2026-06-01T13:15:32+03:00
-last_updated: 2026-06-14T00:00:00+03:00
+last_updated: 2026-06-16T13:58:33.2547713+03:00
 project: FitnessApp
 project_key: NOKEY
 tracking_system: file-system
@@ -53,7 +53,7 @@ development_status:
   epic-1: in-progress
   auth-000-splash-screen-and-startup-routing: in-progress
   auth-001-firebase-auth-module-setup: done
-  auth-002-google-sign-in-integration: backlog
+  auth-002-google-sign-in-integration: done
   auth-003-forgot-password-account-deletion: backlog
   auth-004-firebase-security-rules: backlog
   auth-005-gdpr-account-deletion: backlog

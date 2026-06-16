@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +23,9 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.R
 import com.aml_sakr.fitlife.feature.auth.auth_ui.AuthUiConstants
 import com.aml_sakr.fitlife.feature.auth.auth_ui.action.AuthAction
 import com.aml_sakr.fitlife.feature.auth.auth_ui.event.AuthEvent
+import com.aml_sakr.fitlife.feature.auth.auth_ui.google.DefaultGoogleSignInLauncher
+import com.aml_sakr.fitlife.feature.auth.auth_ui.google.GoogleSignInLauncher
+import com.aml_sakr.fitlife.feature.auth.auth_ui.google.GoogleSignInResult
 import com.aml_sakr.fitlife.feature.auth.auth_ui.state.AuthMode
 import com.aml_sakr.fitlife.feature.auth.auth_ui.state.AuthState
 import com.aml_sakr.fitlife.feature.auth.auth_ui.signin.SignInScreenContent
@@ -29,16 +33,20 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.viewmodel.AuthViewModel
 import com.aml_sakr.fitlife.feature.auth.auth_ui.signup.SignUpScreenContent
 import com.aml_sakr.fitlife.feature.auth.auth_ui.verification.VerificationScreenContent
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 @Composable
 fun AuthRoute(
     viewModel: AuthViewModel,
     onAuthenticated: suspend () -> Unit,
+    googleClientId: String,
+    googleSignInLauncher: GoogleSignInLauncher = DefaultGoogleSignInLauncher,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(viewModel) {
         viewModel.actions.collect { action ->
@@ -60,6 +68,27 @@ fun AuthRoute(
                     }
                 }
                 AuthAction.NavigateToSignIn -> Unit
+                AuthAction.LaunchGoogleSignIn -> {
+                    coroutineScope.launch {
+                        when (
+                            val result = googleSignInLauncher.launch(
+                                context = context,
+                                googleClientId = googleClientId
+                            )
+                        ) {
+                            is GoogleSignInResult.Token ->
+                                viewModel.onEvent(
+                                    AuthEvent.GoogleSignInTokenReceived(result.idToken)
+                                )
+                            is GoogleSignInResult.Cancelled ->
+                                viewModel.onEvent(AuthEvent.GoogleSignInDismissed)
+                            is GoogleSignInResult.Failed ->
+                                viewModel.onEvent(
+                                    AuthEvent.GoogleSignInFailed(result.error)
+                                )
+                        }
+                    }
+                }
                 is AuthAction.ShowMessage ->
                     snackbarHostState.showSnackbar(context.getString(action.messageResId))
             }
@@ -69,6 +98,8 @@ fun AuthRoute(
     AuthScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        googleSignInEnabled = googleClientId.isNotBlank(),
+        isGoogleSignInInProgress = state.isGoogleSignInInProgress,
         snackbarHostState = snackbarHostState,
         modifier = modifier
     )
@@ -78,6 +109,8 @@ fun AuthRoute(
 fun AuthScreen(
     state: AuthState,
     onEvent: (AuthEvent) -> Unit,
+    googleSignInEnabled: Boolean,
+    isGoogleSignInInProgress: Boolean,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     modifier: Modifier = Modifier
 ) {
@@ -92,8 +125,18 @@ fun AuthScreen(
                 .padding(contentPadding)
         ) {
             when (state.mode) {
-                AuthMode.SignIn -> SignInScreenContent(state = state, onEvent = onEvent)
-                AuthMode.SignUp -> SignUpScreenContent(state = state, onEvent = onEvent)
+                AuthMode.SignIn -> SignInScreenContent(
+                    state = state,
+                    onEvent = onEvent,
+                    googleSignInEnabled = googleSignInEnabled,
+                    isGoogleSignInInProgress = isGoogleSignInInProgress
+                )
+                AuthMode.SignUp -> SignUpScreenContent(
+                    state = state,
+                    onEvent = onEvent,
+                    googleSignInEnabled = googleSignInEnabled,
+                    isGoogleSignInInProgress = isGoogleSignInInProgress
+                )
                 AuthMode.VerifyEmail -> VerificationScreenContent(state = state, onEvent = onEvent)
             }
         }
@@ -106,7 +149,9 @@ private fun AuthScreenPreview() {
     FitnessAppTheme {
         AuthScreen(
             state = AuthState(mode = AuthMode.SignUp),
-            onEvent = {}
+            onEvent = {},
+            googleSignInEnabled = false,
+            isGoogleSignInInProgress = false
         )
     }
 }

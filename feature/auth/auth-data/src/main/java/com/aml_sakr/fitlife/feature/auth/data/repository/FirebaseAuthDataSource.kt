@@ -11,6 +11,8 @@ internal interface FirebaseAuthDataSource {
 
     suspend fun signIn(email: String, password: String): FirebaseAuthUserData?
 
+    suspend fun signInWithGoogle(googleIdToken: String): FirebaseAuthUserData?
+
     fun signOut()
 
     fun currentUser(): FirebaseAuthUserData?

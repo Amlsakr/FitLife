@@ -52,6 +52,21 @@ sealed class AuthError(
         message = AuthDomainConstants.ErrorMessages.VERIFICATION_EMAIL_FAILED
     )
 
+    data object GoogleSignInFailed : AuthError(
+        code = AuthDomainConstants.ErrorCodes.GOOGLE_SIGN_IN_FAILED,
+        message = AuthDomainConstants.ErrorMessages.GOOGLE_SIGN_IN_FAILED
+    )
+
+    data object GoogleAccountSetupFailed : AuthError(
+        code = AuthDomainConstants.ErrorCodes.GOOGLE_ACCOUNT_SETUP_FAILED,
+        message = AuthDomainConstants.ErrorMessages.GOOGLE_ACCOUNT_SETUP_FAILED
+    )
+
+    data object GoogleCredentialStateClearFailed : AuthError(
+        code = AuthDomainConstants.ErrorCodes.GOOGLE_CREDENTIAL_STATE_CLEAR_FAILED,
+        message = AuthDomainConstants.ErrorMessages.GOOGLE_CREDENTIAL_STATE_CLEAR_FAILED
+    )
+
     data object Unknown : AuthError(
         code = AuthDomainConstants.ErrorCodes.UNKNOWN,
         message = AuthDomainConstants.ErrorMessages.UNKNOWN

@@ -18,6 +18,10 @@ internal object AuthErrorMessageMapper {
             AuthError.NoAuthenticatedUser -> R.string.auth_error_no_authenticated_user
             AuthError.VerificationEmailFailed ->
                 R.string.auth_error_verification_email_failed
+            AuthError.GoogleSignInFailed -> R.string.auth_error_google_sign_in_failed
+            AuthError.GoogleAccountSetupFailed -> R.string.auth_error_google_account_setup_failed
+            AuthError.GoogleCredentialStateClearFailed ->
+                R.string.auth_error_google_credential_state_clear_failed
             AuthError.Unknown -> R.string.auth_error_unknown
         }
 }

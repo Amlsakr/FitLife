@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthRemoteDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthRepository
+import com.aml_sakr.fitlife.feature.auth.data.repository.GoogleCredentialStateDataSource
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -35,7 +36,11 @@ class FirebaseAuthEmulatorInstrumentedTest {
             useEmulator(EMULATOR_HOST, EMULATOR_PORT)
             signOut()
         }
-        val repository = FirebaseAuthRepository(FirebaseAuthRemoteDataSource(firebaseAuth))
+        val repository = FirebaseAuthRepository(
+            FirebaseAuthRemoteDataSource(firebaseAuth),
+            NoOpFirebaseUserDocumentDataSource,
+            NoOpGoogleCredentialStateDataSource
+        )
         val email = "auth001-${UUID.randomUUID()}@example.com"
         val password = "FitLife-test-123"
 
@@ -71,5 +76,16 @@ class FirebaseAuthEmulatorInstrumentedTest {
         const val PROJECT_ID = "fitlife-1fdd1"
         const val EMULATOR_HOST = "10.0.2.2"
         const val EMULATOR_PORT = 9099
+    }
+
+    private object NoOpFirebaseUserDocumentDataSource :
+        com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseUserDocumentDataSource {
+        override suspend fun upsertAuthenticatedUser(
+            user: com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthUserData
+        ) = Unit
+    }
+
+    private object NoOpGoogleCredentialStateDataSource : GoogleCredentialStateDataSource {
+        override suspend fun clearCredentialState() = Unit
     }
 }

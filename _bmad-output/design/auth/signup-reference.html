@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife AI - Register</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#fcf8ff",
+                        "outline": "#707882",
+                        "error-container": "#ffdad6",
+                        "text-secondary": "#546E7A",
+                        "secondary-fixed-dim": "#44d8f1",
+                        "background": "#fcf8ff",
+                        "surface-container": "#efecff",
+                        "primary": "#006096",
+                        "on-background": "#1a1a2e",
+                        "tertiary-fixed-dim": "#75d1ff",
+                        "joint-cyan": "#00BCD4",
+                        "primary-fixed": "#cee5ff",
+                        "on-secondary-container": "#006573",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#fcf8ff",
+                        "surface-variant": "#e2e0fc",
+                        "on-primary-fixed": "#001d32",
+                        "tertiary-fixed": "#c2e8ff",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "secondary-fixed": "#a1efff",
+                        "on-primary-container": "#fdfcff",
+                        "on-error": "#ffffff",
+                        "background-arctic": "#F0F4F8",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#58e6ff",
+                        "outline-variant": "#bfc7d2",
+                        "on-primary-fixed-variant": "#004a75",
+                        "on-surface": "#1a1a2e",
+                        "on-secondary-fixed": "#001f25",
+                        "primary-container": "#007abc",
+                        "on-secondary-fixed-variant": "#004e59",
+                        "surface-elevated": "#E8EEF4",
+                        "on-tertiary-fixed": "#001e2b",
+                        "tertiary-container": "#007ea7",
+                        "error": "#C62828",
+                        "session-dark-bg": "#000000",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#006385",
+                        "secondary": "#006876",
+                        "inverse-primary": "#96ccff",
+                        "surface-container-high": "#e8e5ff",
+                        "on-surface-variant": "#3f4851",
+                        "inverse-surface": "#2f2e43",
+                        "success": "#2E7D32",
+                        "on-primary": "#ffffff",
+                        "divider": "#ECEFF1",
+                        "on-error-container": "#93000a",
+                        "warning": "#F57C00",
+                        "on-tertiary-container": "#fbfcff",
+                        "surface-dim": "#dad7f3",
+                        "primary-fixed-dim": "#96ccff",
+                        "surface-container-highest": "#e2e0fc",
+                        "surface-tint": "#00639a",
+                        "surface-container-low": "#f5f2ff",
+                        "inverse-on-surface": "#f2efff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xs": "4px",
+                        "touch-target": "48px",
+                        "touch-target-large": "64px",
+                        "margin-tablet": "32px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "title-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "session-rep-count": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "session-rep-count": ["57px", { "lineHeight": "64px", "fontWeight": "800" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        
+        /* Smooth transitions for inputs */
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0, 96, 150, 0.1);
+        }
+
+        body {
+            background-color: #F0F4F8; /* Arctic Focus Background */
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased">
+<!-- Main Registration Container -->
+<main class="min-h-screen flex flex-col items-center justify-center px-margin-mobile py-xl md:px-margin-tablet">
+<!-- Registration Card -->
+<div class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col p-lg md:p-xl space-y-md">
+<!-- Brand Logo -->
+<div class="flex justify-center mb-sm">
+<img alt="FitLife AI Logo" class="w-24 h-24 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvlO4zd3R05TPkaM99LdGWfcA3s_XjEnbGFXT11ifWrqy6KjE149EfPIG8S6Hoe0ndHzyf9MoiXFKE0hMTu-JXI8XBWhQ47-6Ynk8lKU2lADDlOXlAFJ0ZK1HrsfwxBWc_l9WMflSnkDkxjUCNLSVIn_d7TOLh6iKT5nzvPrx-ImYmUtEAWXR-qo1-OfMhiCuBqxSJB13vnBmWh1VqpzxcsYt5CqVX6ETqzI5VE9gwCXE7b_VJVVlB_s5XF"/>
+</div>
+<!-- Typography Header -->
+<div class="text-center space-y-xs">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary md:font-headline-lg md:text-headline-lg">Create Account</h1>
+<p class="font-body-md text-body-md text-text-secondary">Join FitLife to start your AI-powered fitness journey.</p>
+</div>
+<!-- Form Fields -->
+<form class="flex flex-col space-y-md" onsubmit="return false;">
+<!-- Name Field -->
+<div class="flex flex-col space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant px-1" for="full_name">Full Name</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="person">person</span>
+<input class="w-full h-touch-target pl-12 pr-4 border border-outline-variant rounded-lg bg-surface-bright focus:border-primary focus:ring-0 transition-all duration-300 font-body-md text-body-md" id="full_name" placeholder="John Doe" required="" type="text"/>
+</div>
+</div>
+<!-- Email Field -->
+<div class="flex flex-col space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant px-1" for="email">Email Address</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="mail">mail</span>
+<input class="w-full h-touch-target pl-12 pr-4 border border-outline-variant rounded-lg bg-surface-bright focus:border-primary focus:ring-0 transition-all duration-300 font-body-md text-body-md" id="email" placeholder="name@example.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant px-1" for="password">Password</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="lock">lock</span>
+<input class="w-full h-touch-target pl-12 pr-12 border border-outline-variant rounded-lg bg-surface-bright focus:border-primary focus:ring-0 transition-all duration-300 font-body-md text-body-md" id="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-4 text-outline hover:text-primary transition-colors flex items-center justify-center" onclick="togglePassword('password', this)" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Confirm Password Field -->
+<div class="flex flex-col space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant px-1" for="confirm_password">Confirm Password</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="lock_reset">lock_reset</span>
+<input class="w-full h-touch-target pl-12 pr-12 border border-outline-variant rounded-lg bg-surface-bright focus:border-primary focus:ring-0 transition-all duration-300 font-body-md text-body-md" id="confirm_password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-4 text-outline hover:text-primary transition-colors flex items-center justify-center" onclick="togglePassword('confirm_password', this)" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Register Button -->
+<button class="w-full h-touch-target bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md rounded-lg shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 flex items-center justify-center mt-sm" type="submit">
+                    Create Account
+                </button>
+</form>
+<!-- Social/Alt Register Divider -->
+<div class="flex items-center space-x-sm py-xs">
+<div class="flex-1 h-px bg-divider"></div>
+<span class="font-label-sm text-label-sm text-outline-variant">OR REGISTER WITH</span>
+<div class="flex-1 h-px bg-divider"></div>
+</div>
+<!-- Social Register Buttons -->
+<div class="flex space-x-md">
+<button class="flex-1 h-touch-target border border-outline-variant rounded-lg flex items-center justify-center hover:bg-surface-elevated transition-colors">
+<svg class="w-5 h-5 mr-2" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-sm text-label-sm">Google</span>
+</button>
+<button class="flex-1 h-touch-target border border-outline-variant rounded-lg flex items-center justify-center hover:bg-surface-elevated transition-colors">
+<span class="material-symbols-outlined text-on-surface mr-2" data-icon="apple">apps</span>
+<span class="font-label-sm text-label-sm">Apple</span>
+</button>
+</div>
+<!-- Login Link -->
+<div class="text-center pt-md">
+<p class="font-body-md text-body-md text-text-secondary">
+                    Already have an account? 
+                    <a class="text-primary font-semibold hover:underline decoration-2 underline-offset-4 transition-all" href="#">Login</a>
+</p>
+</div>
+</div>
+<!-- Support Info / Footer (Subtle) -->
+<footer class="mt-xl text-center space-y-sm">
+<p class="font-label-sm text-label-sm text-outline">
+                By registering, you agree to our <a class="underline" href="#">Terms of Service</a> and <a class="underline" href="#">Privacy Policy</a>.
+            </p>
+<div class="flex justify-center space-x-lg text-outline">
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified_user">verified_user</span>
+<span class="font-label-sm text-label-sm">Secure Data</span>
+</div>
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-sm text-label-sm">AI Powered</span>
+</div>
+</div>
+</footer>
+</main>
+<script>
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('.material-symbols-outlined');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+    </script>
+</body></html>

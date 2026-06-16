@@ -9,11 +9,13 @@ import com.aml_sakr.fitlife.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.RefreshCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResendEmailVerificationUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInUseCase
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInWithGoogleUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignOutUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignUpUseCase
 import com.aml_sakr.fitlife.feature.auth.auth_ui.action.AuthAction
 import com.aml_sakr.fitlife.feature.auth.auth_ui.event.AuthEvent
 import com.aml_sakr.fitlife.feature.auth.auth_ui.state.AuthMode
+import com.aml_sakr.fitlife.feature.auth.auth_ui.state.AuthState
 import com.aml_sakr.fitlife.feature.auth.auth_ui.viewmodel.AuthViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -176,6 +178,83 @@ class AuthViewModelTest {
     }
 
     @Test
+    fun googleSignInRequested_emitsLaunchAction() = runTest(dispatcher) {
+        val viewModel = createViewModel(FakeAuthRepository())
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.GoogleSignInRequested)
+
+        assertEquals(AuthAction.LaunchGoogleSignIn, viewModel.actions.first())
+        assertTrue(viewModel.state.value.isGoogleSignInInProgress)
+    }
+
+    @Test
+    fun googleSignInDismissed_clearsLaunchGuardWithoutError() = runTest(dispatcher) {
+        val viewModel = createViewModel(FakeAuthRepository())
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.GoogleSignInRequested)
+        viewModel.onEvent(AuthEvent.GoogleSignInDismissed)
+
+        assertFalse(viewModel.state.value.isGoogleSignInInProgress)
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun successfulGoogleSignIn_emitsAuthenticatedNavigation() = runTest(dispatcher) {
+        val user = AuthUser("user-1", "amal@example.com", true)
+        val viewModel = createViewModel(
+            FakeAuthRepository(
+                googleSignInResult = Result.Success(user)
+            )
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.GoogleSignInTokenReceived("google-id-token"))
+        advanceUntilIdle()
+
+        assertEquals(AuthAction.NavigateToAuthenticatedUser, viewModel.actions.first())
+    }
+
+    @Test
+    fun googleSignInAccountSetupFailure_emitsSafeMessage() = runTest(dispatcher) {
+        val viewModel = createViewModel(
+            FakeAuthRepository(
+                googleSignInResult = Result.Failure(AuthError.GoogleAccountSetupFailed)
+            )
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.GoogleSignInTokenReceived("google-id-token"))
+        advanceUntilIdle()
+
+        assertEquals(
+            AuthAction.ShowMessage(R.string.auth_error_google_account_setup_failed),
+            viewModel.actions.first()
+        )
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun signOutCredentialCleanupFailure_stillNavigatesToSignIn_withoutReportingError() = runTest(
+        dispatcher
+    ) {
+        val viewModel = createViewModel(
+            FakeAuthRepository(
+                currentUserResult = Result.Success(null),
+                signOutResult = Result.Success(Unit)
+            )
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.SignOut)
+        advanceUntilIdle()
+
+        assertEquals(AuthState(), viewModel.state.value)
+        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.first())
+    }
+
+    @Test
     fun duplicateSubmit_isIgnoredWhileRequestIsActive() = runTest(dispatcher) {
         val repository = FakeAuthRepository(suspendSignIn = true)
         val viewModel = createViewModel(repository)
@@ -299,6 +378,7 @@ class AuthViewModelTest {
         AuthViewModel(
             signUp = SignUpUseCase(repository),
             signIn = SignInUseCase(repository),
+            signInWithGoogle = SignInWithGoogleUseCase(repository),
             signOut = SignOutUseCase(repository),
             getCurrentUser = GetCurrentUserUseCase(repository),
             resendEmailVerification = ResendEmailVerificationUseCase(repository),
@@ -308,6 +388,7 @@ class AuthViewModelTest {
     private class FakeAuthRepository(
         private val signUpResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val signInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
+        private val googleSignInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val signOutResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
         private val currentUserResult: Result<AuthUser?, AuthError> = Result.Success(null),
         private val verificationResult: Result<Unit, AuthError> = Result.Success(Unit),
@@ -316,6 +397,7 @@ class AuthViewModelTest {
     ) : AuthRepository {
         var signUpCount = 0
         var signInCount = 0
+        var googleSignInCount = 0
 
         override suspend fun signUp(
             email: String,
@@ -332,6 +414,13 @@ class AuthViewModelTest {
             signInCount += 1
             if (suspendSignIn) awaitCancellation()
             return signInResult
+        }
+
+        override suspend fun signInWithGoogle(
+            googleIdToken: String
+        ): Result<AuthUser, AuthError> {
+            googleSignInCount += 1
+            return googleSignInResult
         }
 
         override suspend fun signOut(): Result<Unit, AuthError> = signOutResult
