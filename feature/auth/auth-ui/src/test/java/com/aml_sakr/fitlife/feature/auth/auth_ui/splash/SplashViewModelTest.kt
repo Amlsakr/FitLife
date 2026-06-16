@@ -13,6 +13,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -46,6 +47,12 @@ class SplashViewModelTest {
             startupRouteErrorLogger = RecordingStartupRouteErrorLogger()
         )
 
+        runCurrent()
+        advanceTimeBy(4_999)
+
+        assertTrue(viewModel.state.value.isLoading)
+
+        advanceTimeBy(1)
         advanceUntilIdle()
 
         assertFalse(viewModel.state.value.isLoading)
@@ -58,6 +65,7 @@ class SplashViewModelTest {
             determineStartupDestination = { StartupDestination.Onboarding },
             startupRouteErrorLogger = RecordingStartupRouteErrorLogger()
         )
+        runCurrent()
 
         advanceUntilIdle()
 
@@ -70,6 +78,7 @@ class SplashViewModelTest {
             determineStartupDestination = { StartupDestination.Home },
             startupRouteErrorLogger = RecordingStartupRouteErrorLogger()
         )
+        runCurrent()
 
         advanceUntilIdle()
 
@@ -84,6 +93,7 @@ class SplashViewModelTest {
             determineStartupDestination = { throw failure },
             startupRouteErrorLogger = logger
         )
+        runCurrent()
 
         advanceUntilIdle()
 

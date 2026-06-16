@@ -1,6 +1,7 @@
 package com.aml_sakr.fitlife.feature.auth.data.repository
 
 import com.aml_sakr.fitlife.core.domain.Result
+import com.aml_sakr.fitlife.feature.auth.data.AuthDataConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
@@ -39,7 +40,7 @@ class FirebaseAuthRepository @Inject internal constructor(
         password: String
     ): Result<AuthUser, AuthError> = authCall {
         dataSource.signIn(email, password)?.toDomain()
-            ?: throw IllegalStateException("Firebase returned no authenticated user")
+            ?: throw IllegalStateException(AuthDataConstants.ExceptionMessages.NO_AUTHENTICATED_USER)
     }
 
     override suspend fun signOut(): Result<Unit, AuthError> = authCall {
@@ -69,7 +70,7 @@ class FirebaseAuthRepository @Inject internal constructor(
 
     private fun FirebaseAuthUserData.toDomain(): AuthUser {
         if (id.isBlank()) {
-            throw IllegalStateException("Firebase returned a blank user ID")
+            throw IllegalStateException(AuthDataConstants.ExceptionMessages.BLANK_USER_ID)
         }
         return AuthUser(
             id = id,

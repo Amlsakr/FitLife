@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.core.ui.mvi.BaseMviViewModel
 import com.aml_sakr.fitlife.feature.auth.auth_ui.R
+import com.aml_sakr.fitlife.feature.auth.auth_ui.AuthUiConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.GetCurrentUserUseCase
@@ -115,7 +116,13 @@ class AuthViewModel(
         wasSignUp: Boolean
     ) {
         if (user.isEmailVerified) {
-            setState { copy(isLoading = false, password = "", confirmPassword = "") }
+            setState {
+                copy(
+                    isLoading = false,
+                    password = AuthUiConstants.EMPTY_TEXT,
+                    confirmPassword = AuthUiConstants.EMPTY_TEXT
+                )
+            }
             sendAction(AuthAction.NavigateToAuthenticatedUser)
             return
         }
@@ -203,8 +210,8 @@ class AuthViewModel(
         setState {
             copy(
                 mode = AuthMode.SignIn,
-                password = "",
-                confirmPassword = "",
+                password = AuthUiConstants.EMPTY_TEXT,
+                confirmPassword = AuthUiConstants.EMPTY_TEXT,
                 emailErrorResId = null,
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
@@ -219,8 +226,8 @@ class AuthViewModel(
         setState {
             copy(
                 mode = AuthMode.SignUp,
-                password = "",
-                confirmPassword = "",
+                password = AuthUiConstants.EMPTY_TEXT,
+                confirmPassword = AuthUiConstants.EMPTY_TEXT,
                 emailErrorResId = null,
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
@@ -239,8 +246,8 @@ class AuthViewModel(
             copy(
                 mode = AuthMode.VerifyEmail,
                 email = email,
-                password = "",
-                confirmPassword = "",
+                password = AuthUiConstants.EMPTY_TEXT,
+                confirmPassword = AuthUiConstants.EMPTY_TEXT,
                 emailErrorResId = null,
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
@@ -254,7 +261,7 @@ class AuthViewModel(
         val emailError =
             if (isValidEmail(current.email.trim())) null else R.string.auth_error_invalid_email
         val passwordError =
-            if (current.password.length < MINIMUM_PASSWORD_LENGTH) {
+            if (current.password.length < AuthUiConstants.MINIMUM_PASSWORD_LENGTH) {
                 R.string.auth_error_min_password_length
             } else {
                 null
@@ -284,28 +291,27 @@ class AuthViewModel(
     }
 
     private fun isValidEmail(email: String): Boolean {
-        val parts = email.split('@')
+        val parts = email.split(AuthUiConstants.EMAIL_ADDRESS_SEPARATOR)
         if (parts.size != 2) return false
 
         val localPart = parts[0]
-        val domainLabels = parts[1].split('.')
+        val domainLabels = parts[1].split(AuthUiConstants.EMAIL_DOMAIN_SEPARATOR)
         return localPart.isNotBlank() &&
-            !localPart.startsWith('.') &&
-            !localPart.endsWith('.') &&
-            ".." !in localPart &&
+            !localPart.startsWith(AuthUiConstants.EMAIL_DOMAIN_SEPARATOR) &&
+            !localPart.endsWith(AuthUiConstants.EMAIL_DOMAIN_SEPARATOR) &&
+            AuthUiConstants.EMAIL_LOCAL_PART_CONTAINS_SEQUENCE !in localPart &&
             LOCAL_PART_PATTERN.matches(localPart) &&
             domainLabels.size >= 2 &&
             domainLabels.all { label ->
                 label.isNotBlank() &&
-                    !label.startsWith('-') &&
-                    !label.endsWith('-') &&
+                    !label.startsWith(AuthUiConstants.EMAIL_DOMAIN_LABEL_DISALLOWED_EDGE) &&
+                    !label.endsWith(AuthUiConstants.EMAIL_DOMAIN_LABEL_DISALLOWED_EDGE) &&
                     DOMAIN_LABEL_PATTERN.matches(label)
             }
     }
 
     private companion object {
-        const val MINIMUM_PASSWORD_LENGTH = 6
-        val LOCAL_PART_PATTERN = Regex("^[A-Za-z0-9+_.-]+$")
-        val DOMAIN_LABEL_PATTERN = Regex("^[A-Za-z0-9-]+$")
+        val LOCAL_PART_PATTERN = Regex(AuthUiConstants.LOCAL_PART_REGEX)
+        val DOMAIN_LABEL_PATTERN = Regex(AuthUiConstants.DOMAIN_LABEL_REGEX)
     }
 }

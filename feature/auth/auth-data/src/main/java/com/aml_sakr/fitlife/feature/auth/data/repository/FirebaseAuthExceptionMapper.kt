@@ -1,5 +1,6 @@
 package com.aml_sakr.fitlife.feature.auth.data.repository
 
+import com.aml_sakr.fitlife.feature.auth.data.AuthDataConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
@@ -23,16 +24,16 @@ internal object FirebaseAuthExceptionMapper {
 
     fun mapCode(errorCode: String?): AuthError =
         when (errorCode) {
-            "ERROR_INVALID_EMAIL" -> AuthError.InvalidEmail
-            "ERROR_WEAK_PASSWORD" -> AuthError.WeakPassword
-            "ERROR_EMAIL_ALREADY_IN_USE" -> AuthError.EmailAlreadyInUse
-            "ERROR_INVALID_CREDENTIAL",
-            "ERROR_INVALID_LOGIN_CREDENTIALS",
-            "ERROR_WRONG_PASSWORD",
-            "ERROR_USER_NOT_FOUND" -> AuthError.InvalidCredentials
-            "ERROR_USER_DISABLED" -> AuthError.UserDisabled
-            "ERROR_TOO_MANY_REQUESTS" -> AuthError.TooManyRequests
-            "ERROR_NETWORK_REQUEST_FAILED" -> AuthError.NetworkUnavailable
+            AuthDataConstants.FirebaseAuthErrorCodes.INVALID_EMAIL -> AuthError.InvalidEmail
+            AuthDataConstants.FirebaseAuthErrorCodes.WEAK_PASSWORD -> AuthError.WeakPassword
+            AuthDataConstants.FirebaseAuthErrorCodes.EMAIL_ALREADY_IN_USE -> AuthError.EmailAlreadyInUse
+            AuthDataConstants.FirebaseAuthErrorCodes.INVALID_CREDENTIAL,
+            AuthDataConstants.FirebaseAuthErrorCodes.INVALID_LOGIN_CREDENTIALS,
+            AuthDataConstants.FirebaseAuthErrorCodes.WRONG_PASSWORD,
+            AuthDataConstants.FirebaseAuthErrorCodes.USER_NOT_FOUND -> AuthError.InvalidCredentials
+            AuthDataConstants.FirebaseAuthErrorCodes.USER_DISABLED -> AuthError.UserDisabled
+            AuthDataConstants.FirebaseAuthErrorCodes.TOO_MANY_REQUESTS -> AuthError.TooManyRequests
+            AuthDataConstants.FirebaseAuthErrorCodes.NETWORK_REQUEST_FAILED -> AuthError.NetworkUnavailable
             else -> AuthError.Unknown
         }
 }

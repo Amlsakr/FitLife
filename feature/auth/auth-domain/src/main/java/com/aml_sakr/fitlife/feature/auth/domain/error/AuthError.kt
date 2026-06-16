@@ -1,58 +1,59 @@
 package com.aml_sakr.fitlife.feature.auth.domain.error
 
 import com.aml_sakr.fitlife.core.domain.DomainError
+import com.aml_sakr.fitlife.feature.auth.domain.AuthDomainConstants
 
 sealed class AuthError(
     override val code: String,
     override val message: String
 ) : DomainError {
     data object InvalidEmail : AuthError(
-        code = "auth_invalid_email",
-        message = "The email address is invalid."
+        code = AuthDomainConstants.ErrorCodes.INVALID_EMAIL,
+        message = AuthDomainConstants.ErrorMessages.INVALID_EMAIL
     )
 
     data object WeakPassword : AuthError(
-        code = "auth_weak_password",
-        message = "The password does not meet the minimum requirements."
+        code = AuthDomainConstants.ErrorCodes.WEAK_PASSWORD,
+        message = AuthDomainConstants.ErrorMessages.WEAK_PASSWORD
     )
 
     data object EmailAlreadyInUse : AuthError(
-        code = "auth_email_already_in_use",
-        message = "An account already exists for this email address."
+        code = AuthDomainConstants.ErrorCodes.EMAIL_ALREADY_IN_USE,
+        message = AuthDomainConstants.ErrorMessages.EMAIL_ALREADY_IN_USE
     )
 
     data object InvalidCredentials : AuthError(
-        code = "auth_invalid_credentials",
-        message = "The supplied credentials are invalid."
+        code = AuthDomainConstants.ErrorCodes.INVALID_CREDENTIALS,
+        message = AuthDomainConstants.ErrorMessages.INVALID_CREDENTIALS
     )
 
     data object UserDisabled : AuthError(
-        code = "auth_user_disabled",
-        message = "This account is disabled."
+        code = AuthDomainConstants.ErrorCodes.USER_DISABLED,
+        message = AuthDomainConstants.ErrorMessages.USER_DISABLED
     )
 
     data object TooManyRequests : AuthError(
-        code = "auth_too_many_requests",
-        message = "Too many authentication attempts."
+        code = AuthDomainConstants.ErrorCodes.TOO_MANY_REQUESTS,
+        message = AuthDomainConstants.ErrorMessages.TOO_MANY_REQUESTS
     )
 
     data object NetworkUnavailable : AuthError(
-        code = "auth_network_unavailable",
-        message = "Authentication could not reach the network."
+        code = AuthDomainConstants.ErrorCodes.NETWORK_UNAVAILABLE,
+        message = AuthDomainConstants.ErrorMessages.NETWORK_UNAVAILABLE
     )
 
     data object NoAuthenticatedUser : AuthError(
-        code = "auth_no_authenticated_user",
-        message = "No authenticated user is available."
+        code = AuthDomainConstants.ErrorCodes.NO_AUTHENTICATED_USER,
+        message = AuthDomainConstants.ErrorMessages.NO_AUTHENTICATED_USER
     )
 
     data object VerificationEmailFailed : AuthError(
-        code = "auth_verification_email_failed",
-        message = "The verification email could not be sent."
+        code = AuthDomainConstants.ErrorCodes.VERIFICATION_EMAIL_FAILED,
+        message = AuthDomainConstants.ErrorMessages.VERIFICATION_EMAIL_FAILED
     )
 
     data object Unknown : AuthError(
-        code = "auth_unknown",
-        message = "Authentication failed unexpectedly."
+        code = AuthDomainConstants.ErrorCodes.UNKNOWN,
+        message = AuthDomainConstants.ErrorMessages.UNKNOWN
     )
 }

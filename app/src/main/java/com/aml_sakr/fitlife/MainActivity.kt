@@ -20,12 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
@@ -103,6 +104,8 @@ fun FitLifeApp(
     ) {
         determineStartupDestination ?: startupDestinationUseCase::invoke
     }
+    val shouldUseHiltSplashViewModel =
+        determineStartupDestination == null && startupRouteErrorLogger === AndroidStartupRouteErrorLogger
 
     NavDisplay(
         backStack = backStack,
@@ -114,11 +117,15 @@ fun FitLifeApp(
         ),
         entryProvider = entryProvider {
             entry<AppRoute.Splash> {
-                val splashViewModel = viewModel {
-                    SplashViewModel(
-                        determineStartupDestination = resolveStartupDestination,
-                        startupRouteErrorLogger = startupRouteErrorLogger
-                    )
+                val splashViewModel = if (shouldUseHiltSplashViewModel) {
+                    hiltViewModel<SplashViewModel>()
+                } else {
+                    viewModel {
+                        SplashViewModel(
+                            determineStartupDestination = resolveStartupDestination,
+                            startupRouteErrorLogger = startupRouteErrorLogger
+                        )
+                    }
                 }
                 SplashRoute(
                     viewModel = splashViewModel,

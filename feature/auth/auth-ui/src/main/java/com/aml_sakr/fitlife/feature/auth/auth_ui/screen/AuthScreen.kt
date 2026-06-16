@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.aml_sakr.fitlife.core.ui.theme.FitnessAppTheme
 import com.aml_sakr.fitlife.feature.auth.auth_ui.R
+import com.aml_sakr.fitlife.feature.auth.auth_ui.AuthUiConstants
 import com.aml_sakr.fitlife.feature.auth.auth_ui.action.AuthAction
 import com.aml_sakr.fitlife.feature.auth.auth_ui.event.AuthEvent
 import com.aml_sakr.fitlife.feature.auth.auth_ui.state.AuthMode
@@ -52,15 +53,15 @@ fun AuthRoute(
                             throw cancellation
                         } catch (_: Throwable) {
                             snackbarHostState.showSnackbar(
-                                message ="Unable to continue. Please try again.",
-                                actionLabel = "Retry"
+                                message = AuthUiConstants.CONTINUE_UNAVAILABLE_MESSAGE,
+                                actionLabel = AuthUiConstants.RETRY_ACTION_LABEL
                             ) == SnackbarResult.ActionPerformed
                         }
                     }
                 }
                 AuthAction.NavigateToSignIn -> Unit
                 is AuthAction.ShowMessage ->
-                    snackbarHostState.showSnackbar("context.getString(action.messageResId)")
+                    snackbarHostState.showSnackbar(context.getString(action.messageResId))
             }
         }
     }
