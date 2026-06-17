@@ -1,10 +1,13 @@
 package com.aml_sakr.fitlife.feature.auth.data.repository
 
+import com.aml_sakr.fitlife.core.data.purge.UserDataPurgeContributor
+import com.aml_sakr.fitlife.core.data.purge.UserDataPurgeCoordinator
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -18,11 +21,7 @@ class FirebaseAuthRepositoryTest {
                 isEmailVerified = true
             )
         )
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
-        )
+        val repository = createRepository(dataSource = dataSource)
 
         val result = repository.signUp("amal@example.com", "secret1")
 
@@ -46,11 +45,7 @@ class FirebaseAuthRepositoryTest {
             createdUser = FirebaseAuthUserData("user-1", "amal@example.com", false),
             verificationFailure = IllegalStateException("mail unavailable")
         )
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
-        )
+        val repository = createRepository(dataSource = dataSource)
 
         val result = repository.signUp("amal@example.com", "secret1")
 
@@ -62,11 +57,7 @@ class FirebaseAuthRepositoryTest {
         val dataSource = FakeFirebaseAuthDataSource(
             signedInUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
         )
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
-        )
+        val repository = createRepository(dataSource = dataSource)
 
         val result = repository.signIn("amal@example.com", "secret1")
 
@@ -87,11 +78,7 @@ class FirebaseAuthRepositoryTest {
         val dataSource = FakeFirebaseAuthDataSource(
             reloadedUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
         )
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
-        )
+        val repository = createRepository(dataSource = dataSource)
 
         val result = repository.refreshCurrentUser()
 
@@ -103,10 +90,9 @@ class FirebaseAuthRepositoryTest {
     fun signOut_clearsFirebaseSession_andGoogleCredentialState() = runTest {
         val dataSource = FakeFirebaseAuthDataSource()
         val googleCredentialStateDataSource = FakeGoogleCredentialStateDataSource()
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            googleCredentialStateDataSource
+        val repository = createRepository(
+            dataSource = dataSource,
+            googleCredentialStateDataSource = googleCredentialStateDataSource
         )
 
         assertEquals(Result.Success(Unit), repository.signOut())
@@ -117,10 +103,9 @@ class FirebaseAuthRepositoryTest {
     @Test
     fun signOut_ignoresCredentialCleanupFailure_afterFirebaseSessionIsCleared() = runTest {
         val dataSource = FakeFirebaseAuthDataSource()
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource(
+        val repository = createRepository(
+            dataSource = dataSource,
+            googleCredentialStateDataSource = FakeGoogleCredentialStateDataSource(
                 clearFailure = IllegalStateException("credential manager unavailable")
             )
         )
@@ -134,11 +119,7 @@ class FirebaseAuthRepositoryTest {
         val dataSource = FakeFirebaseAuthDataSource(
             verificationFailure = NoAuthenticatedFirebaseUserException
         )
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
-        )
+        val repository = createRepository(dataSource = dataSource)
 
         assertEquals(
             Result.Failure(AuthError.NoAuthenticatedUser),
@@ -184,10 +165,8 @@ class FirebaseAuthRepositoryTest {
     @Test
     fun repository_rethrowsCancellation() = runTest {
         val cancellation = CancellationException("cancelled")
-        val repository = FirebaseAuthRepository(
-            FakeFirebaseAuthDataSource(signInFailure = cancellation),
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
+        val repository = createRepository(
+            dataSource = FakeFirebaseAuthDataSource(signInFailure = cancellation)
         )
 
         try {
@@ -204,10 +183,9 @@ class FirebaseAuthRepositoryTest {
             googleSignedInUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
         )
         val userDocumentDataSource = FakeFirebaseUserDocumentDataSource()
-        val repository = FirebaseAuthRepository(
-            authDataSource,
-            userDocumentDataSource,
-            FakeGoogleCredentialStateDataSource()
+        val repository = createRepository(
+            dataSource = authDataSource,
+            userDocumentDataSource = userDocumentDataSource
         )
 
         val result = repository.signInWithGoogle("google-id-token")
@@ -231,14 +209,13 @@ class FirebaseAuthRepositoryTest {
 
     @Test
     fun signInWithGoogle_returnsAccountSetupFailure_whenUserDocumentWriteFails() = runTest {
-        val repository = FirebaseAuthRepository(
-            FakeFirebaseAuthDataSource(
+        val repository = createRepository(
+            dataSource = FakeFirebaseAuthDataSource(
                 googleSignedInUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
             ),
-            FakeFirebaseUserDocumentDataSource(
+            userDocumentDataSource = FakeFirebaseUserDocumentDataSource(
                 upsertFailure = IllegalStateException("firestore unavailable")
-            ),
-            FakeGoogleCredentialStateDataSource()
+            )
         )
 
         val result = repository.signInWithGoogle("google-id-token")
@@ -249,65 +226,103 @@ class FirebaseAuthRepositoryTest {
     @Test
     fun resetPassword_delegatesToFirebaseAuth() = runTest {
         val dataSource = FakeFirebaseAuthDataSource()
-        val repository = FirebaseAuthRepository(
-            dataSource,
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
-        )
+        val repository = createRepository(dataSource = dataSource)
 
         assertEquals(Result.Success(Unit), repository.resetPassword("amal@example.com"))
         assertEquals("amal@example.com", dataSource.passwordResetRequest)
     }
 
     @Test
-    fun deleteAccount_deletesFirestoreUserDocument_afterDeletingFirebaseUser() = runTest {
+    fun deleteAccount_purgesOwnedData_beforeDeletingFirebaseUser() = runTest {
         val dataSource = FakeFirebaseAuthDataSource(
             currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
         )
-        val userDocumentDataSource = FakeFirebaseUserDocumentDataSource()
+        val purgeContributor = FakeUserDataPurgeContributor()
+        val archiveDataSource = FakeFirebaseOwnedUserDataArchiveDataSource()
         val repository = FirebaseAuthRepository(
             dataSource,
-            userDocumentDataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            UserDataPurgeCoordinator(setOf(purgeContributor)),
+            archiveDataSource,
             FakeGoogleCredentialStateDataSource()
         )
 
         assertEquals(Result.Success(Unit), repository.deleteAccount())
-        assertEquals("user-1", userDocumentDataSource.deletedUserId)
+        assertEquals("user-1", purgeContributor.purgedUserId)
+        assertEquals(1, archiveDataSource.snapshotCount)
+        assertEquals(0, archiveDataSource.restoreCount)
         assertEquals(1, dataSource.deleteCount)
     }
 
     @Test
-    fun deleteAccount_restoresFirestoreUserDocument_whenFirebaseDeleteFails() = runTest {
+    fun deleteAccount_restoresOwnedData_whenFirebaseDeleteFails() = runTest {
         val dataSource = FakeFirebaseAuthDataSource(
             currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true),
             deleteFailure = IllegalStateException("delete failed")
         )
-        val userDocumentDataSource = FakeFirebaseUserDocumentDataSource()
+        val purgeContributor = FakeUserDataPurgeContributor()
+        val archiveDataSource = FakeFirebaseOwnedUserDataArchiveDataSource()
         val repository = FirebaseAuthRepository(
             dataSource,
-            userDocumentDataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            UserDataPurgeCoordinator(setOf(purgeContributor)),
+            archiveDataSource,
             FakeGoogleCredentialStateDataSource()
         )
 
         assertEquals(Result.Failure(AuthError.Unknown), repository.deleteAccount())
-        assertEquals("user-1", userDocumentDataSource.deletedUserId)
-        assertEquals(
-            FirebaseAuthUserData("user-1", "amal@example.com", true),
-            userDocumentDataSource.upsertedUser
-        )
+        assertEquals("user-1", purgeContributor.purgedUserId)
+        assertEquals(1, archiveDataSource.snapshotCount)
+        assertEquals(1, archiveDataSource.restoreCount)
         assertEquals(0, dataSource.deleteCount)
     }
 
     @Test
     fun deleteAccount_returnsNoAuthenticatedUser_whenNoCurrentUserExists() = runTest {
-        val repository = FirebaseAuthRepository(
-            FakeFirebaseAuthDataSource(currentUser = null),
-            FakeFirebaseUserDocumentDataSource(),
-            FakeGoogleCredentialStateDataSource()
+        val repository = createRepository(
+            dataSource = FakeFirebaseAuthDataSource(currentUser = null)
         )
 
         assertEquals(Result.Failure(AuthError.NoAuthenticatedUser), repository.deleteAccount())
     }
+
+    @Test
+    fun deleteAccount_stopsBeforeAuthDeletion_whenPurgeFails() = runTest {
+        val dataSource = FakeFirebaseAuthDataSource(
+            currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
+        )
+        val purgeContributor = FakeUserDataPurgeContributor(
+            purgeFailure = IllegalStateException("purge failed")
+        )
+        val archiveDataSource = FakeFirebaseOwnedUserDataArchiveDataSource()
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            UserDataPurgeCoordinator(setOf(purgeContributor)),
+            archiveDataSource,
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        assertEquals(Result.Failure(AuthError.Unknown), repository.deleteAccount())
+        assertEquals("user-1", purgeContributor.purgedUserId)
+        assertEquals(1, archiveDataSource.snapshotCount)
+        assertEquals(1, archiveDataSource.restoreCount)
+        assertEquals(0, dataSource.deleteCount)
+    }
+
+    private fun createRepository(
+        dataSource: FakeFirebaseAuthDataSource = FakeFirebaseAuthDataSource(),
+        userDocumentDataSource: FakeFirebaseUserDocumentDataSource = FakeFirebaseUserDocumentDataSource(),
+        purgeContributor: FakeUserDataPurgeContributor = FakeUserDataPurgeContributor(),
+        archiveDataSource: FakeFirebaseOwnedUserDataArchiveDataSource = FakeFirebaseOwnedUserDataArchiveDataSource(),
+        googleCredentialStateDataSource: FakeGoogleCredentialStateDataSource = FakeGoogleCredentialStateDataSource()
+    ): FirebaseAuthRepository = FirebaseAuthRepository(
+        dataSource,
+        userDocumentDataSource,
+        UserDataPurgeCoordinator(setOf(purgeContributor)),
+        archiveDataSource,
+        googleCredentialStateDataSource
+    )
 
     private class FakeFirebaseAuthDataSource(
         private val createdUser: FirebaseAuthUserData? = null,
@@ -398,6 +413,46 @@ class FirebaseAuthRepositoryTest {
         override suspend fun deleteAuthenticatedUser(userId: String) {
             upsertFailure?.let { throw it }
             deletedUserId = userId
+        }
+    }
+
+    private class FakeFirebaseOwnedUserDataArchiveDataSource(
+        private val snapshotFailure: Throwable? = null,
+        private val restoreFailure: Throwable? = null
+    ) : FirebaseOwnedUserDataArchiveDataSource {
+        var snapshotCount = 0
+        var restoreCount = 0
+        var lastSnapshot: FirebaseOwnedUserDataSnapshot? = null
+
+        override suspend fun snapshotUserData(userId: String): FirebaseOwnedUserDataSnapshot {
+            snapshotFailure?.let { throw it }
+            snapshotCount += 1
+            return FirebaseOwnedUserDataSnapshot(
+                userDocument = FirebaseOwnedUserDocumentData(
+                    path = "users/$userId",
+                    data = mapOf("id" to userId)
+                ),
+                workoutPlans = emptyList(),
+                sessions = emptyList(),
+                progressDocs = emptyList()
+            ).also { lastSnapshot = it }
+        }
+
+        override suspend fun restoreUserData(snapshot: FirebaseOwnedUserDataSnapshot) {
+            restoreFailure?.let { throw it }
+            restoreCount += 1
+            lastSnapshot = snapshot
+        }
+    }
+
+    private class FakeUserDataPurgeContributor(
+        private val purgeFailure: Throwable? = null
+    ) : UserDataPurgeContributor {
+        var purgedUserId: String? = null
+
+        override suspend fun purgeUserData(userId: String) {
+            purgedUserId = userId
+            purgeFailure?.let { throw it }
         }
     }
 
