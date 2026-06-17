@@ -1,6 +1,6 @@
 # Story AUTH-004: Firebase Security Rules
 
-Status: review
+Status: done
 Completion Note: Firestore rules, emulator config, and emulator-backed verification were implemented and deployed.
 
 ## Story
@@ -158,3 +158,8 @@ GPT-5 Codex
 - `firestore.rules`
 - `feature/auth/auth-data/src/androidTest/AndroidManifest.xml`
 - `feature/auth/auth-data/src/androidTest/java/com/aml_sakr/fitlife/feature/auth/data/FirestoreSecurityRulesEmulatorTest.kt`
+
+### Review Findings
+
+- [x] [Review][Patch] Progress updates can hijack another user's document [firestore.rules:29-31]
+- [x] [Review][Patch] No denied-access coverage for `users/{uid}/sessions/{sessionId}` [feature/auth/auth-data/src/androidTest/java/com/aml_sakr/fitlife/feature/auth/data/FirestoreSecurityRulesEmulatorTest.kt:121]

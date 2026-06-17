@@ -28,7 +28,11 @@ service cloud.firestore {
 
     match /progress/{progressId} {
       allow read, delete: if isSignedIn() && resource != null && resource.data.userId == request.auth.uid;
-      allow create, update: if isOwnedProgressWrite();
+      allow create: if isOwnedProgressWrite();
+      allow update: if isSignedIn()
+        && resource != null
+        && resource.data.userId == request.auth.uid
+        && isOwnedProgressWrite();
     }
   }
 }

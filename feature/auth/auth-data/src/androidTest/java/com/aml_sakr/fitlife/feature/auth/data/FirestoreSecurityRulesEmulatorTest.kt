@@ -161,6 +161,19 @@ class FirestoreSecurityRulesEmulatorTest {
             }
 
             assertPermissionDenied {
+                usersCollection.document(other.uid)
+                    .collection("sessions")
+                    .document("session-1")
+                    .set(
+                        mapOf(
+                            "sessionId" to "session-1",
+                            "userId" to other.uid
+                        )
+                    )
+                    .await()
+            }
+
+            assertPermissionDenied {
                 firestore.collection(PROGRESS_COLLECTION)
                     .document("progress-denied")
                     .set(
@@ -190,6 +203,13 @@ class FirestoreSecurityRulesEmulatorTest {
             assertPermissionDenied {
                 ownerUserDoc.get().await()
             }
+
+            assertPermissionDenied {
+                ownerUserDoc.collection("sessions")
+                    .document("session-unauth")
+                    .get()
+                    .await()
+            }
         }
     }
 
@@ -198,11 +218,12 @@ class FirestoreSecurityRulesEmulatorTest {
         runBlocking {
             val owner = createUser("owner")
             signIn(owner.email, owner.password)
+            val progressDocId = "progress-guard-${UUID.randomUUID()}"
 
-            val progressDoc = firestore.collection(PROGRESS_COLLECTION).document("progress-guard")
+            val progressDoc = firestore.collection(PROGRESS_COLLECTION).document(progressDocId)
             progressDoc.set(
                 mapOf(
-                    "progressId" to "progress-guard",
+                    "progressId" to progressDocId,
                     "userId" to owner.uid,
                     "weeklyCalories" to 900L
                 )
@@ -216,7 +237,7 @@ class FirestoreSecurityRulesEmulatorTest {
 
             assertPermissionDenied {
                 firestore.collection(PROGRESS_COLLECTION)
-                    .document("progress-foreign")
+                    .document("progress-foreign-${UUID.randomUUID()}")
                     .set(
                         mapOf(
                             "progressId" to "progress-foreign",
