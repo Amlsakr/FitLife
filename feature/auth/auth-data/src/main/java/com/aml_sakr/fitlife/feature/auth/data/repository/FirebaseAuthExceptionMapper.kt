@@ -4,6 +4,7 @@ import com.aml_sakr.fitlife.feature.auth.data.AuthDataConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.firestore.FirebaseFirestoreException
 
 internal object FirebaseAuthExceptionMapper {
     fun map(throwable: Throwable): AuthError {
@@ -11,7 +12,9 @@ internal object FirebaseAuthExceptionMapper {
             return AuthError.NoAuthenticatedUser
         }
         return mapFailure(
-            isNetworkFailure = throwable is FirebaseNetworkException,
+            isNetworkFailure = throwable is FirebaseNetworkException ||
+                throwable is FirebaseFirestoreException &&
+                throwable.code.name in FIRESTORE_NETWORK_FAILURE_CODES,
             errorCode = (throwable as? FirebaseAuthException)?.errorCode
         )
     }
@@ -45,6 +48,13 @@ internal object FirebaseAuthExceptionMapper {
             AuthDataConstants.FirebaseAuthErrorCodes.USER_DISABLED -> AuthError.UserDisabled
             AuthDataConstants.FirebaseAuthErrorCodes.TOO_MANY_REQUESTS -> AuthError.TooManyRequests
             AuthDataConstants.FirebaseAuthErrorCodes.NETWORK_REQUEST_FAILED -> AuthError.NetworkUnavailable
+            AuthDataConstants.FirebaseAuthErrorCodes.REQUIRES_RECENT_LOGIN ->
+                AuthError.ReauthenticationRequired
             else -> AuthError.Unknown
         }
+
+    private val FIRESTORE_NETWORK_FAILURE_CODES = setOf(
+        "UNAVAILABLE",
+        "DEADLINE_EXCEEDED"
+    )
 }

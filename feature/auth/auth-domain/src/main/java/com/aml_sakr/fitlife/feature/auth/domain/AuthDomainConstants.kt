@@ -15,6 +15,7 @@ internal object AuthDomainConstants {
         const val GOOGLE_ACCOUNT_SETUP_FAILED = "auth_google_account_setup_failed"
         const val GOOGLE_CREDENTIAL_STATE_CLEAR_FAILED =
             "auth_google_credential_state_clear_failed"
+        const val REAUTHENTICATION_REQUIRED = "auth_reauthentication_required"
         const val UNKNOWN = "auth_unknown"
     }
 
@@ -32,6 +33,8 @@ internal object AuthDomainConstants {
         const val GOOGLE_ACCOUNT_SETUP_FAILED = "Google sign-in succeeded, but account setup failed."
         const val GOOGLE_CREDENTIAL_STATE_CLEAR_FAILED =
             "Signed out, but Google sign-in state could not be cleared."
+        const val REAUTHENTICATION_REQUIRED =
+            "Recent sign-in is required before this action can continue."
         const val UNKNOWN = "Authentication failed unexpectedly."
     }
 }

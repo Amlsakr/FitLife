@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -44,8 +46,10 @@ import com.aml_sakr.fitlife.feature.auth.domain.startup.AuthSessionReader
 import com.aml_sakr.fitlife.feature.auth.domain.startup.DetermineStartupDestinationUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.startup.OnboardingCompletionReader
 import com.aml_sakr.fitlife.feature.auth.domain.startup.StartupDestination
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.DeleteAccountUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.RefreshCurrentUserUseCase
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResetPasswordUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResendEmailVerificationUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInWithGoogleUseCase
@@ -161,6 +165,8 @@ fun FitLifeApp(
                         signUp = SignUpUseCase(authRepository),
                         signIn = SignInUseCase(authRepository),
                         signInWithGoogle = SignInWithGoogleUseCase(authRepository),
+                        resetPasswordUseCase = ResetPasswordUseCase(authRepository),
+                        deleteAccountUseCase = DeleteAccountUseCase(authRepository),
                         signOut = SignOutUseCase(authRepository),
                         getCurrentUser = GetCurrentUserUseCase(authRepository),
                         resendEmailVerification = ResendEmailVerificationUseCase(authRepository),
@@ -192,6 +198,13 @@ fun FitLifeApp(
                             backStack = backStack,
                             currentRoute = AppRoute.Onboarding
                         )
+                    },
+                    onDeleteAccount = {
+                        deleteAccountAndNavigateToAuth(
+                            authRepository = authRepository,
+                            backStack = backStack,
+                            currentRoute = AppRoute.Onboarding
+                        )
                     }
                 )
             }
@@ -200,6 +213,13 @@ fun FitLifeApp(
                     title = "Home",
                     onSignOut = {
                         signOutAndNavigateToAuth(
+                            authRepository = authRepository,
+                            backStack = backStack,
+                            currentRoute = AppRoute.Home
+                        )
+                    },
+                    onDeleteAccount = {
+                        deleteAccountAndNavigateToAuth(
                             authRepository = authRepository,
                             backStack = backStack,
                             currentRoute = AppRoute.Home
@@ -243,15 +263,32 @@ private suspend fun signOutAndNavigateToAuth(
     }
 }
 
+private suspend fun deleteAccountAndNavigateToAuth(
+    authRepository: AuthRepository,
+    backStack: MutableList<NavKey>,
+    currentRoute: AppRoute
+): Result<Unit, AuthError> {
+    return when (val result = DeleteAccountUseCase(authRepository)()) {
+        is Result.Success -> {
+            backStack.replaceRoot(currentRoute, AppRoute.Auth)
+            result
+        }
+        is Result.Failure -> result
+    }
+}
+
 @Composable
 private fun ProtectedDestination(
     title: String,
     onSignOut: suspend () -> Unit,
+    onDeleteAccount: suspend () -> Result<Unit, AuthError>,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var isSigningOut by remember { mutableStateOf(false) }
+    var isDeletingAccount by remember { mutableStateOf(false) }
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -290,10 +327,76 @@ private fun ProtectedDestination(
                     Text("Sign out")
                 }
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = { showDeleteAccountDialog = true },
+                enabled = !isSigningOut && !isDeletingAccount
+            ) {
+                if (isDeletingAccount) {
+                    CircularProgressIndicator(strokeWidth = 2.dp)
+                } else {
+                    Text("Delete account")
+                }
+            }
         }
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
+
+    if (showDeleteAccountDialog) {
+        AlertDialog(
+            onDismissRequest = { if (!isDeletingAccount) showDeleteAccountDialog = false },
+            title = { Text("Delete your account?") },
+            text = { Text("This will remove your FitLife account and the data tied to it from the app.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (isDeletingAccount) return@TextButton
+                        showDeleteAccountDialog = false
+                        isDeletingAccount = true
+                        coroutineScope.launch {
+                            try {
+                                when (val result = onDeleteAccount()) {
+                                    is Result.Success -> {
+                                        showDeleteAccountDialog = false
+                                    }
+                                    is Result.Failure -> {
+                                        snackbarHostState.showSnackbar(
+                                            when (result.error) {
+                                                AuthError.ReauthenticationRequired ->
+                                                    "Please sign in again before deleting your account."
+                                                else ->
+                                                    "Unable to delete account. Please try again."
+                                            }
+                                        )
+                                    }
+                                }
+                            } catch (cancellation: CancellationException) {
+                                throw cancellation
+                            } catch (_: Throwable) {
+                                snackbarHostState.showSnackbar(
+                                    "Unable to delete account. Please try again."
+                                )
+                            } finally {
+                                isDeletingAccount = false
+                            }
+                        }
+                    },
+                    enabled = !isDeletingAccount
+                ) {
+                    Text("Delete permanently")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteAccountDialog = false },
+                    enabled = !isDeletingAccount
+                ) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }
@@ -332,6 +435,12 @@ private object DefaultAuthRepository : AuthRepository {
         googleIdToken: String
     ): Result<AuthUser, AuthError> = Result.Failure(AuthError.GoogleSignInFailed)
 
+    override suspend fun resetPassword(email: String): Result<Unit, AuthError> =
+        Result.Failure(AuthError.Unknown)
+
+    override suspend fun deleteAccount(): Result<Unit, AuthError> =
+        Result.Failure(AuthError.Unknown)
+
     override suspend fun signOut(): Result<Unit, AuthError> = Result.Success(Unit)
 
     override suspend fun currentUser(): Result<AuthUser?, AuthError> = Result.Success(null)
@@ -359,7 +468,8 @@ fun FitLifeAppPreview() {
     FitnessAppTheme {
         ProtectedDestination(
             title = "Splash preview handled in auth-ui",
-            onSignOut = {}
+            onSignOut = {},
+            onDeleteAccount = { Result.Success(Unit) }
         )
     }
 }

@@ -67,6 +67,11 @@ sealed class AuthError(
         message = AuthDomainConstants.ErrorMessages.GOOGLE_CREDENTIAL_STATE_CLEAR_FAILED
     )
 
+    data object ReauthenticationRequired : AuthError(
+        code = AuthDomainConstants.ErrorCodes.REAUTHENTICATION_REQUIRED,
+        message = AuthDomainConstants.ErrorMessages.REAUTHENTICATION_REQUIRED
+    )
+
     data object Unknown : AuthError(
         code = AuthDomainConstants.ErrorCodes.UNKNOWN,
         message = AuthDomainConstants.ErrorMessages.UNKNOWN

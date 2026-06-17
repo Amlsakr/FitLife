@@ -112,6 +112,7 @@ internal fun SignInScreenContent(
                         googleButtonTextResId = R.string.auth_continue_with_google,
                         promptTextResId = R.string.auth_new_to_fitlife,
                         actionTextResId = R.string.auth_register_button,
+                        showForgotPasswordAction = true,
                         googleSignInEnabled = googleSignInEnabled,
                         isGoogleSignInInProgress = isGoogleSignInInProgress
                     )

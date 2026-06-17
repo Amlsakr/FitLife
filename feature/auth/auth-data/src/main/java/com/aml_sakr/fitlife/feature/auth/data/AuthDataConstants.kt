@@ -12,6 +12,7 @@ internal object AuthDataConstants {
         const val USER_DISABLED = "ERROR_USER_DISABLED"
         const val TOO_MANY_REQUESTS = "ERROR_TOO_MANY_REQUESTS"
         const val NETWORK_REQUEST_FAILED = "ERROR_NETWORK_REQUEST_FAILED"
+        const val REQUIRES_RECENT_LOGIN = "ERROR_REQUIRES_RECENT_LOGIN"
     }
 
     internal object ExceptionMessages {

@@ -8,6 +8,7 @@ sealed interface AuthEvent : UIEvent {
     data class PasswordChanged(val value: String) : AuthEvent
     data class ConfirmPasswordChanged(val value: String) : AuthEvent
     data object Submit : AuthEvent
+    data object ResetPasswordRequested : AuthEvent
     data object GoogleSignInRequested : AuthEvent
     data class GoogleSignInTokenReceived(val token: String) : AuthEvent
     data class GoogleSignInFailed(val error: AuthError) : AuthEvent
@@ -16,5 +17,8 @@ sealed interface AuthEvent : UIEvent {
     data object ShowSignUp : AuthEvent
     data object ResendVerification : AuthEvent
     data object RefreshVerification : AuthEvent
+    data object DeleteAccountRequested : AuthEvent
+    data object DeleteAccountConfirmed : AuthEvent
+    data object DeleteAccountDismissed : AuthEvent
     data object SignOut : AuthEvent
 }

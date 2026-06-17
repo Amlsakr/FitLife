@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.aml_sakr.fitlife.core.ui.theme.FitnessAppTheme
 import com.aml_sakr.fitlife.feature.auth.auth_ui.R
@@ -141,6 +145,35 @@ fun AuthScreen(
             }
         }
     }
+
+    if (state.isDeleteAccountConfirmationVisible) {
+        DeleteAccountConfirmationDialog(onEvent = onEvent)
+    }
+}
+
+@Composable
+private fun DeleteAccountConfirmationDialog(
+    onEvent: (AuthEvent) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onEvent(AuthEvent.DeleteAccountDismissed) },
+        title = {
+            Text(text = stringResource(R.string.auth_delete_account_title))
+        },
+        text = {
+            Text(text = stringResource(R.string.auth_delete_account_confirmation))
+        },
+        confirmButton = {
+            TextButton(onClick = { onEvent(AuthEvent.DeleteAccountConfirmed) }) {
+                Text(text = stringResource(R.string.auth_delete_account_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onEvent(AuthEvent.DeleteAccountDismissed) }) {
+                Text(text = stringResource(R.string.auth_delete_account_cancel))
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)

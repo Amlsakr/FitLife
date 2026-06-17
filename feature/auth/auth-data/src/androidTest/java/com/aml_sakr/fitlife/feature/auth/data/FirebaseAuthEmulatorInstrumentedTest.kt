@@ -83,6 +83,8 @@ class FirebaseAuthEmulatorInstrumentedTest {
         override suspend fun upsertAuthenticatedUser(
             user: com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthUserData
         ) = Unit
+
+        override suspend fun deleteAuthenticatedUser(userId: String) = Unit
     }
 
     private object NoOpGoogleCredentialStateDataSource : GoogleCredentialStateDataSource {

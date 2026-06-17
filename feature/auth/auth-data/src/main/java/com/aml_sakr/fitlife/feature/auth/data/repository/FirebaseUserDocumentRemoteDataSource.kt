@@ -23,4 +23,10 @@ internal class FirebaseUserDocumentRemoteDataSource @Inject constructor(
             )
             .await()
     }
+
+    override suspend fun deleteAuthenticatedUser(userId: String) {
+        usersCollection.document(userId)
+            .delete()
+            .await()
+    }
 }

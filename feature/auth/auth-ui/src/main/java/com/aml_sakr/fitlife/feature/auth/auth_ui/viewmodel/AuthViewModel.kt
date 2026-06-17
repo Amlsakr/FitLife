@@ -7,8 +7,10 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.R
 import com.aml_sakr.fitlife.feature.auth.auth_ui.AuthUiConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.DeleteAccountUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.RefreshCurrentUserUseCase
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResetPasswordUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResendEmailVerificationUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInWithGoogleUseCase
@@ -25,6 +27,8 @@ class AuthViewModel(
     private val signUp: SignUpUseCase,
     private val signIn: SignInUseCase,
     private val signInWithGoogle: SignInWithGoogleUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
     private val signOut: SignOutUseCase,
     private val getCurrentUser: GetCurrentUserUseCase,
     private val resendEmailVerification: ResendEmailVerificationUseCase,
@@ -46,6 +50,7 @@ class AuthViewModel(
                 copy(confirmPassword = event.value, confirmPasswordErrorResId = null)
             }
             AuthEvent.Submit -> submit()
+            AuthEvent.ResetPasswordRequested -> resetPassword()
             AuthEvent.GoogleSignInRequested -> requestGoogleSignIn()
             is AuthEvent.GoogleSignInTokenReceived -> handleGoogleSignIn(event.token)
             is AuthEvent.GoogleSignInFailed -> {
@@ -59,6 +64,11 @@ class AuthViewModel(
             AuthEvent.ShowSignUp -> showSignUp()
             AuthEvent.ResendVerification -> resendVerification()
             AuthEvent.RefreshVerification -> refreshVerification()
+            AuthEvent.DeleteAccountRequested -> requestDeleteAccount()
+            AuthEvent.DeleteAccountConfirmed -> confirmDeleteAccount()
+            AuthEvent.DeleteAccountDismissed -> setState {
+                copy(isDeleteAccountConfirmationVisible = false)
+            }
             AuthEvent.SignOut -> performSignOut()
         }
     }
@@ -116,6 +126,29 @@ class AuthViewModel(
                     } else {
                         setState { copy(isLoading = false) }
                     }
+                    sendError(result.error)
+                }
+            }
+        }
+    }
+
+    private fun resetPassword() {
+        if (state.value.isLoading) return
+        val email = state.value.email.trim()
+        if (!isValidEmail(email)) {
+            setState { copy(emailErrorResId = R.string.auth_error_invalid_email) }
+            return
+        }
+
+        setState { copy(isLoading = true) }
+        viewModelScope.launch {
+            when (val result = resetPasswordUseCase(email)) {
+                is Result.Success -> {
+                    setState { copy(isLoading = false, password = AuthUiConstants.EMPTY_TEXT) }
+                    sendAction(AuthAction.ShowMessage(R.string.auth_message_password_reset_sent))
+                }
+                is Result.Failure -> {
+                    setState { copy(isLoading = false) }
                     sendError(result.error)
                 }
             }
@@ -222,6 +255,33 @@ class AuthViewModel(
         }
     }
 
+    private fun requestDeleteAccount() {
+        if (state.value.isLoading) return
+        setState { copy(isDeleteAccountConfirmationVisible = true) }
+    }
+
+    private fun confirmDeleteAccount() {
+        if (state.value.isLoading) return
+        setState {
+            copy(
+                isLoading = true,
+                isDeleteAccountConfirmationVisible = false
+            )
+        }
+        viewModelScope.launch {
+            when (val result = deleteAccountUseCase()) {
+                is Result.Success -> {
+                    setState { AuthState() }
+                    sendAction(AuthAction.NavigateToSignIn)
+                }
+                is Result.Failure -> {
+                    setState { copy(isLoading = false) }
+                    sendError(result.error)
+                }
+            }
+        }
+    }
+
     private fun performSignOut() {
         if (state.value.isLoading) return
         setState { copy(isLoading = true) }
@@ -259,6 +319,7 @@ class AuthViewModel(
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
                 verificationEmail = null,
+                isDeleteAccountConfirmationVisible = false,
                 isGoogleSignInInProgress = false,
                 isLoading = false
             )
@@ -276,6 +337,7 @@ class AuthViewModel(
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
                 verificationEmail = null,
+                isDeleteAccountConfirmationVisible = false,
                 isGoogleSignInInProgress = false,
                 isLoading = false
             )
@@ -297,6 +359,7 @@ class AuthViewModel(
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
                 verificationEmail = email.takeIf { it.isNotBlank() },
+                isDeleteAccountConfirmationVisible = false,
                 isGoogleSignInInProgress = false,
                 isLoading = false
             )

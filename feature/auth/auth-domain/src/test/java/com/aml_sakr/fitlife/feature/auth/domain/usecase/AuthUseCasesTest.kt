@@ -46,6 +46,22 @@ class AuthUseCasesTest {
     }
 
     @Test
+    fun resetPassword_delegatesToRepository() = runTest {
+        val repository = FakeAuthRepository(resetPasswordResult = Result.Success(Unit))
+
+        assertEquals(Result.Success(Unit), ResetPasswordUseCase(repository)("amal@example.com"))
+        assertEquals("amal@example.com", repository.resetPasswordRequest)
+    }
+
+    @Test
+    fun deleteAccount_delegatesToRepository() = runTest {
+        val repository = FakeAuthRepository(deleteAccountResult = Result.Success(Unit))
+
+        assertEquals(Result.Success(Unit), DeleteAccountUseCase(repository)())
+        assertEquals(1, repository.deleteAccountCount)
+    }
+
+    @Test
     fun signOut_delegatesToRepository() = runTest {
         val repository = FakeAuthRepository(signOutResult = Result.Success(Unit))
 
@@ -81,6 +97,8 @@ class AuthUseCasesTest {
         private val signUpResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val signInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val googleSignInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
+        private val resetPasswordResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
+        private val deleteAccountResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
         private val signOutResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
         private val currentUserResult: Result<AuthUser?, AuthError> = Result.Success(null),
         private val verificationResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
@@ -89,6 +107,8 @@ class AuthUseCasesTest {
         var signUpRequest: Pair<String, String>? = null
         var signInRequest: Pair<String, String>? = null
         var googleSignInRequest: String? = null
+        var resetPasswordRequest: String? = null
+        var deleteAccountCount = 0
         var signOutCount = 0
         var verificationCount = 0
         var refreshCount = 0
@@ -114,6 +134,16 @@ class AuthUseCasesTest {
         ): Result<AuthUser, AuthError> {
             googleSignInRequest = googleIdToken
             return googleSignInResult
+        }
+
+        override suspend fun resetPassword(email: String): Result<Unit, AuthError> {
+            resetPasswordRequest = email
+            return resetPasswordResult
+        }
+
+        override suspend fun deleteAccount(): Result<Unit, AuthError> {
+            deleteAccountCount += 1
+            return deleteAccountResult
         }
 
         override suspend fun signOut(): Result<Unit, AuthError> {

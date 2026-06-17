@@ -20,6 +20,7 @@
     <string name="auth_already_have_an_account">Already have an account?</string>
     <string name="auth_new_to_fitlife">New to FitLife?</string>
     <string name="auth_register_button">Register</string>
+    <string name="auth_forgot_password">Forgot password?</string>
     <string name="auth_terms_disclaimer">By registering, you agree to our Terms of Service and Privacy Policy.</string>
     <string name="auth_secure_data">Secure Data</string>
     <string name="auth_ai_powered">AI Powered</string>
@@ -27,12 +28,18 @@
     <string name="auth_verified_email_button">I\'ve verified my email</string>
     <string name="auth_resend_verification_email">Resend verification email</string>
     <string name="auth_sign_out">Sign out</string>
+    <string name="auth_delete_account">Delete account</string>
+    <string name="auth_delete_account_title">Delete your account?</string>
+    <string name="auth_delete_account_confirmation">This will remove your FitLife account and the data tied to it from the app.</string>
+    <string name="auth_delete_account_confirm">Delete permanently</string>
+    <string name="auth_delete_account_cancel">Cancel</string>
     <string name="auth_message_unable_to_continue">Unable to continue. Please try again.</string>
     <string name="auth_action_retry">Retry</string>
     <string name="auth_message_verification_email_sent_after_sign_up">Verification email sent. Check your inbox before continuing.</string>
     <string name="auth_message_verify_email_before_continuing">Verify your email before continuing.</string>
     <string name="auth_message_verification_email_resent">Verification email sent again.</string>
     <string name="auth_message_email_not_verified_yet">Email is not verified yet. Check your inbox.</string>
+    <string name="auth_message_password_reset_sent">Password reset email sent. Check your inbox.</string>
     <string name="auth_error_invalid_email">Enter a valid email address.</string>
     <string name="auth_error_min_password_length">Use at least 6 characters.</string>
     <string name="auth_error_passwords_do_not_match">Passwords do not match.</string>
@@ -47,6 +54,7 @@
     <string name="auth_error_google_sign_in_failed">Google sign-in failed. Please try again.</string>
     <string name="auth_error_google_account_setup_failed">Signed in with Google, but we could not finish setting up your account. Please try again.</string>
     <string name="auth_error_google_credential_state_clear_failed">You were signed out, but Google sign-in data could not be cleared. Please try again.</string>
+    <string name="auth_error_reauthentication_required">Please sign in again before deleting your account.</string>
     <string name="auth_error_unknown">Authentication failed. Please try again.</string>
     <string name="splash_brand_name">FitLife</string>
     <string name="splash_brand_tagline">PRECISION PERFORMANCE</string>
