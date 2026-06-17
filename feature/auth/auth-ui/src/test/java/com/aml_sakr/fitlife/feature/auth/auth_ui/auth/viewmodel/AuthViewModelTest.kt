@@ -5,8 +5,10 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.R
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.DeleteAccountUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.GetCurrentUserUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.RefreshCurrentUserUseCase
+import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResetPasswordUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.ResendEmailVerificationUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInUseCase
 import com.aml_sakr.fitlife.feature.auth.domain.usecase.SignInWithGoogleUseCase
@@ -175,6 +177,38 @@ class AuthViewModelTest {
             viewModel.actions.first()
         )
         assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun resetPasswordRequested_emitsConfirmationMessage_withoutLeavingScreen() = runTest(
+        dispatcher
+    ) {
+        val repository = FakeAuthRepository()
+        val viewModel = createViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.EmailChanged("amal@example.com"))
+        viewModel.onEvent(AuthEvent.ResetPasswordRequested)
+        advanceUntilIdle()
+
+        assertEquals(1, repository.resetPasswordCount)
+        assertTrue(viewModel.actions.first() is AuthAction.ShowMessage)
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun resetPasswordRequested_rejectsInvalidEmail_withoutCallingRepository() = runTest(
+        dispatcher
+    ) {
+        val repository = FakeAuthRepository()
+        val viewModel = createViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.EmailChanged("invalid-email"))
+        viewModel.onEvent(AuthEvent.ResetPasswordRequested)
+
+        assertEquals(R.string.auth_error_invalid_email, viewModel.state.value.emailErrorResId)
+        assertEquals(0, repository.resetPasswordCount)
     }
 
     @Test
@@ -362,6 +396,73 @@ class AuthViewModelTest {
         assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.first())
     }
 
+    @Test
+    fun deleteAccountRequested_showsConfirmationDialog() = runTest(dispatcher) {
+        val user = AuthUser("user-1", "amal@example.com", false)
+        val viewModel = createViewModel(
+            FakeAuthRepository(currentUserResult = Result.Success(user))
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.DeleteAccountRequested)
+
+        assertTrue(viewModel.state.value.isDeleteAccountConfirmationVisible)
+    }
+
+    @Test
+    fun deleteAccountConfirmed_deletesUser_andNavigatesToSignIn() = runTest(dispatcher) {
+        val user = AuthUser("user-1", "amal@example.com", false)
+        val repository = FakeAuthRepository(
+            currentUserResult = Result.Success(user),
+            deleteAccountResult = Result.Success(Unit)
+        )
+        val viewModel = createViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.DeleteAccountRequested)
+        viewModel.onEvent(AuthEvent.DeleteAccountConfirmed)
+        advanceUntilIdle()
+
+        assertEquals(1, repository.deleteAccountCount)
+        assertEquals(AuthState(), viewModel.state.value)
+        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.first())
+    }
+
+    @Test
+    fun deleteAccountConfirmed_handlesReauthenticationRequiredSafely() = runTest(dispatcher) {
+        val user = AuthUser("user-1", "amal@example.com", false)
+        val repository = FakeAuthRepository(
+            currentUserResult = Result.Success(user),
+            deleteAccountResult = Result.Failure(AuthError.ReauthenticationRequired)
+        )
+        val viewModel = createViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.DeleteAccountRequested)
+        viewModel.onEvent(AuthEvent.DeleteAccountConfirmed)
+        advanceUntilIdle()
+
+        assertEquals(1, repository.deleteAccountCount)
+        assertEquals(
+            AuthAction.ShowMessage(R.string.auth_error_reauthentication_required),
+            viewModel.actions.first()
+        )
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun deleteAccountDismissed_doesNotTriggerDeletion() = runTest(dispatcher) {
+        val repository = FakeAuthRepository()
+        val viewModel = createViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onEvent(AuthEvent.DeleteAccountRequested)
+        viewModel.onEvent(AuthEvent.DeleteAccountDismissed)
+
+        assertFalse(viewModel.state.value.isDeleteAccountConfirmationVisible)
+        assertEquals(0, repository.deleteAccountCount)
+    }
+
     private fun enterCredentials(
         viewModel: AuthViewModel,
         signUp: Boolean = false
@@ -379,6 +480,8 @@ class AuthViewModelTest {
             signUp = SignUpUseCase(repository),
             signIn = SignInUseCase(repository),
             signInWithGoogle = SignInWithGoogleUseCase(repository),
+            resetPasswordUseCase = ResetPasswordUseCase(repository),
+            deleteAccountUseCase = DeleteAccountUseCase(repository),
             signOut = SignOutUseCase(repository),
             getCurrentUser = GetCurrentUserUseCase(repository),
             resendEmailVerification = ResendEmailVerificationUseCase(repository),
@@ -389,6 +492,8 @@ class AuthViewModelTest {
         private val signUpResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val signInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
         private val googleSignInResult: Result<AuthUser, AuthError> = Result.Failure(AuthError.Unknown),
+        private val resetPasswordResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
+        private val deleteAccountResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
         private val signOutResult: Result<Unit, AuthError> = Result.Failure(AuthError.Unknown),
         private val currentUserResult: Result<AuthUser?, AuthError> = Result.Success(null),
         private val verificationResult: Result<Unit, AuthError> = Result.Success(Unit),
@@ -398,6 +503,8 @@ class AuthViewModelTest {
         var signUpCount = 0
         var signInCount = 0
         var googleSignInCount = 0
+        var resetPasswordCount = 0
+        var deleteAccountCount = 0
 
         override suspend fun signUp(
             email: String,
@@ -421,6 +528,16 @@ class AuthViewModelTest {
         ): Result<AuthUser, AuthError> {
             googleSignInCount += 1
             return googleSignInResult
+        }
+
+        override suspend fun resetPassword(email: String): Result<Unit, AuthError> {
+            resetPasswordCount += 1
+            return resetPasswordResult
+        }
+
+        override suspend fun deleteAccount(): Result<Unit, AuthError> {
+            deleteAccountCount += 1
+            return deleteAccountResult
         }
 
         override suspend fun signOut(): Result<Unit, AuthError> = signOutResult

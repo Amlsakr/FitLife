@@ -26,6 +26,10 @@ internal class FirebaseAuthRemoteDataSource @Inject constructor(
             GoogleAuthProvider.getCredential(googleIdToken, null)
         ).await().user?.toData()
 
+    override suspend fun sendPasswordResetEmail(email: String) {
+        firebaseAuth.sendPasswordResetEmail(email).await()
+    }
+
     override fun signOut() {
         firebaseAuth.signOut()
     }
@@ -35,6 +39,11 @@ internal class FirebaseAuthRemoteDataSource @Inject constructor(
     override suspend fun sendEmailVerification() {
         val user = firebaseAuth.currentUser ?: throw NoAuthenticatedFirebaseUserException
         user.sendEmailVerification().await()
+    }
+
+    override suspend fun deleteCurrentUser() {
+        val user = firebaseAuth.currentUser ?: throw NoAuthenticatedFirebaseUserException
+        user.delete().await()
     }
 
     override suspend fun reloadCurrentUser(): FirebaseAuthUserData? {

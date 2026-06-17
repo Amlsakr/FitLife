@@ -68,6 +68,34 @@ class FirebaseAuthRepository @Inject internal constructor(
         }
     }
 
+    override suspend fun resetPassword(email: String): Result<Unit, AuthError> = authCall {
+        dataSource.sendPasswordResetEmail(email)
+    }
+
+    override suspend fun deleteAccount(): Result<Unit, AuthError> {
+        val authenticatedUser = when (val result = currentUser()) {
+            is Result.Failure -> return Result.Failure(result.error)
+            is Result.Success -> result.value ?: return Result.Failure(AuthError.NoAuthenticatedUser)
+        }
+
+        return try {
+            userDocumentDataSource.deleteAuthenticatedUser(authenticatedUser.id)
+            dataSource.deleteCurrentUser()
+            Result.Success(Unit)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (throwable: Throwable) {
+            try {
+                userDocumentDataSource.upsertAuthenticatedUser(authenticatedUser.toData())
+            } catch (restoreCancellation: CancellationException) {
+                throw restoreCancellation
+            } catch (_: Throwable) {
+                // If rollback fails, we still return the original deletion failure.
+            }
+            Result.Failure(FirebaseAuthExceptionMapper.map(throwable))
+        }
+    }
+
     override suspend fun signOut(): Result<Unit, AuthError> {
         val result = authCall {
             dataSource.signOut()

@@ -98,6 +98,30 @@ class FitLifeAppNavigationTest {
     }
 
     @Test
+    fun protectedDestination_deleteAccountReplacesRootWithAuth() {
+        lateinit var backStack: NavBackStack<NavKey>
+
+        composeRule.setContent {
+            backStack = rememberNavBackStack(AppRoute.Home)
+
+            FitnessAppTheme {
+                FitLifeApp(
+                    backStack = backStack,
+                    authRepository = VerifiedAuthRepository,
+                    startupRouteErrorLogger = NoOpStartupRouteErrorLogger
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Delete account").performClick()
+        composeRule.onNodeWithText("Delete permanently").performClick()
+        composeRule.onNodeWithText("Login").assertIsDisplayed()
+        composeRule.runOnIdle {
+            assertEquals(listOf(AppRoute.Auth), backStack.toList())
+        }
+    }
+
+    @Test
     fun googleSignInAction_navigatesToHomeAndRemovesAuth() {
         lateinit var backStack: NavBackStack<NavKey>
         var destinationCheckCount = 0
@@ -296,6 +320,12 @@ class FitLifeAppNavigationTest {
             googleIdToken: String
         ): Result<AuthUser, AuthError> = Result.Success(user)
 
+        override suspend fun resetPassword(email: String): Result<Unit, AuthError> =
+            Result.Success(Unit)
+
+        override suspend fun deleteAccount(): Result<Unit, AuthError> =
+            Result.Success(Unit)
+
         override suspend fun signOut(): Result<Unit, AuthError> = Result.Success(Unit)
 
         override suspend fun currentUser(): Result<AuthUser?, AuthError> = Result.Success(user)
@@ -335,6 +365,12 @@ class FitLifeAppNavigationTest {
             googleIdToken: String
         ): Result<AuthUser, AuthError> = Result.Success(user)
 
+        override suspend fun resetPassword(email: String): Result<Unit, AuthError> =
+            Result.Success(Unit)
+
+        override suspend fun deleteAccount(): Result<Unit, AuthError> =
+            Result.Success(Unit)
+
         override suspend fun signOut(): Result<Unit, AuthError> = Result.Success(Unit)
 
         override suspend fun currentUser(): Result<AuthUser?, AuthError> = Result.Success(user)
@@ -366,6 +402,12 @@ class FitLifeAppNavigationTest {
         override suspend fun signInWithGoogle(
             googleIdToken: String
         ): Result<AuthUser, AuthError> = Result.Success(user)
+
+        override suspend fun resetPassword(email: String): Result<Unit, AuthError> =
+            Result.Success(Unit)
+
+        override suspend fun deleteAccount(): Result<Unit, AuthError> =
+            Result.Success(Unit)
 
         override suspend fun signOut(): Result<Unit, AuthError> = Result.Success(Unit)
 

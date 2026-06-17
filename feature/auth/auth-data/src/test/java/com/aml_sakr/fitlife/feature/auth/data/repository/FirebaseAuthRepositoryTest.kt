@@ -158,7 +158,8 @@ class FirebaseAuthRepositoryTest {
             "ERROR_USER_NOT_FOUND" to AuthError.InvalidCredentials,
             "ERROR_USER_DISABLED" to AuthError.UserDisabled,
             "ERROR_TOO_MANY_REQUESTS" to AuthError.TooManyRequests,
-            "ERROR_NETWORK_REQUEST_FAILED" to AuthError.NetworkUnavailable
+            "ERROR_NETWORK_REQUEST_FAILED" to AuthError.NetworkUnavailable,
+            "ERROR_REQUIRES_RECENT_LOGIN" to AuthError.ReauthenticationRequired
         )
 
         cases.forEach { (code, expected) ->
@@ -245,6 +246,69 @@ class FirebaseAuthRepositoryTest {
         assertEquals(Result.Failure(AuthError.GoogleAccountSetupFailed), result)
     }
 
+    @Test
+    fun resetPassword_delegatesToFirebaseAuth() = runTest {
+        val dataSource = FakeFirebaseAuthDataSource()
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        assertEquals(Result.Success(Unit), repository.resetPassword("amal@example.com"))
+        assertEquals("amal@example.com", dataSource.passwordResetRequest)
+    }
+
+    @Test
+    fun deleteAccount_deletesFirestoreUserDocument_afterDeletingFirebaseUser() = runTest {
+        val dataSource = FakeFirebaseAuthDataSource(
+            currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
+        )
+        val userDocumentDataSource = FakeFirebaseUserDocumentDataSource()
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            userDocumentDataSource,
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        assertEquals(Result.Success(Unit), repository.deleteAccount())
+        assertEquals("user-1", userDocumentDataSource.deletedUserId)
+        assertEquals(1, dataSource.deleteCount)
+    }
+
+    @Test
+    fun deleteAccount_restoresFirestoreUserDocument_whenFirebaseDeleteFails() = runTest {
+        val dataSource = FakeFirebaseAuthDataSource(
+            currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true),
+            deleteFailure = IllegalStateException("delete failed")
+        )
+        val userDocumentDataSource = FakeFirebaseUserDocumentDataSource()
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            userDocumentDataSource,
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        assertEquals(Result.Failure(AuthError.Unknown), repository.deleteAccount())
+        assertEquals("user-1", userDocumentDataSource.deletedUserId)
+        assertEquals(
+            FirebaseAuthUserData("user-1", "amal@example.com", true),
+            userDocumentDataSource.upsertedUser
+        )
+        assertEquals(0, dataSource.deleteCount)
+    }
+
+    @Test
+    fun deleteAccount_returnsNoAuthenticatedUser_whenNoCurrentUserExists() = runTest {
+        val repository = FirebaseAuthRepository(
+            FakeFirebaseAuthDataSource(currentUser = null),
+            FakeFirebaseUserDocumentDataSource(),
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        assertEquals(Result.Failure(AuthError.NoAuthenticatedUser), repository.deleteAccount())
+    }
+
     private class FakeFirebaseAuthDataSource(
         private val createdUser: FirebaseAuthUserData? = null,
         private val signedInUser: FirebaseAuthUserData? = null,
@@ -254,12 +318,16 @@ class FirebaseAuthRepositoryTest {
         private val createFailure: Throwable? = null,
         private val signInFailure: Throwable? = null,
         private val googleSignInFailure: Throwable? = null,
+        private val passwordResetFailure: Throwable? = null,
+        private val deleteFailure: Throwable? = null,
         private val signOutFailure: Throwable? = null,
         private val verificationFailure: Throwable? = null,
         private val reloadFailure: Throwable? = null
     ) : FirebaseAuthDataSource {
         var createRequest: Pair<String, String>? = null
         var googleSignInToken: String? = null
+        var passwordResetRequest: String? = null
+        var deleteCount = 0
         var verificationCount = 0
         var reloadCount = 0
         var signOutCount = 0
@@ -287,6 +355,11 @@ class FirebaseAuthRepositoryTest {
             return googleSignedInUser
         }
 
+        override suspend fun sendPasswordResetEmail(email: String) {
+            passwordResetFailure?.let { throw it }
+            passwordResetRequest = email
+        }
+
         override fun signOut() {
             signOutFailure?.let { throw it }
             signOutCount += 1
@@ -297,6 +370,11 @@ class FirebaseAuthRepositoryTest {
         override suspend fun sendEmailVerification() {
             verificationCount += 1
             verificationFailure?.let { throw it }
+        }
+
+        override suspend fun deleteCurrentUser() {
+            deleteFailure?.let { throw it }
+            deleteCount += 1
         }
 
         override suspend fun reloadCurrentUser(): FirebaseAuthUserData? {
@@ -310,10 +388,16 @@ class FirebaseAuthRepositoryTest {
         val upsertFailure: Throwable? = null
     ) : FirebaseUserDocumentDataSource {
         var upsertedUser: FirebaseAuthUserData? = null
+        var deletedUserId: String? = null
 
         override suspend fun upsertAuthenticatedUser(user: FirebaseAuthUserData) {
             upsertFailure?.let { throw it }
             upsertedUser = user
+        }
+
+        override suspend fun deleteAuthenticatedUser(userId: String) {
+            upsertFailure?.let { throw it }
+            deletedUserId = userId
         }
     }
 

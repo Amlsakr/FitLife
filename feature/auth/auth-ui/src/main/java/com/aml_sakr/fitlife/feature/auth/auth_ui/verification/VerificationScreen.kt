@@ -81,4 +81,11 @@ internal fun VerificationScreenContent(
     ) {
         Text(text = stringResource(R.string.auth_sign_out))
     }
+
+    TextButton(
+        onClick = { onEvent(AuthEvent.DeleteAccountRequested) },
+        enabled = !state.isLoading
+    ) {
+        Text(text = stringResource(R.string.auth_delete_account))
+    }
 }

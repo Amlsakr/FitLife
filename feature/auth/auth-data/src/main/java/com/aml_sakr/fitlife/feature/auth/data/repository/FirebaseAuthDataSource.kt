@@ -13,11 +13,15 @@ internal interface FirebaseAuthDataSource {
 
     suspend fun signInWithGoogle(googleIdToken: String): FirebaseAuthUserData?
 
+    suspend fun sendPasswordResetEmail(email: String)
+
     fun signOut()
 
     fun currentUser(): FirebaseAuthUserData?
 
     suspend fun sendEmailVerification()
+
+    suspend fun deleteCurrentUser()
 
     suspend fun reloadCurrentUser(): FirebaseAuthUserData?
 }

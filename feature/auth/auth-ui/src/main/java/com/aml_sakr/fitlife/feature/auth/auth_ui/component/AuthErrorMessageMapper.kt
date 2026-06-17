@@ -22,6 +22,7 @@ internal object AuthErrorMessageMapper {
             AuthError.GoogleAccountSetupFailed -> R.string.auth_error_google_account_setup_failed
             AuthError.GoogleCredentialStateClearFailed ->
                 R.string.auth_error_google_credential_state_clear_failed
+            AuthError.ReauthenticationRequired -> R.string.auth_error_reauthentication_required
             AuthError.Unknown -> R.string.auth_error_unknown
         }
 }

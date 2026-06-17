@@ -50,6 +50,7 @@ internal fun AuthCredentialForm(
     googleButtonTextResId: Int,
     promptTextResId: Int,
     actionTextResId: Int,
+    showForgotPasswordAction: Boolean,
     googleSignInEnabled: Boolean,
     isGoogleSignInInProgress: Boolean
 ) {
@@ -128,6 +129,21 @@ internal fun AuthCredentialForm(
                     onDone = { onEvent(AuthEvent.Submit) }
                 )
             )
+        }
+
+        if (showForgotPasswordAction) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(
+                    onClick = { onEvent(AuthEvent.ResetPasswordRequested) },
+                    enabled = !isBusy
+                ) {
+                    Text(text = stringResource(R.string.auth_forgot_password))
+                }
+            }
+            Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.space_sm)))
         }
 
         Spacer(modifier = Modifier.height(dimensionResource(CoreUiR.dimen.space_lg)))

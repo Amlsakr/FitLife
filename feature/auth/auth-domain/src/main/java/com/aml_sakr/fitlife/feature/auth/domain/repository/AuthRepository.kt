@@ -11,6 +11,10 @@ interface AuthRepository {
 
     suspend fun signInWithGoogle(googleIdToken: String): Result<AuthUser, AuthError>
 
+    suspend fun resetPassword(email: String): Result<Unit, AuthError>
+
+    suspend fun deleteAccount(): Result<Unit, AuthError>
+
     suspend fun signOut(): Result<Unit, AuthError>
 
     suspend fun currentUser(): Result<AuthUser?, AuthError>

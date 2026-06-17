@@ -112,6 +112,7 @@ internal fun SignUpScreenContent(
                         googleButtonTextResId = R.string.auth_continue_with_google,
                         promptTextResId = R.string.auth_already_have_an_account,
                         actionTextResId = R.string.auth_login_button,
+                        showForgotPasswordAction = false,
                         googleSignInEnabled = googleSignInEnabled,
                         isGoogleSignInInProgress = isGoogleSignInInProgress
                     )
