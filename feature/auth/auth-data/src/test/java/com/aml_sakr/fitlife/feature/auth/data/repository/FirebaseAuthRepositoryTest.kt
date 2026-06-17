@@ -239,12 +239,13 @@ class FirebaseAuthRepositoryTest {
         )
         val purgeContributor = FakeUserDataPurgeContributor()
         val archiveDataSource = FakeFirebaseOwnedUserDataArchiveDataSource()
+        val googleCredentialStateDataSource = FakeGoogleCredentialStateDataSource()
         val repository = FirebaseAuthRepository(
             dataSource,
             FakeFirebaseUserDocumentDataSource(),
             UserDataPurgeCoordinator(setOf(purgeContributor)),
             archiveDataSource,
-            FakeGoogleCredentialStateDataSource()
+            googleCredentialStateDataSource
         )
 
         assertEquals(Result.Success(Unit), repository.deleteAccount())
@@ -252,10 +253,11 @@ class FirebaseAuthRepositoryTest {
         assertEquals(1, archiveDataSource.snapshotCount)
         assertEquals(0, archiveDataSource.restoreCount)
         assertEquals(1, dataSource.deleteCount)
+        assertEquals(1, googleCredentialStateDataSource.clearCount)
     }
 
     @Test
-    fun deleteAccount_restoresOwnedData_whenFirebaseDeleteFails() = runTest {
+    fun deleteAccount_doesNotRestoreOwnedData_whenFirebaseDeleteFails() = runTest {
         val dataSource = FakeFirebaseAuthDataSource(
             currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true),
             deleteFailure = IllegalStateException("delete failed")

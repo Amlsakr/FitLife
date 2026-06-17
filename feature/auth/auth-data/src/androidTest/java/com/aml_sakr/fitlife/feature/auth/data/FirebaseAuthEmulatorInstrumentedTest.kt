@@ -15,6 +15,8 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseOwnedUserDataSnapshot
+import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseOwnedUserDocumentData
 import java.util.UUID
 import java.net.HttpURLConnection
 import java.net.URL
@@ -41,12 +43,13 @@ class FirebaseAuthEmulatorInstrumentedTest {
             appName
         )
         val firebaseAuth = FirebaseAuth.getInstance(firebaseApp).apply {
-            useEmulator(EMULATOR_HOST, EMULATOR_PORT)
+            useEmulator(resolveEmulatorHost(), EMULATOR_PORT)
             signOut()
         }
         val firestore = FirebaseFirestore.getInstance(firebaseApp).apply {
-            useEmulator(EMULATOR_HOST, FIRESTORE_PORT)
+            useEmulator(resolveEmulatorHost(), FIRESTORE_PORT)
         }
+        val archiveDataSource = FirebaseFirestoreOwnedUserDataArchiveDataSource(firestore)
         val repository = FirebaseAuthRepository(
             FirebaseAuthRemoteDataSource(firebaseAuth),
             FirebaseUserDocumentRemoteDataSource(firestore),
@@ -81,6 +84,31 @@ class FirebaseAuthEmulatorInstrumentedTest {
                 200
             )
             assertDocumentResponse("$PROGRESS_COLLECTION/progress-1", idToken, 200)
+
+            archiveDataSource.restoreUserData(
+                FirebaseOwnedUserDataSnapshot(
+                    userDocument = FirebaseOwnedUserDocumentData(
+                        path = "users/${createdUser.id}",
+                        data = mapOf(
+                            "id" to createdUser.id,
+                            "email" to "restored@example.com",
+                            "isEmailVerified" to false
+                        )
+                    ),
+                    workoutPlans = emptyList(),
+                    sessions = emptyList(),
+                    progressDocs = emptyList()
+                )
+            )
+            assertDocumentResponse("users/${createdUser.id}", idToken, 200)
+            assertEquals(
+                "seed@example.com",
+                firestore.collection(USERS_COLLECTION)
+                    .document(createdUser.id)
+                    .get()
+                    .await()
+                    .getString("email")
+            )
 
             assertEquals(Result.Success(Unit), repository.deleteAccount())
 
@@ -165,7 +193,7 @@ class FirebaseAuthEmulatorInstrumentedTest {
         vararg expectedCodes: Int
     ) {
         val connection = URL(
-            "http://$EMULATOR_HOST:$FIRESTORE_PORT/v1/projects/$PROJECT_ID/databases/(default)/documents/$documentPath"
+            "http://${resolveEmulatorHost()}:$FIRESTORE_PORT/v1/projects/$PROJECT_ID/databases/(default)/documents/$documentPath"
         ).openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.connectTimeout = 5_000
@@ -183,7 +211,6 @@ class FirebaseAuthEmulatorInstrumentedTest {
 
     private companion object {
         const val PROJECT_ID = "fitlife-1fdd1"
-        const val EMULATOR_HOST = "10.0.2.2"
         const val EMULATOR_PORT = 9099
         const val FIRESTORE_PORT = 8080
         const val USERS_COLLECTION = "users"
@@ -191,6 +218,16 @@ class FirebaseAuthEmulatorInstrumentedTest {
         const val SESSIONS_COLLECTION = "sessions"
         const val PROGRESS_COLLECTION = "progress"
         const val PROGRESS_USER_ID_FIELD = "userId"
+
+        fun resolveEmulatorHost(): String {
+            val args = InstrumentationRegistry.getArguments()
+            val override = args.getString("fitlifeFirebaseHost")
+                ?: System.getProperty("fitlife.firebase.host")
+            if (!override.isNullOrBlank()) {
+                return override
+            }
+            return "10.0.2.2"
+        }
     }
 
     private object NoOpGoogleCredentialStateDataSource : GoogleCredentialStateDataSource {

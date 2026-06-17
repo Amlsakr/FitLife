@@ -56,9 +56,10 @@ internal class FirebaseFirestoreOwnedUserDataArchiveDataSource @Inject construct
     ): List<FirebaseOwnedUserDocumentData> = documents.map { it.toOwnedDocument() }
 
     private suspend fun restoreDocument(document: FirebaseOwnedUserDocumentData) {
-        firestore.document(document.path)
-            .set(document.data, SetOptions.merge())
-            .await()
+        val reference = firestore.document(document.path)
+        if (!reference.get().await().exists()) {
+            reference.set(document.data, SetOptions.merge()).await()
+        }
     }
 
     private fun com.google.firebase.firestore.DocumentSnapshot.toOwnedDocument():

@@ -93,6 +93,14 @@ class FirebaseAuthRepository @Inject internal constructor(
             userDataPurgeCoordinator.purgeUserData(authenticatedUser.id)
             userDocumentDataSource.deleteAuthenticatedUser(authenticatedUser.id)
             dataSource.deleteCurrentUser()
+            try {
+                googleCredentialStateDataSource.clearCredentialState()
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Throwable) {
+                // Best effort only: the account has already been deleted, so
+                // do not fail the request because credential cleanup failed.
+            }
             Result.Success(Unit)
         } catch (cancellation: CancellationException) {
             throw cancellation
@@ -102,8 +110,8 @@ class FirebaseAuthRepository @Inject internal constructor(
             } catch (restoreCancellation: CancellationException) {
                 throw restoreCancellation
             } catch (_: Throwable) {
-                // Best effort: preserve the original delete failure while trying
-                // to put owned data back if auth deletion fails late.
+                // Best effort: keep the original auth failure while restoring
+                // only missing documents if we can.
             }
             Result.Failure(FirebaseAuthExceptionMapper.map(throwable))
         }

@@ -85,6 +85,8 @@ so that I keep full control over my privacy.
 
 - 2026-06-17: Added shared purge contract, Firestore contributor, delete sequencing, and coverage updates.
 - 2026-06-17: Added snapshot/restore rollback so late auth delete failures rehydrate owned Firestore data.
+- 2026-06-17: Removed stale-data rollback from account deletion and cleared Google credential state on success.
+- 2026-06-17: Restored rollback with safe restore-only-when-missing behavior and validated the flow on a real Android device.
 
 ## Dev Agent Record
 
@@ -102,8 +104,9 @@ GPT-5 Codex
 
 - Added a shared user-data purge contract in `core-data` and wired the auth module into it with a Firestore contributor.
 - `FirebaseAuthRepository.deleteAccount()` now purges owned Firestore data, deletes `users/{uid}`, then deletes the Firebase Auth user with no rollback.
-- Verified with auth-data unit tests, core-data contract tests, app compile/test, and auth-data Android-test compilation; emulator coverage was added for the full delete flow.
-- Added owned-data snapshot/restore so late `deleteCurrentUser()` failures put user Firestore data back before returning an error.
+- Verified with auth-data unit tests, core-data contract tests, app compile/test, and auth-data Android-test compilation on a connected Android device against the local Firebase emulators.
+- Restored owned-data snapshot/restore rollback while making restore idempotent for existing documents so late `deleteCurrentUser()` failures do not overwrite concurrent Firestore updates.
+- Resolved review feedback by keeping rollback safe for concurrent writes and by clearing Google credential state after successful delete.
 
 ### File List
 
