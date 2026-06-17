@@ -85,6 +85,13 @@ class FirebaseAuthRepository @Inject internal constructor(
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (throwable: Throwable) {
+            try {
+                userDocumentDataSource.upsertAuthenticatedUser(authenticatedUser.toData())
+            } catch (restoreCancellation: CancellationException) {
+                throw restoreCancellation
+            } catch (_: Throwable) {
+                // If rollback fails, we still return the original deletion failure.
+            }
             Result.Failure(FirebaseAuthExceptionMapper.map(throwable))
         }
     }

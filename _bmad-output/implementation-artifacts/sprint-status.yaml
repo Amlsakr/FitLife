@@ -54,7 +54,7 @@ development_status:
   auth-000-splash-screen-and-startup-routing: in-progress
   auth-001-firebase-auth-module-setup: done
   auth-002-google-sign-in-integration: done
-  auth-003-forgot-password-account-deletion: review
+  auth-003-forgot-password-account-deletion: done
   auth-004-firebase-security-rules: backlog
   auth-005-gdpr-account-deletion: backlog
   auth-006-camera-permission-privacy-disclosure: backlog

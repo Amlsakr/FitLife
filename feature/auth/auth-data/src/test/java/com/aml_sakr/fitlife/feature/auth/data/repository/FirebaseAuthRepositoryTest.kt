@@ -260,7 +260,7 @@ class FirebaseAuthRepositoryTest {
     }
 
     @Test
-    fun deleteAccount_deletesFirestoreUserDocument_beforeDeletingFirebaseUser() = runTest {
+    fun deleteAccount_deletesFirestoreUserDocument_afterDeletingFirebaseUser() = runTest {
         val dataSource = FakeFirebaseAuthDataSource(
             currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true)
         )
@@ -274,6 +274,28 @@ class FirebaseAuthRepositoryTest {
         assertEquals(Result.Success(Unit), repository.deleteAccount())
         assertEquals("user-1", userDocumentDataSource.deletedUserId)
         assertEquals(1, dataSource.deleteCount)
+    }
+
+    @Test
+    fun deleteAccount_restoresFirestoreUserDocument_whenFirebaseDeleteFails() = runTest {
+        val dataSource = FakeFirebaseAuthDataSource(
+            currentUser = FirebaseAuthUserData("user-1", "amal@example.com", true),
+            deleteFailure = IllegalStateException("delete failed")
+        )
+        val userDocumentDataSource = FakeFirebaseUserDocumentDataSource()
+        val repository = FirebaseAuthRepository(
+            dataSource,
+            userDocumentDataSource,
+            FakeGoogleCredentialStateDataSource()
+        )
+
+        assertEquals(Result.Failure(AuthError.Unknown), repository.deleteAccount())
+        assertEquals("user-1", userDocumentDataSource.deletedUserId)
+        assertEquals(
+            FirebaseAuthUserData("user-1", "amal@example.com", true),
+            userDocumentDataSource.upsertedUser
+        )
+        assertEquals(0, dataSource.deleteCount)
     }
 
     @Test
