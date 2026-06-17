@@ -1,6 +1,7 @@
 package com.aml_sakr.fitlife.feature.auth.data.repository
 
 import com.aml_sakr.fitlife.core.domain.Result
+import com.aml_sakr.fitlife.core.data.purge.UserDataPurgeCoordinator
 import com.aml_sakr.fitlife.feature.auth.data.AuthDataConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
@@ -11,6 +12,8 @@ import javax.inject.Inject
 class FirebaseAuthRepository @Inject internal constructor(
     private val dataSource: FirebaseAuthDataSource,
     private val userDocumentDataSource: FirebaseUserDocumentDataSource,
+    private val userDataPurgeCoordinator: UserDataPurgeCoordinator,
+    private val userDataArchiveDataSource: FirebaseOwnedUserDataArchiveDataSource,
     private val googleCredentialStateDataSource: GoogleCredentialStateDataSource
 ) : AuthRepository {
     override suspend fun signUp(
@@ -78,19 +81,37 @@ class FirebaseAuthRepository @Inject internal constructor(
             is Result.Success -> result.value ?: return Result.Failure(AuthError.NoAuthenticatedUser)
         }
 
+        val userDataSnapshot = try {
+            userDataArchiveDataSource.snapshotUserData(authenticatedUser.id)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (throwable: Throwable) {
+            return Result.Failure(FirebaseAuthExceptionMapper.map(throwable))
+        }
+
         return try {
+            userDataPurgeCoordinator.purgeUserData(authenticatedUser.id)
             userDocumentDataSource.deleteAuthenticatedUser(authenticatedUser.id)
             dataSource.deleteCurrentUser()
+            try {
+                googleCredentialStateDataSource.clearCredentialState()
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Throwable) {
+                // Best effort only: the account has already been deleted, so
+                // do not fail the request because credential cleanup failed.
+            }
             Result.Success(Unit)
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (throwable: Throwable) {
             try {
-                userDocumentDataSource.upsertAuthenticatedUser(authenticatedUser.toData())
+                userDataArchiveDataSource.restoreUserData(userDataSnapshot)
             } catch (restoreCancellation: CancellationException) {
                 throw restoreCancellation
             } catch (_: Throwable) {
-                // If rollback fails, we still return the original deletion failure.
+                // Best effort: keep the original auth failure while restoring
+                // only missing documents if we can.
             }
             Result.Failure(FirebaseAuthExceptionMapper.map(throwable))
         }

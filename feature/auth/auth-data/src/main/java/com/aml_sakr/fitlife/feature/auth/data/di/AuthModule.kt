@@ -3,16 +3,21 @@ package com.aml_sakr.fitlife.feature.auth.data.di
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthRemoteDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseAuthRepository
+import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseFirestoreOwnedUserDataArchiveDataSource
+import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseFirestoreUserDataPurgeContributor
+import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseOwnedUserDataArchiveDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseUserDocumentDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.FirebaseUserDocumentRemoteDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.GoogleCredentialStateDataSource
 import com.aml_sakr.fitlife.feature.auth.data.repository.GoogleCredentialStateRemoteDataSource
+import com.aml_sakr.fitlife.core.data.purge.UserDataPurgeContributor
 import com.aml_sakr.fitlife.feature.auth.data.startup.FirebaseAuthSessionReader
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
 import com.aml_sakr.fitlife.feature.auth.domain.startup.AuthSessionReader
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Binds
 import dagger.Module
+import dagger.multibindings.IntoSet
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -32,6 +37,19 @@ internal abstract class AuthBindingsModule {
     abstract fun bindFirebaseUserDocumentDataSource(
         dataSource: FirebaseUserDocumentRemoteDataSource
     ): FirebaseUserDocumentDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindFirebaseOwnedUserDataArchiveDataSource(
+        dataSource: FirebaseFirestoreOwnedUserDataArchiveDataSource
+    ): FirebaseOwnedUserDataArchiveDataSource
+
+    @Binds
+    @IntoSet
+    @Singleton
+    abstract fun bindUserDataPurgeContributor(
+        contributor: FirebaseFirestoreUserDataPurgeContributor
+    ): UserDataPurgeContributor
 
     @Binds
     @Singleton

@@ -22,6 +22,13 @@ internal object AuthDataConstants {
 
     internal object FirestoreCollections {
         const val USERS = "users"
+        const val PROGRESS = "progress"
+        const val WORKOUT_PLANS = "workoutPlans"
+        const val SESSIONS = "sessions"
+    }
+
+    internal object ProgressDocumentFields {
+        const val USER_ID = "userId"
     }
 
     internal object UserDocumentFields {
