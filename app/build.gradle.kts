@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":feature:auth:auth-data"))
     implementation(project(":feature:auth:auth-domain"))
     implementation(project(":feature:auth:auth-ui"))
+    implementation(project(":feature:session:session-ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.activity.compose)

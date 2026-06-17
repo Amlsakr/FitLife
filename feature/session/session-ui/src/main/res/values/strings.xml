@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_permission_title">Keep your form analysis private</string>
+    <string name="camera_permission_body">FitLife uses your camera to analyze your form in real time. All processing happens on your device and nothing is uploaded or stored.</string>
+    <string name="camera_permission_rationale_body">Before we ask for camera access, we want to explain why we need it. FitLife only uses the camera for live on-device form analysis during training sessions. Nothing is uploaded or stored.</string>
+    <string name="camera_permission_continue">Continue to camera</string>
+    <string name="camera_permission_audio_only">Use audio only</string>
+    <string name="camera_permission_audio_only_body">Audio-only guidance is available, so you can keep training without camera access.</string>
+    <string name="camera_permission_waiting_for_prompt">Waiting for the system camera prompt...</string>
+</resources>

@@ -62,6 +62,7 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.SplashViewModel
 import com.aml_sakr.fitlife.feature.auth.auth_ui.splash.StartupRouteErrorLogger
 import com.aml_sakr.fitlife.feature.auth.auth_ui.screen.AuthRoute
 import com.aml_sakr.fitlife.feature.auth.auth_ui.viewmodel.AuthViewModel
+import com.aml_sakr.fitlife.feature.session.ui.permission.CameraPermissionGateRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -224,6 +225,16 @@ fun FitLifeApp(
                             backStack = backStack,
                             currentRoute = AppRoute.Home
                         )
+                    },
+                    onStartSession = {
+                        backStack.add(AppRoute.Session)
+                    }
+                )
+            }
+            entry<AppRoute.Session> {
+                SessionEntryDestination(
+                    onExitSession = {
+                        backStack.removeLastOrNull()
                     }
                 )
             }
@@ -282,6 +293,7 @@ private fun ProtectedDestination(
     title: String,
     onSignOut: suspend () -> Unit,
     onDeleteAccount: suspend () -> Result<Unit, AuthError>,
+    onStartSession: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -290,52 +302,67 @@ private fun ProtectedDestination(
     var isDeletingAccount by remember { mutableStateOf(false) }
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleLarge
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    if (isSigningOut) return@Button
-                    isSigningOut = true
-                    coroutineScope.launch {
-                        try {
-                            onSignOut()
-                        } catch (cancellation: CancellationException) {
-                            throw cancellation
-                        } catch (_: Throwable) {
-                            snackbarHostState.showSnackbar(
-                                "Unable to sign out. Please try again."
-                            )
-                        } finally {
-                            isSigningOut = false
+    Box(modifier = modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = {
+                        if (isSigningOut) return@Button
+                        isSigningOut = true
+                        coroutineScope.launch {
+                            try {
+                                onSignOut()
+                            } catch (cancellation: CancellationException) {
+                                throw cancellation
+                            } catch (_: Throwable) {
+                                snackbarHostState.showSnackbar(
+                                    "Unable to sign out. Please try again."
+                                )
+                            } finally {
+                                isSigningOut = false
+                            }
                         }
+                    },
+                    enabled = !isSigningOut
+                ) {
+                    if (isSigningOut) {
+                        CircularProgressIndicator(strokeWidth = 2.dp)
+                    } else {
+                        Text("Sign out")
                     }
-                },
-                enabled = !isSigningOut
-            ) {
-                if (isSigningOut) {
-                    CircularProgressIndicator(strokeWidth = 2.dp)
-                } else {
-                    Text("Sign out")
                 }
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Button(
-                onClick = { showDeleteAccountDialog = true },
-                enabled = !isSigningOut && !isDeletingAccount
-            ) {
-                if (isDeletingAccount) {
-                    CircularProgressIndicator(strokeWidth = 2.dp)
-                } else {
-                    Text("Delete account")
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = { showDeleteAccountDialog = true },
+                    enabled = !isSigningOut && !isDeletingAccount
+                ) {
+                    if (isDeletingAccount) {
+                        CircularProgressIndicator(strokeWidth = 2.dp)
+                    } else {
+                        Text("Delete account")
+                    }
+                }
+                if (onStartSession != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = {
+                            if (!isSigningOut && !isDeletingAccount) {
+                                onStartSession()
+                            }
+                        },
+                        enabled = !isSigningOut && !isDeletingAccount
+                    ) {
+                        Text("Start session")
+                    }
                 }
             }
         }
@@ -401,6 +428,51 @@ private fun ProtectedDestination(
     }
 }
 
+@Composable
+private fun SessionEntryDestination(
+    onExitSession: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var sessionMode by remember { mutableStateOf<SessionMode?>(null) }
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        val mode = sessionMode
+        if (mode == null) {
+            CameraPermissionGateRoute(
+                onCameraSessionReady = {
+                    sessionMode = SessionMode.Camera
+                },
+                onAudioOnlySession = {
+                    sessionMode = SessionMode.AudioOnly
+                }
+            )
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = when (mode) {
+                        SessionMode.Camera -> "SESSION-001 camera handoff is ready."
+                        SessionMode.AudioOnly -> "SESSION-001 audio-only guidance is active."
+                    },
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = onExitSession) {
+                    Text("Back to home")
+                }
+            }
+        }
+    }
+}
+
+private enum class SessionMode {
+    Camera,
+    AudioOnly
+}
+
 @Serializable
 internal sealed interface AppRoute : NavKey {
     @Serializable
@@ -411,6 +483,9 @@ internal sealed interface AppRoute : NavKey {
 
     @Serializable
     data object Onboarding : AppRoute
+
+    @Serializable
+    data object Session : AppRoute
 
     @Serializable
     data object Home : AppRoute
