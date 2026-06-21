@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife Onboarding - Goals Selection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "warning": "#F57C00",
+                        "surface": "#fcf8ff",
+                        "surface-variant": "#e2e0fc",
+                        "outline": "#707882",
+                        "background-arctic": "#F0F4F8",
+                        "surface-container-high": "#e8e5ff",
+                        "success": "#2E7D32",
+                        "primary-fixed-dim": "#96ccff",
+                        "session-dark-bg": "#000000",
+                        "secondary": "#006876",
+                        "text-secondary": "#546E7A",
+                        "on-surface-variant": "#3f4851",
+                        "surface-container-highest": "#e2e0fc",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#004a75",
+                        "primary-fixed": "#cee5ff",
+                        "on-primary-fixed": "#001d32",
+                        "tertiary": "#006385",
+                        "on-secondary-fixed": "#001f25",
+                        "joint-cyan": "#00BCD4",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f2efff",
+                        "divider": "#ECEFF1",
+                        "error": "#C62828",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#bfc7d2",
+                        "secondary-fixed": "#a1efff",
+                        "surface-tint": "#00639a",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f5f2ff",
+                        "primary": "#006096",
+                        "inverse-surface": "#2f2e43",
+                        "on-secondary-fixed-variant": "#004e59",
+                        "secondary-fixed-dim": "#44d8f1",
+                        "tertiary-fixed": "#c2e8ff",
+                        "on-tertiary-container": "#fbfcff",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "on-secondary-container": "#006573",
+                        "surface-container": "#efecff",
+                        "on-tertiary-fixed": "#001e2b",
+                        "surface-bright": "#fcf8ff",
+                        "inverse-primary": "#96ccff",
+                        "primary-container": "#007abc",
+                        "on-surface": "#1a1a2e",
+                        "on-primary-container": "#fdfcff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#75d1ff",
+                        "surface-elevated": "#E8EEF4",
+                        "secondary-container": "#58e6ff",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#007ea7",
+                        "surface-dim": "#dad7f3",
+                        "on-background": "#1a1a2e",
+                        "background": "#fcf8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-large": "64px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "margin-tablet": "32px",
+                        "sm": "8px",
+                        "touch-target": "48px",
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "title-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "session-rep-count": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "title-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "session-rep-count": ["57px", { "lineHeight": "64px", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chip-active {
+            background-color: #00BCD4 !important;
+            color: #ffffff !important;
+            border-color: #00BCD4 !important;
+        }
+        .arctic-gradient {
+            background: linear-gradient(135deg, #F0F4F8 0%, #ffffff 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-arctic min-h-screen flex flex-col font-body-md text-on-background antialiased">
+<!-- Header Navigation (Simplified for Onboarding) -->
+<header class="w-full top-0 sticky bg-background/80 backdrop-blur-md z-40 px-md h-touch-target flex items-center justify-between">
+<button aria-label="Go back" class="flex items-center justify-center w-touch-target h-touch-target text-primary hover:bg-surface-elevated transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<span class="font-title-md text-primary opacity-60">Step 2 of 3</span>
+<div class="w-touch-target"></div> <!-- Spacer for centering -->
+</header>
+<main class="flex-grow flex flex-col px-md py-xl max-w-2xl mx-auto w-full">
+<!-- Progress Bar -->
+<div class="w-full bg-divider h-1 rounded-full mb-xl overflow-hidden">
+<div class="bg-primary h-full transition-all duration-700 ease-out" style="width: 66%"></div>
+</div>
+<!-- Headline Section -->
+<section class="mb-xl text-center md:text-left">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-sm">
+                What are your goals?
+            </h1>
+<p class="font-body-md text-text-secondary">
+                Choose at least one to help your AI coach tailor your training.
+            </p>
+</section>
+<!-- Goals Grid (Bento Style Variation) -->
+<section class="grid grid-cols-1 sm:grid-cols-2 gap-md mb-xl" id="goals-container">
+<!-- Hypertrophy -->
+<button class="group flex items-center justify-between p-lg bg-surface border border-divider rounded-xl hover:border-primary-fixed-dim transition-all text-left shadow-sm" onclick="toggleGoal(this)">
+<div class="flex flex-col gap-xs">
+<span class="font-title-md text-primary group-active:text-white">Hypertrophy</span>
+<span class="font-label-sm text-text-secondary group-active:text-white/80">Build muscle mass</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center transition-colors check-circle">
+<span class="material-symbols-outlined text-transparent select-none" data-icon="check" style="font-size: 20px;">check</span>
+</div>
+</button>
+<!-- Strength -->
+<button class="group flex items-center justify-between p-lg bg-surface border border-divider rounded-xl hover:border-primary-fixed-dim transition-all text-left shadow-sm" onclick="toggleGoal(this)">
+<div class="flex flex-col gap-xs">
+<span class="font-title-md text-primary group-active:text-white">Strength</span>
+<span class="font-label-sm text-text-secondary group-active:text-white/80">Max power &amp; lifting</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center transition-colors check-circle">
+<span class="material-symbols-outlined text-transparent select-none" data-icon="check" style="font-size: 20px;">check</span>
+</div>
+</button>
+<!-- Endurance -->
+<button class="group flex items-center justify-between p-lg bg-surface border border-divider rounded-xl hover:border-primary-fixed-dim transition-all text-left shadow-sm" onclick="toggleGoal(this)">
+<div class="flex flex-col gap-xs">
+<span class="font-title-md text-primary group-active:text-white">Endurance</span>
+<span class="font-label-sm text-text-secondary group-active:text-white/80">Stamina &amp; cardio health</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center transition-colors check-circle">
+<span class="material-symbols-outlined text-transparent select-none" data-icon="check" style="font-size: 20px;">check</span>
+</div>
+</button>
+<!-- Fat Loss -->
+<button class="group flex items-center justify-between p-lg bg-surface border border-divider rounded-xl hover:border-primary-fixed-dim transition-all text-left shadow-sm" onclick="toggleGoal(this)">
+<div class="flex flex-col gap-xs">
+<span class="font-title-md text-primary group-active:text-white">Fat Loss</span>
+<span class="font-label-sm text-text-secondary group-active:text-white/80">Weight management</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center transition-colors check-circle">
+<span class="material-symbols-outlined text-transparent select-none" data-icon="check" style="font-size: 20px;">check</span>
+</div>
+</button>
+<!-- Athletic Performance -->
+<button class="group flex items-center justify-between p-lg bg-surface border border-divider rounded-xl hover:border-primary-fixed-dim transition-all text-left shadow-sm sm:col-span-2" onclick="toggleGoal(this)">
+<div class="flex flex-col gap-xs">
+<span class="font-title-md text-primary group-active:text-white">Athletic Performance</span>
+<span class="font-label-sm text-text-secondary group-active:text-white/80">Agility, speed, and versatility</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center transition-colors check-circle">
+<span class="material-symbols-outlined text-transparent select-none" data-icon="check" style="font-size: 20px;">check</span>
+</div>
+</button>
+</section>
+<!-- Illustration / Mood Decor -->
+<div class="mt-auto pt-lg flex justify-center opacity-40">
+<div class="relative w-full max-w-sm h-32 overflow-hidden rounded-xl bg-surface-container flex items-center justify-center">
+<div class="absolute inset-0 bg-cover bg-center grayscale mix-blend-overlay" data-alt="A minimalist clinical-chic fitness studio with soft morning light hitting arctic blue walls. Elegant exercise equipment is barely visible in the soft-focus background, creating a sense of serene focus and professional health-tech aesthetic. The lighting is high-key and pristine." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBAecKATbgweI0B_uPAMI_k0cwpc2wt7U5y565uhOl7QfgW8-M5zcH0q6yySoPaCWEAt0zPCLCuDNgsodniNv2TQr8tCxLDGLO-Krpd-AKpEyIilwUfnRwrJhhgbgS_vLefahO0g8QJFO1h8L7d3-wTwM_iGK2wpBxJt-sF9zUSI_X8bEJaABuYg1dlTMXEZ8jA6C6N_Ms_Lpl4eZJU5bOZJz2TWlQRv14Xkw8I9LT9VDwfE2pDBL1a-CEOm4k8KfrjajeueE4L2Aea')"></div>
+<span class="material-symbols-outlined text-[64px] text-primary-fixed-dim animate-pulse" data-icon="insights">insights</span>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="sticky bottom-0 bg-background/95 backdrop-blur-md p-md pb-safe border-t border-divider">
+<div class="max-w-2xl mx-auto w-full">
+<button class="w-full h-touch-target-large bg-outline-variant text-on-primary font-title-md rounded-lg flex items-center justify-center gap-sm transition-all cursor-not-allowed" disabled="" id="continue-btn">
+                Continue
+                <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+<p class="text-center font-label-sm text-text-secondary mt-sm">
+                Your data is stored securely and used to optimize your AI model.
+            </p>
+</div>
+</footer>
+<script>
+        let selectedCount = 0;
+
+        function toggleGoal(el) {
+            const isSelected = el.classList.toggle('chip-active');
+            const checkCircle = el.querySelector('.check-circle');
+            const checkIcon = el.querySelector('.material-symbols-outlined[data-icon="check"]');
+            
+            if (isSelected) {
+                selectedCount++;
+                el.classList.remove('bg-surface', 'border-divider');
+                el.classList.add('bg-joint-cyan', 'border-joint-cyan');
+                checkCircle.classList.add('bg-white', 'border-white');
+                checkIcon.classList.remove('text-transparent');
+                checkIcon.classList.add('text-joint-cyan');
+                // Change text colors
+                el.querySelectorAll('span').forEach(s => {
+                    if(!s.classList.contains('material-symbols-outlined')) {
+                        s.classList.add('text-white');
+                        s.classList.remove('text-primary', 'text-text-secondary');
+                    }
+                });
+            } else {
+                selectedCount--;
+                el.classList.add('bg-surface', 'border-divider');
+                el.classList.remove('bg-joint-cyan', 'border-joint-cyan');
+                checkCircle.classList.remove('bg-white', 'border-white');
+                checkIcon.classList.add('text-transparent');
+                checkIcon.classList.remove('text-joint-cyan');
+                // Revert text colors
+                el.querySelector('.font-title-md').classList.remove('text-white');
+                el.querySelector('.font-title-md').classList.add('text-primary');
+                el.querySelector('.font-label-sm').classList.remove('text-white');
+                el.querySelector('.font-label-sm').classList.add('text-text-secondary');
+            }
+
+            updateButtonState();
+        }
+
+        function updateButtonState() {
+            const btn = document.getElementById('continue-btn');
+            if (selectedCount > 0) {
+                btn.disabled = false;
+                btn.classList.remove('bg-outline-variant', 'cursor-not-allowed');
+                btn.classList.add('bg-primary', 'shadow-lg', 'active:scale-95');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('bg-outline-variant', 'cursor-not-allowed');
+                btn.classList.remove('bg-primary', 'shadow-lg', 'active:scale-95');
+            }
+        }
+    </script>
+</body></html>

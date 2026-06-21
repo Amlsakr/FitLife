@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife Onboarding - Step 3</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "warning": "#F57C00",
+                        "surface": "#fcf8ff",
+                        "surface-variant": "#e2e0fc",
+                        "outline": "#707882",
+                        "background-arctic": "#F0F4F8",
+                        "surface-container-high": "#e8e5ff",
+                        "success": "#2E7D32",
+                        "primary-fixed-dim": "#96ccff",
+                        "session-dark-bg": "#000000",
+                        "secondary": "#006876",
+                        "text-secondary": "#546E7A",
+                        "on-surface-variant": "#3f4851",
+                        "surface-container-highest": "#e2e0fc",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#004a75",
+                        "primary-fixed": "#cee5ff",
+                        "on-primary-fixed": "#001d32",
+                        "tertiary": "#006385",
+                        "on-secondary-fixed": "#001f25",
+                        "joint-cyan": "#00BCD4",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f2efff",
+                        "divider": "#ECEFF1",
+                        "error": "#C62828",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#bfc7d2",
+                        "secondary-fixed": "#a1efff",
+                        "surface-tint": "#00639a",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f5f2ff",
+                        "primary": "#006096",
+                        "inverse-surface": "#2f2e43",
+                        "on-secondary-fixed-variant": "#004e59",
+                        "secondary-fixed-dim": "#44d8f1",
+                        "tertiary-fixed": "#c2e8ff",
+                        "on-tertiary-container": "#fbfcff",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "on-secondary-container": "#006573",
+                        "surface-container": "#efecff",
+                        "on-tertiary-fixed": "#001e2b",
+                        "surface-bright": "#fcf8ff",
+                        "inverse-primary": "#96ccff",
+                        "primary-container": "#007abc",
+                        "on-surface": "#1a1a2e",
+                        "on-primary-container": "#fdfcff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#75d1ff",
+                        "surface-elevated": "#E8EEF4",
+                        "secondary-container": "#58e6ff",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#007ea7",
+                        "surface-dim": "#dad7f3",
+                        "on-background": "#1a1a2e",
+                        "background": "#fcf8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-large": "64px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "margin-tablet": "32px",
+                        "sm": "8px",
+                        "touch-target": "48px",
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "title-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "session-rep-count": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "title-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "session-rep-count": ["57px", { "lineHeight": "64px", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F4F8; /* Arctic Focus Level 0 */
+        }
+        .arctic-card {
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px -2px rgba(2, 136, 209, 0.08);
+            border: 1px solid #ECEFF1;
+        }
+        .input-focus-ring:focus-within {
+            border-color: #006096;
+            box-shadow: 0 0 0 2px rgba(0, 96, 150, 0.1);
+        }
+        .step-indicator-bar {
+            height: 4px;
+            background: #ECEFF1;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .step-indicator-progress {
+            height: 100%;
+            background: #006096;
+            width: 100%;
+            transition: width 0.5s ease-out;
+        }
+        .no-spinner::-webkit-inner-spin-button, 
+        .no-spinner::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col text-on-surface">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-background flex items-center justify-between px-md h-touch-target z-40">
+<button aria-label="Go back" class="flex items-center justify-center w-touch-target h-touch-target hover:bg-surface-elevated transition-colors duration-200 rounded-full">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<span class="font-title-md text-title-md text-primary">Step 3 of 3</span>
+<div class="w-touch-target"></div> <!-- Spacer for center alignment -->
+</header>
+<main class="flex-1 flex flex-col px-md py-lg max-w-lg mx-auto w-full">
+<!-- Progress Bar -->
+<div class="mb-xl">
+<div class="step-indicator-bar">
+<div class="step-indicator-progress"></div>
+</div>
+</div>
+<!-- Headline & Description -->
+<section class="mb-xl">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-sm">Estimate your 1RM (Optional)</h1>
+<p class="font-body-md text-body-md text-text-secondary">If you know your one-rep max for key lifts, enter them below. We'll use these to set your initial loads.</p>
+</section>
+<!-- Form Section -->
+<form class="space-y-lg" id="max-form">
+<!-- Bench Press Field -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-outline px-xs" for="bench">Bench Press</label>
+<div class="flex items-stretch arctic-card rounded-lg overflow-hidden input-focus-ring transition-all duration-200 h-touch-target-large">
+<div class="flex items-center px-md text-primary">
+<span class="material-symbols-outlined">fitness_center</span>
+</div>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-title-md font-title-md no-spinner" id="bench" min="0" name="bench" placeholder="0" step="0.5" type="number"/>
+<div class="bg-surface-container-low px-md flex items-center border-l border-divider">
+<select class="bg-transparent border-none focus:ring-0 font-label-sm text-label-sm text-primary cursor-pointer pr-sm">
+<option value="kg">KG</option>
+<option value="lbs">LBS</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Squat Field -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-outline px-xs" for="squat">Squat</label>
+<div class="flex items-stretch arctic-card rounded-lg overflow-hidden input-focus-ring transition-all duration-200 h-touch-target-large">
+<div class="flex items-center px-md text-primary">
+<span class="material-symbols-outlined">directions_run</span>
+</div>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-title-md font-title-md no-spinner" id="squat" min="0" name="squat" placeholder="0" step="0.5" type="number"/>
+<div class="bg-surface-container-low px-md flex items-center border-l border-divider">
+<select class="bg-transparent border-none focus:ring-0 font-label-sm text-label-sm text-primary cursor-pointer pr-sm">
+<option value="kg">KG</option>
+<option value="lbs">LBS</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Deadlift Field -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-outline px-xs" for="deadlift">Deadlift</label>
+<div class="flex items-stretch arctic-card rounded-lg overflow-hidden input-focus-ring transition-all duration-200 h-touch-target-large">
+<div class="flex items-center px-md text-primary">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-title-md font-title-md no-spinner" id="deadlift" min="0" name="deadlift" placeholder="0" step="0.5" type="number"/>
+<div class="bg-surface-container-low px-md flex items-center border-l border-divider">
+<select class="bg-transparent border-none focus:ring-0 font-label-sm text-label-sm text-primary cursor-pointer pr-sm">
+<option value="kg">KG</option>
+<option value="lbs">LBS</option>
+</select>
+</div>
+</div>
+</div>
+<p class="hidden text-error font-label-sm text-label-sm flex items-center gap-xs" id="error-message">
+<span class="material-symbols-outlined text-[16px]">error</span>
+                Please enter positive numeric values only.
+            </p>
+</form>
+<!-- Tip Card -->
+<div class="mt-xl arctic-card rounded-xl p-md flex gap-md items-start bg-blue-50/30 border-blue-100">
+<span class="material-symbols-outlined text-joint-cyan">psychology</span>
+<div>
+<h4 class="font-label-sm text-label-sm font-bold text-primary mb-1">AI Coach Tip</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">Don't know your 1RM? Leave these blank. I'll automatically calculate them after your first session based on your performance.</p>
+</div>
+</div>
+</main>
+<!-- Footer Action -->
+<footer class="sticky bottom-0 p-md bg-white/80 backdrop-blur-md border-t border-divider w-full max-w-lg mx-auto">
+<button class="w-full bg-primary text-on-primary h-touch-target-large rounded-lg font-title-md text-title-md shadow-lg shadow-primary/20 hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-sm" id="finish-btn">
+            Finish Setup
+            <span class="material-symbols-outlined">chevron_right</span>
+</button>
+</footer>
+<script>
+        const form = document.getElementById('max-form');
+        const finishBtn = document.getElementById('finish-btn');
+        const errorMsg = document.getElementById('error-message');
+        const inputs = form.querySelectorAll('input[type="number"]');
+
+        const validate = () => {
+            let isValid = true;
+            inputs.forEach(input => {
+                const val = input.value;
+                if (val !== "" && (isNaN(val) || parseFloat(val) < 0)) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                errorMsg.classList.remove('hidden');
+                finishBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                finishBtn.disabled = true;
+            } else {
+                errorMsg.classList.add('hidden');
+                finishBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                finishBtn.disabled = false;
+            }
+            return isValid;
+        };
+
+        inputs.forEach(input => {
+            input.addEventListener('input', validate);
+        });
+
+        finishBtn.addEventListener('click', (e) => {
+            if (validate()) {
+                finishBtn.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Finalizing...
+                `;
+                setTimeout(() => {
+                    alert("Setup Complete! Welcome to FitLife.");
+                    finishBtn.innerHTML = 'Finish Setup <span class="material-symbols-outlined">chevron_right</span>';
+                }, 1500);
+            }
+        });
+    </script>
+</body></html>

@@ -1,6 +1,7 @@
 # Story AUTH-003: Forgot Password & Account Deletion
 
-Status: review
+Status: done
+Design Status: Linked
 
 ## Story
 
@@ -137,6 +138,28 @@ Expected new or updated areas:
 - Previous story: `_bmad-output/implementation-artifacts/auth-002-google-sign-in-integration.md`
 - Project context: `_bmad-output/project-context.md`
 
+## Design References
+
+Stitch Screen:
+- _bmad-output/design/auth/forget-password.png
+
+Design:
+- _bmad-output/design/auth/forget-password.png
+- _bmad-output/design/auth/forget-password-reference.html
+- _bmad-output/design/auth/forget-password-design.md
+- https://stitch.withgoogle.com/projects/14149816895860058914?node-id=6e70ceea07e74f3fbd5faf737a41b9af
+
+### Review Findings
+
+- [x] [Review][Patch] Back-to-login is disabled during loading [feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/forgotpassword/ForgotPasswordRoute.kt:312] — The approved design keeps the footer link available while reset is in flight; disabling it can trap users on the screen.
+- [x] [Review][Patch] Email field copy does not match the approved mock [feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/forgotpassword/ForgotPasswordRoute.kt:206] — The design reference uses “Email Address,” but the screen renders the generic `auth_email_label` string, which is still “Email.”
+- [x] [Review][Patch] Forgot-password tap does not reach the dedicated reset screen [feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/navigation/AuthNavigation.kt:69-96] — The sign-in form still routes the event through the existing auth flow, but `registerAuthEntries()` never supplies `onNavigateToForgotPassword` for `AuthDestination.SignIn`, so the new destination cannot be opened from the normal login path.
+- [x] [Review][Patch] Onboarding branches are dead-end routes [app/src/main/java/com/aml_sakr/fitlife/MainActivity.kt:158-589] — Successful auth can land in `AppRoute.BeginnerOnboarding` / `AppRoute.IntermediateOnboarding`, but those destinations only render a level-change action that loops back to `AppRoute.Onboarding` and never advances to `AppRoute.Home`.
+- [x] [Review][Patch] Story design reference points to a nonexistent file [_bmad-output/implementation-artifacts/auth-003-forgot-password-account-deletion.md:146-150] — The story previously referenced `_bmad-output/design/auth/forget-password-design.htm`; the correct artifact is `_bmad-output/design/auth/forget-password-design.md`.
+- [x] [Review][Defer] Forgot-password tap falls back to reset-email flow instead of navigation [feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/navigation/AuthNavigation.kt:70-77] — deferred, pre-existing
+- [x] [Review][Defer] Sign-up success no-ops because onboarding callback expects Splash on top [app/src/main/java/com/aml_sakr/fitlife/MainActivity.kt:149-150] — deferred, pre-existing
+- [x] [Review][Defer] Story docs now promise Home-only auth despite onboarding routing [docs/fitlife-stories-v1.md:129-135] — deferred, pre-existing
+
 ## Dev Agent Record
 
 ### Agent Model Used
@@ -150,6 +173,8 @@ GPT-5 Codex
 - Hit a JVM test failure caused by eager Firestore enum initialization in the auth exception mapper; removed the static enum dependency and narrowed the unit test to the network-mapping contract.
 - Fixed an auth-ui test expectation that depended on a brittle resource-id value and re-ran the module successfully.
 - Ran the combined regression pass across `auth-domain`, `auth-data`, `auth-ui`, and `app` unit tests successfully.
+- Refined the forgot-password screen to match the approved visual reference, added design-oriented strings, and introduced a compose UI test for layout and interaction coverage.
+- Verified `:feature:auth:auth-ui:assembleDebug`, `:feature:auth:auth-ui:compileDebugAndroidTestKotlin`, and `:feature:auth:auth-ui:testDebugUnitTest` successfully after the screen update.
 
 ### Completion Notes
 
@@ -158,11 +183,17 @@ GPT-5 Codex
 - Extended the auth MVI flow with forgot-password and delete-account events, confirmation dialog handling, safe messaging, and duplicate-request guards.
 - Exposed account deletion from the protected app shell placeholder and ensured successful deletion atomically returns the back stack to the auth root.
 - Added and updated unit/instrumented coverage for domain use cases, repository mapping, ViewModel behavior, and navigation reset behavior.
+- Reworked `ForgetPasswordScreen` to follow the approved reset-password mock more closely, including the branded hero, card layout, CTA, and back-to-login action.
+- Added a compose UI test that checks the reset-password layout and primary interaction behavior, and verified the module compiles cleanly.
 
 ## File List
 
 - `_bmad-output/implementation-artifacts/auth-003-forgot-password-account-deletion.md`
 - `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- `feature/auth/auth-ui/build.gradle.kts`
+- `feature/auth/auth-ui/src/androidTest/java/com/aml_sakr/fitlife/feature/auth/auth_ui/forgotpassword/ForgotPasswordScreenTest.kt`
+- `feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/forgotpassword/ForgotPasswordRoute.kt`
+- `feature/auth/auth-ui/src/main/res/values/strings.xml`
 - `app/src/androidTest/java/com/aml_sakr/fitlife/FitLifeAppNavigationTest.kt`
 - `app/src/main/java/com/aml_sakr/fitlife/MainActivity.kt`
 - `feature/auth/auth-data/src/androidTest/java/com/aml_sakr/fitlife/feature/auth/data/FirebaseAuthEmulatorInstrumentedTest.kt`
@@ -188,11 +219,11 @@ GPT-5 Codex
 - `feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/signin/SignInScreen.kt`
 - `feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/signup/SignUpScreen.kt`
 - `feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/state/AuthState.kt`
-- `feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/verification/VerificationScreen.kt`
 - `feature/auth/auth-ui/src/main/java/com/aml_sakr/fitlife/feature/auth/auth_ui/viewmodel/AuthViewModel.kt`
 - `feature/auth/auth-ui/src/main/res/values/strings.xml`
 - `feature/auth/auth-ui/src/test/java/com/aml_sakr/fitlife/feature/auth/auth_ui/auth/viewmodel/AuthViewModelTest.kt`
 
 ## Change Log
 
+- 2026-06-19: Refined `ForgetPasswordScreen` to match the approved reset-password design reference, added compose UI coverage, and verified the auth-ui module build/tests.
 - 2026-06-17: Implemented AUTH-003 password reset and account deletion flows across domain, data, UI, and app shell layers; added regression tests and verified the combined unit suite.

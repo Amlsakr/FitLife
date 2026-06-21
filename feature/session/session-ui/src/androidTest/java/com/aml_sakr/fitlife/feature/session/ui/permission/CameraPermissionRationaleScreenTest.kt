@@ -30,7 +30,11 @@ class CameraPermissionRationaleScreenTest {
         }
 
         composeRule.onNodeWithText("Keep your form analysis private").assertIsDisplayed()
-        composeRule.onNodeWithText("Nothing is uploaded or stored.").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(
+                com.aml_sakr.fitlife.feature.session.ui.R.string.camera_permission_rationale_body
+            )
+        ).assertIsDisplayed()
         composeRule.onNodeWithText("Continue to camera").performClick()
         composeRule.onNodeWithText("Use audio only").performClick()
 

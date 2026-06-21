@@ -22,6 +22,7 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.viewmodel.AuthViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -52,7 +53,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun initialLoad_showsVerification_whenCurrentUserIsUnverified() = runTest(dispatcher) {
+    fun initialLoad_emitsAuthenticatedUserNavigation_whenCurrentUserExists() = runTest(dispatcher) {
         val user = AuthUser("user-1", "amal@example.com", false)
         val viewModel = createViewModel(
             FakeAuthRepository(currentUserResult = Result.Success(user))
@@ -60,8 +61,10 @@ class AuthViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(AuthMode.VerifyEmail, viewModel.state.value.mode)
-        assertEquals("amal@example.com", viewModel.state.value.verificationEmail)
+        assertEquals(
+            AuthAction.NavigateToAuthenticatedUser(user),
+            viewModel.actions.first()
+        )
     }
 
     @Test
@@ -84,7 +87,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun successfulSignUp_entersVerificationState_andClearsPasswords() = runTest(dispatcher) {
+    fun successfulUnverifiedSignUp_emitsAuthenticatedNavigation_andClearsPasswords() = runTest(dispatcher) {
         val user = AuthUser("user-1", "amal@example.com", false)
         val repository = FakeAuthRepository(signUpResult = Result.Success(user))
         val viewModel = createViewModel(repository)
@@ -94,18 +97,29 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.Submit)
         advanceUntilIdle()
 
-        assertEquals(AuthMode.VerifyEmail, viewModel.state.value.mode)
-        assertEquals("amal@example.com", viewModel.state.value.verificationEmail)
         assertEquals("", viewModel.state.value.password)
         assertEquals("", viewModel.state.value.confirmPassword)
-        assertEquals(
-            AuthAction.ShowMessage(R.string.auth_message_verification_email_sent_after_sign_up),
-            viewModel.actions.first()
-        )
+        assertEquals(AuthAction.NavigateToAuthenticatedUser(user), viewModel.actions.first())
     }
 
     @Test
-    fun signUpVerificationDispatchFailure_stillEntersVerificationState() = runTest(dispatcher) {
+    fun successfulVerifiedSignUp_navigatesToOnboarding_andClearsPasswords() = runTest(dispatcher) {
+        val user = AuthUser("user-1", "amal@example.com", true)
+        val repository = FakeAuthRepository(signUpResult = Result.Success(user))
+        val viewModel = createViewModel(repository)
+        advanceUntilIdle()
+
+        enterCredentials(viewModel, signUp = true)
+        viewModel.onEvent(AuthEvent.Submit)
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.state.value.password)
+        assertEquals("", viewModel.state.value.confirmPassword)
+        assertEquals(AuthAction.NavigateToOnboarding, viewModel.actions.first())
+    }
+
+    @Test
+    fun signUpVerificationDispatchFailure_reportsError_withoutEnteringVerificationState() = runTest(dispatcher) {
         val viewModel = createViewModel(
             FakeAuthRepository(
                 signUpResult = Result.Failure(AuthError.VerificationEmailFailed)
@@ -117,8 +131,7 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.Submit)
         advanceUntilIdle()
 
-        assertEquals(AuthMode.VerifyEmail, viewModel.state.value.mode)
-        assertEquals("amal@example.com", viewModel.state.value.verificationEmail)
+        assertEquals(AuthMode.SignUp, viewModel.state.value.mode)
         assertEquals(
             AuthAction.ShowMessage(
                 R.string.auth_error_verification_email_failed
@@ -139,11 +152,14 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.Submit)
         advanceUntilIdle()
 
-        assertEquals(AuthAction.NavigateToAuthenticatedUser, viewModel.actions.first())
+        assertEquals(
+            AuthAction.NavigateToAuthenticatedUser(user),
+            viewModel.actions.first()
+        )
     }
 
     @Test
-    fun successfulUnverifiedSignIn_staysInAuthVerificationState() = runTest(dispatcher) {
+    fun successfulUnverifiedSignIn_emitsAuthenticatedNavigation() = runTest(dispatcher) {
         val user = AuthUser("user-1", "amal@example.com", false)
         val viewModel = createViewModel(
             FakeAuthRepository(signInResult = Result.Success(user))
@@ -154,9 +170,8 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.Submit)
         advanceUntilIdle()
 
-        assertEquals(AuthMode.VerifyEmail, viewModel.state.value.mode)
         assertEquals(
-            AuthAction.ShowMessage(R.string.auth_message_verify_email_before_continuing),
+            AuthAction.NavigateToAuthenticatedUser(user),
             viewModel.actions.first()
         )
     }
@@ -247,7 +262,10 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.GoogleSignInTokenReceived("google-id-token"))
         advanceUntilIdle()
 
-        assertEquals(AuthAction.NavigateToAuthenticatedUser, viewModel.actions.first())
+        assertEquals(
+            AuthAction.NavigateToAuthenticatedUser(user),
+            viewModel.actions.first()
+        )
     }
 
     @Test
@@ -305,13 +323,12 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun refreshVerification_navigatesOnlyAfterReloadedUserIsVerified() = runTest(dispatcher) {
+    fun refreshVerification_emitsAuthenticatedNavigation_whenSessionStillExists() = runTest(dispatcher) {
         val unverified = AuthUser("user-1", "amal@example.com", false)
-        val verified = unverified.copy(isEmailVerified = true)
         val viewModel = createViewModel(
             FakeAuthRepository(
                 currentUserResult = Result.Success(unverified),
-                refreshResult = Result.Success(verified)
+                refreshResult = Result.Success(unverified)
             )
         )
         advanceUntilIdle()
@@ -319,7 +336,10 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.RefreshVerification)
         advanceUntilIdle()
 
-        assertEquals(AuthAction.NavigateToAuthenticatedUser, viewModel.actions.first())
+        assertEquals(
+            AuthAction.NavigateToAuthenticatedUser(unverified),
+            viewModel.actions.drop(1).first()
+        )
     }
 
     @Test
@@ -336,10 +356,9 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.RefreshVerification)
         advanceUntilIdle()
 
-        assertEquals(AuthMode.SignIn, viewModel.state.value.mode)
         assertFalse(viewModel.state.value.isLoading)
-        assertNull(viewModel.state.value.verificationEmail)
-        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.first())
+        assertEquals(AuthState(), viewModel.state.value)
+        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.drop(1).first())
     }
 
     @Test
@@ -372,13 +391,13 @@ class AuthViewModelTest {
 
         assertEquals(
             AuthAction.ShowMessage(R.string.auth_message_verification_email_resent),
-            viewModel.actions.first()
+            viewModel.actions.drop(1).first()
         )
         assertFalse(viewModel.state.value.isLoading)
     }
 
     @Test
-    fun signOut_clearsVerificationState_andEmitsSignInNavigation() = runTest(dispatcher) {
+    fun signOut_clearsAuthState_andEmitsSignInNavigation() = runTest(dispatcher) {
         val user = AuthUser("user-1", "amal@example.com", false)
         val viewModel = createViewModel(
             FakeAuthRepository(
@@ -391,9 +410,8 @@ class AuthViewModelTest {
         viewModel.onEvent(AuthEvent.SignOut)
         advanceUntilIdle()
 
-        assertEquals(AuthMode.SignIn, viewModel.state.value.mode)
-        assertNull(viewModel.state.value.verificationEmail)
-        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.first())
+        assertEquals(AuthState(), viewModel.state.value)
+        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.drop(1).first())
     }
 
     @Test
@@ -425,7 +443,7 @@ class AuthViewModelTest {
 
         assertEquals(1, repository.deleteAccountCount)
         assertEquals(AuthState(), viewModel.state.value)
-        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.first())
+        assertEquals(AuthAction.NavigateToSignIn, viewModel.actions.drop(1).first())
     }
 
     @Test
@@ -445,7 +463,7 @@ class AuthViewModelTest {
         assertEquals(1, repository.deleteAccountCount)
         assertEquals(
             AuthAction.ShowMessage(R.string.auth_error_reauthentication_required),
-            viewModel.actions.first()
+            viewModel.actions.drop(1).first()
         )
         assertFalse(viewModel.state.value.isLoading)
     }

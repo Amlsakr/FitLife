@@ -89,18 +89,22 @@ class AuthViewModel(
     private fun handleLoadedUser(user: AuthUser?) {
         when {
             user == null -> setState { copy(isLoading = false) }
-            user.isEmailVerified -> {
-                setState { copy(isLoading = false) }
-                sendAction(AuthAction.NavigateToAuthenticatedUser)
+            else -> {
+                setState {
+                    copy(
+                        isLoading = false,
+                        password = AuthUiConstants.EMPTY_TEXT,
+                        confirmPassword = AuthUiConstants.EMPTY_TEXT
+                    )
+                }
+                sendAction(AuthAction.NavigateToAuthenticatedUser(user))
             }
-            else -> showVerification(user)
         }
     }
 
     private fun submit() {
         if (state.value.isLoading) return
         val current = state.value
-        if (current.mode == AuthMode.VerifyEmail) return
         if (!validate(current)) return
 
         setState { copy(isLoading = true) }
@@ -118,14 +122,7 @@ class AuthViewModel(
                     wasSignUp = current.mode == AuthMode.SignUp
                 )
                 is Result.Failure -> {
-                    if (
-                        current.mode == AuthMode.SignUp &&
-                        result.error == AuthError.VerificationEmailFailed
-                    ) {
-                        showVerificationEmail(email)
-                    } else {
-                        setState { copy(isLoading = false) }
-                    }
+                    setState { copy(isLoading = false) }
                     sendError(result.error)
                 }
             }
@@ -182,28 +179,18 @@ class AuthViewModel(
         user: AuthUser,
         wasSignUp: Boolean
     ) {
-        if (user.isEmailVerified) {
-            setState {
-                copy(
-                    isLoading = false,
-                    password = AuthUiConstants.EMPTY_TEXT,
-                    confirmPassword = AuthUiConstants.EMPTY_TEXT
-                )
-            }
-            sendAction(AuthAction.NavigateToAuthenticatedUser)
-            return
-        }
-
-        showVerification(user)
-        sendAction(
-            AuthAction.ShowMessage(
-                if (wasSignUp) {
-                    R.string.auth_message_verification_email_sent_after_sign_up
-                } else {
-                    R.string.auth_message_verify_email_before_continuing
-                }
+        setState {
+            copy(
+                isLoading = false,
+                password = AuthUiConstants.EMPTY_TEXT,
+                confirmPassword = AuthUiConstants.EMPTY_TEXT
             )
-        )
+        }
+        if (wasSignUp && user.isEmailVerified) {
+            sendAction(AuthAction.NavigateToOnboarding)
+        } else {
+            sendAction(AuthAction.NavigateToAuthenticatedUser(user))
+        }
     }
 
     private fun resendVerification() {
@@ -235,15 +222,9 @@ class AuthViewModel(
                             setState { AuthState() }
                             sendAction(AuthAction.NavigateToSignIn)
                         }
-                        user.isEmailVerified -> {
-                            setState { copy(isLoading = false) }
-                            sendAction(AuthAction.NavigateToAuthenticatedUser)
-                        }
                         else -> {
-                            showVerification(user)
-                            sendAction(
-                                AuthAction.ShowMessage(R.string.auth_message_email_not_verified_yet)
-                            )
+                            setState { copy(isLoading = false) }
+                            sendAction(AuthAction.NavigateToAuthenticatedUser(user))
                         }
                     }
                 }
@@ -318,7 +299,6 @@ class AuthViewModel(
                 emailErrorResId = null,
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
-                verificationEmail = null,
                 isDeleteAccountConfirmationVisible = false,
                 isGoogleSignInInProgress = false,
                 isLoading = false
@@ -336,29 +316,6 @@ class AuthViewModel(
                 emailErrorResId = null,
                 passwordErrorResId = null,
                 confirmPasswordErrorResId = null,
-                verificationEmail = null,
-                isDeleteAccountConfirmationVisible = false,
-                isGoogleSignInInProgress = false,
-                isLoading = false
-            )
-        }
-    }
-
-    private fun showVerification(user: AuthUser) {
-        showVerificationEmail(user.email.orEmpty())
-    }
-
-    private fun showVerificationEmail(email: String) {
-        setState {
-            copy(
-                mode = AuthMode.VerifyEmail,
-                email = email,
-                password = AuthUiConstants.EMPTY_TEXT,
-                confirmPassword = AuthUiConstants.EMPTY_TEXT,
-                emailErrorResId = null,
-                passwordErrorResId = null,
-                confirmPasswordErrorResId = null,
-                verificationEmail = email.takeIf { it.isNotBlank() },
                 isDeleteAccountConfirmationVisible = false,
                 isGoogleSignInInProgress = false,
                 isLoading = false

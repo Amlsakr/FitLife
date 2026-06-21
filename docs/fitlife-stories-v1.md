@@ -129,15 +129,15 @@
 **User Story**: *As a new user, I want to create an account and sign in with email/password so that my account persists securely and workout access remains blocked until email verification.*
 **Acceptance Criteria**:
 - Email/password sign-up, sign-in, sign-out, resend verification, and verification refresh flows work.
-- Email verification is required before onboarding, home, or workout access.
+- Successful authentication routes directly to Home without showing a verification screen.
 - Firebase failures map to explicit domain errors and safe UI messages.
 - AUTH-000 reads the real Firebase session on startup.
-- Verified authentication atomically replaces Auth with Onboarding or Home in the Navigation 3 back stack.
+- Authentication atomically replaces Auth with Home in the Navigation 3 back stack.
 **Technical Tasks**:
 - Add the supported `firebase-auth` main artifact through the Firebase BoM; do not use the removed KTX artifact.
 - Create Firebase-free domain models, errors, `AuthRepository`, and focused use cases.
 - Implement Firebase-backed data sources, repository mapping, session reading, and Hilt bindings.
-- Build email/password and verification-required MVI Compose states.
+- Build email/password MVI Compose states.
 - Integrate verified auth with the app-owned Navigation 3 back stack.
 **Modules Affected**: `:feature:auth:auth-data`, `:feature:auth:auth-domain`, `:feature:auth:auth-ui`.
 **Dependencies**: SETUP-001, SETUP-003.
@@ -229,7 +229,7 @@
 **Title**: Typed Auth Navigation Contract
 **User Story**: *As a developer, I need typed Navigation 3 destinations for auth screens so auth navigation is modular, restorable, and isolated from the main flow.*
 **Acceptance Criteria**:
-- Serializable `NavKey` destinations exist for Splash, SignIn, SignUp, ForgotPassword, and verification-required state.
+- Serializable `NavKey` destinations exist for Splash, SignIn, SignUp, and ForgotPassword.
 - Auth destinations are registered through a feature-owned Navigation 3 entry-provider helper.
 - Auth navigation uses callbacks or MVI actions and does not expose app-owned back-stack state to auth screens.
 - Forward, back, root-replacement, and key-restoration behavior is covered by tests.

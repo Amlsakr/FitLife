@@ -1,3 +1,20 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
+fun String.orEnv(name: String): String =
+    takeIf { it.isNotBlank() } ?: (System.getenv(name) ?: "")
+
+fun String.escapeForBuildConfig(): String =
+    replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\n", "\\n")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.hilt.android)
@@ -23,6 +40,19 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        val geminiApiKey = (localProperties.getProperty("FITLIFE_GEMINI_API_KEY") ?: "")
+            .orEnv("FITLIFE_GEMINI_API_KEY")
+            .ifBlank { (localProperties.getProperty("GEMINI_API_KEY") ?: "").orEnv("GEMINI_API_KEY") }
+        val workoutGeminiModelName = (localProperties.getProperty("FITLIFE_GEMINI_MODEL") ?: "")
+            .orEnv("FITLIFE_GEMINI_MODEL")
+            .ifBlank { (localProperties.getProperty("GEMINI_MODEL_NAME") ?: "").orEnv("GEMINI_MODEL_NAME") }
+        buildConfigField("String", "WORKOUT_GEMINI_API_KEY", "\"${geminiApiKey.escapeForBuildConfig()}\"")
+        buildConfigField(
+            "String",
+            "WORKOUT_GEMINI_MODEL_NAME",
+            "\"${(workoutGeminiModelName.ifBlank { "" }).escapeForBuildConfig()}\""
+        )
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -41,6 +71,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -50,6 +81,11 @@ dependencies {
     implementation(project(":feature:auth:auth-data"))
     implementation(project(":feature:auth:auth-domain"))
     implementation(project(":feature:auth:auth-ui"))
+    implementation(project(":feature:onboarding:onboarding-data"))
+    implementation(project(":feature:onboarding:onboarding-domain"))
+    implementation(project(":feature:onboarding:onboarding-ui"))
+    implementation(project(":feature:workout:workout-data"))
+    implementation(project(":feature:workout:workout-domain"))
     implementation(project(":feature:session:session-ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))

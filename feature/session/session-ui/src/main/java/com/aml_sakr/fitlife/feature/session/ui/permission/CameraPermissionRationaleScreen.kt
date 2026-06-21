@@ -62,6 +62,15 @@ data class CameraPermissionState(
     val isAudioOnlyFallbackVisible: Boolean = false
 ) : UIState
 
+data class CameraPermissionStatus(
+    val isGranted: Boolean,
+    val shouldShowRationale: Boolean
+)
+
+fun interface CameraPermissionRequester {
+    fun request(onPermissionResult: (Boolean) -> Unit)
+}
+
 sealed interface CameraPermissionEvent : UIEvent {
     data class SessionEntered(
         val shouldShowRationale: Boolean
@@ -82,6 +91,8 @@ sealed interface CameraPermissionEvent : UIEvent {
 
 sealed interface CameraPermissionAction : OneTimeAction {
     data object RequestSystemPermission : CameraPermissionAction
+
+    data object EnterCameraSession : CameraPermissionAction
 
     data object EnterAudioOnlySession : CameraPermissionAction
 }
@@ -133,7 +144,9 @@ class CameraPermissionViewModel : BaseMviViewModel<
                         isAudioOnlyFallbackVisible = !event.isGranted
                     )
                 }
-                if (!event.isGranted) {
+                if (event.isGranted) {
+                    sendAction(CameraPermissionAction.EnterCameraSession)
+                } else {
                     sendAction(CameraPermissionAction.EnterAudioOnlySession)
                 }
             }
@@ -146,14 +159,16 @@ fun CameraPermissionGateRoute(
     onCameraSessionReady: () -> Unit,
     onAudioOnlySession: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CameraPermissionViewModel = viewModel()
+    viewModel: CameraPermissionViewModel = viewModel(),
+    permissionStatus: CameraPermissionStatus? = null,
+    permissionRequester: CameraPermissionRequester? = null
 ) {
     val context = LocalContext.current
-    val permissionStatus = rememberCameraPermissionStatus(context)
+    val cameraPermissionStatus = permissionStatus ?: rememberCameraPermissionStatus(context)
     var hasNotifiedGrantedSession by remember { mutableStateOf(false) }
 
-    LaunchedEffect(permissionStatus.isGranted) {
-        if (permissionStatus.isGranted) {
+    LaunchedEffect(cameraPermissionStatus.isGranted) {
+        if (cameraPermissionStatus.isGranted) {
             if (!hasNotifiedGrantedSession) {
                 hasNotifiedGrantedSession = true
                 onCameraSessionReady()
@@ -163,30 +178,30 @@ fun CameraPermissionGateRoute(
         }
     }
 
-    if (permissionStatus.isGranted) {
+    if (cameraPermissionStatus.isGranted) {
         return
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        viewModel.onEvent(CameraPermissionEvent.SystemPermissionResult(isGranted))
-    }
+    val permissionLauncher = permissionRequester ?: rememberCameraPermissionRequester(
+        onPermissionResult = { isGranted ->
+            viewModel.onEvent(CameraPermissionEvent.SystemPermissionResult(isGranted))
+        }
+    )
 
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(viewModel) {
         viewModel.onEvent(
             CameraPermissionEvent.SessionEntered(
-                shouldShowRationale = permissionStatus.shouldShowRationale
+                shouldShowRationale = cameraPermissionStatus.shouldShowRationale
             )
         )
     }
 
-    LaunchedEffect(permissionStatus.shouldShowRationale) {
+    LaunchedEffect(cameraPermissionStatus.shouldShowRationale) {
         viewModel.onEvent(
             CameraPermissionEvent.RationaleStatusChanged(
-                shouldShowRationale = permissionStatus.shouldShowRationale
+                shouldShowRationale = cameraPermissionStatus.shouldShowRationale
             )
         )
     }
@@ -195,7 +210,12 @@ fun CameraPermissionGateRoute(
         viewModel.actions.collect { action ->
             when (action) {
                 CameraPermissionAction.RequestSystemPermission ->
-                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                    permissionLauncher.request { isGranted ->
+                        viewModel.onEvent(CameraPermissionEvent.SystemPermissionResult(isGranted))
+                    }
+
+                CameraPermissionAction.EnterCameraSession ->
+                    onCameraSessionReady()
 
                 CameraPermissionAction.EnterAudioOnlySession ->
                     onAudioOnlySession()
@@ -209,6 +229,23 @@ fun CameraPermissionGateRoute(
         onUseAudioOnly = { viewModel.onEvent(CameraPermissionEvent.UseAudioOnlyClicked) },
         modifier = modifier
     )
+}
+
+@Composable
+private fun rememberCameraPermissionRequester(
+    onPermissionResult: (Boolean) -> Unit
+): CameraPermissionRequester {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        onPermissionResult(isGranted)
+    }
+
+    return remember(launcher) {
+        CameraPermissionRequester { _ ->
+            launcher.launch(Manifest.permission.CAMERA)
+        }
+    }
 }
 
 @Composable
@@ -334,11 +371,6 @@ private fun Context.findActivity(): Activity? = when (this) {
     is ContextWrapper -> baseContext.findActivity()
     else -> null
 }
-
-data class CameraPermissionStatus(
-    val isGranted: Boolean,
-    val shouldShowRationale: Boolean
-)
 
 @Preview(showBackground = true)
 @Composable

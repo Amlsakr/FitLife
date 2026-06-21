@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.room.Room
 import com.aml_sakr.fitlife.core.data.connectivity.AndroidConnectivityMonitor
 import com.aml_sakr.fitlife.core.data.connectivity.ConnectivityMonitor
 import com.aml_sakr.fitlife.core.data.preferences.DataStorePreferencesDataSource
 import com.aml_sakr.fitlife.core.data.preferences.PreferencesDataSource
+import com.aml_sakr.fitlife.core.data.workout.WorkoutPlanDao
+import com.aml_sakr.fitlife.core.data.workout.WorkoutPlanDatabase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -44,4 +47,18 @@ object CoreDataModule {
     fun providePreferencesDataStore(
         @ApplicationContext context: Context
     ): DataStore<Preferences> = context.fitLifePreferencesDataStore
+
+    @Provides
+    @Singleton
+    fun provideWorkoutPlanDatabase(
+        @ApplicationContext context: Context
+    ): WorkoutPlanDatabase = Room.databaseBuilder(
+        context,
+        WorkoutPlanDatabase::class.java,
+        "workout_plan.db"
+    ).build()
+
+    @Provides
+    fun provideWorkoutPlanDao(database: WorkoutPlanDatabase): WorkoutPlanDao =
+        database.workoutPlanDao()
 }

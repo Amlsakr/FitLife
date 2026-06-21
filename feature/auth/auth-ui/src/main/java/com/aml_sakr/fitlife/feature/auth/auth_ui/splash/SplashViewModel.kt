@@ -17,14 +17,18 @@ class SplashViewModel @Inject constructor(
     private val startupRouteErrorLogger: StartupRouteErrorLogger
 ) : BaseMviViewModel<SplashState, SplashEvent, SplashAction>(SplashState()) {
     private var startupRouteJob: Job? = null
+    private var splashDisplayDurationMillis: Long = AuthUiConstants.SPLASH_DISPLAY_DURATION_MILLIS
 
     constructor(
         determineStartupDestination: suspend () -> StartupDestination,
-        startupRouteErrorLogger: StartupRouteErrorLogger
+        startupRouteErrorLogger: StartupRouteErrorLogger,
+        splashDisplayDurationMillis: Long
     ) : this(
         startupDestinationResolver = StartupDestinationResolver { determineStartupDestination() },
         startupRouteErrorLogger = startupRouteErrorLogger
-    )
+    ) {
+        this.splashDisplayDurationMillis = splashDisplayDurationMillis
+    }
 
     init {
         onEvent(SplashEvent.CheckStartupRoute)
@@ -45,7 +49,7 @@ class SplashViewModel @Inject constructor(
         startupRouteJob = viewModelScope.launch {
             try {
                 val startupDestination = startupDestinationResolver.resolve()
-                delay(AuthUiConstants.SPLASH_DISPLAY_DURATION_MILLIS)
+                delay(splashDisplayDurationMillis)
                 when (startupDestination) {
                     StartupDestination.Auth -> sendAction(SplashAction.NavigateToAuth)
                     StartupDestination.Onboarding -> sendAction(SplashAction.NavigateToOnboarding)

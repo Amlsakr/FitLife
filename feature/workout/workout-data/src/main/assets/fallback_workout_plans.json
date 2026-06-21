@@ -1,0 +1,146 @@
+{
+  "templates": [
+    {
+      "id": "beginner-home-bodyweight",
+      "fitnessLevel": "Beginner",
+      "location": "Home",
+      "requiredEquipment": ["bodyweight", "chair"],
+      "days": [
+        {
+          "day": 1,
+          "title": "Foundation Day",
+          "durationMinutes": 30,
+          "exercises": [
+            { "name": "Chair Squat", "sets": 3, "reps": "10", "estimatedDurationMinutes": 8 },
+            { "name": "Incline Push-Up", "sets": 3, "reps": "8", "estimatedDurationMinutes": 8 }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Core Stability",
+          "durationMinutes": 25,
+          "exercises": [
+            { "name": "Plank", "sets": 3, "reps": "30 sec", "estimatedDurationMinutes": 6 },
+            { "name": "Dead Bug", "sets": 3, "reps": "10/side", "estimatedDurationMinutes": 8 }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Lower Body",
+          "durationMinutes": 30,
+          "exercises": [
+            { "name": "Reverse Lunge", "sets": 3, "reps": "10/side", "estimatedDurationMinutes": 8 },
+            { "name": "Glute Bridge", "sets": 3, "reps": "12", "estimatedDurationMinutes": 7 }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Active Recovery",
+          "durationMinutes": 20,
+          "exercises": [
+            { "name": "Mobility Flow", "sets": 2, "reps": "5 min", "estimatedDurationMinutes": 10 },
+            { "name": "Easy March", "sets": 2, "reps": "5 min", "estimatedDurationMinutes": 10 }
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Upper Body",
+          "durationMinutes": 30,
+          "exercises": [
+            { "name": "Knee Push-Up", "sets": 3, "reps": "8", "estimatedDurationMinutes": 8 },
+            { "name": "Prone Back Extension", "sets": 3, "reps": "12", "estimatedDurationMinutes": 8 }
+          ]
+        },
+        {
+          "day": 6,
+          "title": "Full Body Circuit",
+          "durationMinutes": 35,
+          "exercises": [
+            { "name": "Bodyweight Squat", "sets": 3, "reps": "12", "estimatedDurationMinutes": 8 },
+            { "name": "Mountain Climber", "sets": 3, "reps": "30 sec", "estimatedDurationMinutes": 8 }
+          ]
+        },
+        {
+          "day": 7,
+          "title": "Reset Day",
+          "durationMinutes": 20,
+          "exercises": [
+            { "name": "Stretching", "sets": 2, "reps": "5 min", "estimatedDurationMinutes": 10 },
+            { "name": "Breathing Drill", "sets": 2, "reps": "5 min", "estimatedDurationMinutes": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "intermediate-gym-equipment",
+      "fitnessLevel": "Intermediate",
+      "location": "Gym",
+      "requiredEquipment": ["dumbbells", "bench", "cable machine"],
+      "days": [
+        {
+          "day": 1,
+          "title": "Push Strength",
+          "durationMinutes": 45,
+          "exercises": [
+            { "name": "Bench Press", "sets": 4, "reps": "6", "estimatedDurationMinutes": 12 },
+            { "name": "Dumbbell Shoulder Press", "sets": 3, "reps": "8", "estimatedDurationMinutes": 10 }
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Pull Strength",
+          "durationMinutes": 45,
+          "exercises": [
+            { "name": "Lat Pulldown", "sets": 4, "reps": "8", "estimatedDurationMinutes": 12 },
+            { "name": "Seated Row", "sets": 3, "reps": "10", "estimatedDurationMinutes": 10 }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Legs",
+          "durationMinutes": 50,
+          "exercises": [
+            { "name": "Barbell Squat", "sets": 4, "reps": "6", "estimatedDurationMinutes": 15 },
+            { "name": "Dumbbell Lunge", "sets": 3, "reps": "10/side", "estimatedDurationMinutes": 10 }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Conditioning",
+          "durationMinutes": 35,
+          "exercises": [
+            { "name": "Incline Walk", "sets": 1, "reps": "15 min", "estimatedDurationMinutes": 15 },
+            { "name": "Bike Intervals", "sets": 1, "reps": "10 min", "estimatedDurationMinutes": 10 }
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Upper Accessory",
+          "durationMinutes": 40,
+          "exercises": [
+            { "name": "Cable Fly", "sets": 3, "reps": "12", "estimatedDurationMinutes": 10 },
+            { "name": "Dumbbell Curl", "sets": 3, "reps": "12", "estimatedDurationMinutes": 8 }
+          ]
+        },
+        {
+          "day": 6,
+          "title": "Full Body",
+          "durationMinutes": 45,
+          "exercises": [
+            { "name": "Deadlift", "sets": 4, "reps": "5", "estimatedDurationMinutes": 15 },
+            { "name": "Leg Press", "sets": 3, "reps": "10", "estimatedDurationMinutes": 10 }
+          ]
+        },
+        {
+          "day": 7,
+          "title": "Recovery",
+          "durationMinutes": 25,
+          "exercises": [
+            { "name": "Mobility", "sets": 2, "reps": "8 min", "estimatedDurationMinutes": 10 },
+            { "name": "Walk", "sets": 1, "reps": "10 min", "estimatedDurationMinutes": 10 }
+          ]
+        }
+      ]
+    }
+  ]
+}

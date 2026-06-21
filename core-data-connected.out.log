@@ -1,0 +1,86 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+
+> Task :core:core-domain:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:core-domain:compileKotlin UP-TO-DATE
+> Task :core:core-domain:compileJava NO-SOURCE
+> Task :core:core-domain:processResources NO-SOURCE
+> Task :core:core-domain:classes UP-TO-DATE
+> Task :core:core-domain:jar UP-TO-DATE
+> Task :core:core-data:preBuild UP-TO-DATE
+> Task :core:core-data:preDebugBuild UP-TO-DATE
+> Task :core:core-data:generateDebugResources UP-TO-DATE
+> Task :core:core-data:packageDebugResources UP-TO-DATE
+> Task :core:core-data:processDebugNavigationResources UP-TO-DATE
+> Task :core:core-data:parseDebugLocalResources UP-TO-DATE
+> Task :core:core-data:generateDebugRFile UP-TO-DATE
+> Task :core:core-data:kspDebugKotlin UP-TO-DATE
+> Task :core:core-data:compileDebugKotlin UP-TO-DATE
+> Task :core:core-data:javaPreCompileDebug UP-TO-DATE
+> Task :core:core-data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:core-data:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:core-data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:core-data:preDebugAndroidTestBuild UP-TO-DATE
+> Task :core:core-data:generateDebugAndroidTestResources UP-TO-DATE
+> Task :core:core-data:packageDebugAndroidTestResources UP-TO-DATE
+> Task :core:core-data:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :core:core-data:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :core:core-data:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :core:core-data:kspDebugAndroidTestKotlin UP-TO-DATE
+> Task :core:core-data:compileDebugAndroidTestKotlin UP-TO-DATE
+> Task :core:core-data:javaPreCompileDebugAndroidTest UP-TO-DATE
+> Task :core:core-data:compileDebugAndroidTestJavaWithJavac NO-SOURCE
+> Task :core:core-data:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :core:core-data:generateDebugAssets UP-TO-DATE
+> Task :core:core-data:mergeDebugAssets
+> Task :core:core-data:mergeDebugAndroidTestAssets UP-TO-DATE
+> Task :core:core-data:compressDebugAndroidTestAssets UP-TO-DATE
+> Task :core:core-data:generateDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :core:core-data:processDebugAndroidTestJavaRes
+> Task :core:core-data:processDebugJavaRes
+> Task :core:core-data:checkDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :core:core-data:desugarDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :core:core-data:mergeDebugAndroidTestJavaResource
+> Task :core:core-data:mergeExtDexDebugAndroidTest UP-TO-DATE
+> Task :core:core-data:hiltSyncDebugAndroidTest UP-TO-DATE
+> Task :core:core-data:mapDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :core:core-data:compileDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :core:core-data:writeDebugAarMetadata
+> Task :core:core-data:mapDebugSourceSetPaths
+> Task :core:core-data:bundleLibRuntimeToJarDebug
+> Task :core:core-data:bundleLibRuntimeToDirDebug
+> Task :core:core-data:checkDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :core:core-data:hiltAggregateDepsDebugAndroidTest UP-TO-DATE
+> Task :core:core-data:hiltJavaCompileDebugAndroidTest NO-SOURCE
+> Task :core:core-data:compileDebugLibraryResources
+> Task :core:core-data:mergeDebugAndroidTestResources UP-TO-DATE
+> Task :core:core-data:extractDeepLinksDebug
+> Task :core:core-data:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:core-data:mergeDebugNativeLibs NO-SOURCE
+> Task :core:core-data:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :core:core-data:mergeDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :core:core-data:processDebugManifest
+> Task :core:core-data:mergeDebugAndroidTestNativeLibs UP-TO-DATE
+> Task :core:core-data:processDebugAndroidTestManifest UP-TO-DATE
+> Task :core:core-data:processDebugAndroidTestResources UP-TO-DATE
+> Task :core:core-data:stripDebugAndroidTestDebugSymbols UP-TO-DATE
+> Task :core:core-data:validateSigningDebugAndroidTest UP-TO-DATE
+> Task :core:core-data:writeDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :core:core-data:transformDebugAndroidTestClassesWithAsm
+> Task :core:core-data:dexBuilderDebugAndroidTest
+> Task :core:core-data:mergeProjectDexDebugAndroidTest
+> Task :core:core-data:mergeLibDexDebugAndroidTest
+> Task :core:core-data:packageDebugAndroidTest
+> Task :core:core-data:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :core:core-data:connectedDebugAndroidTest
+
+Starting 4 tests on Pixel_8(AVD) - 14
+Finished 4 tests on Pixel_8(AVD) - 14
+
+BUILD SUCCESSFUL in 2m 27s
+59 actionable tasks: 17 executed, 42 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.4.1/userguide/configuration_cache_enabling.html

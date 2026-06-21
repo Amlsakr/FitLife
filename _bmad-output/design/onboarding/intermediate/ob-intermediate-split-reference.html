@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife Onboarding - Step 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "warning": "#F57C00",
+                    "surface": "#fcf8ff",
+                    "surface-variant": "#e2e0fc",
+                    "outline": "#707882",
+                    "background-arctic": "#F0F4F8",
+                    "surface-container-high": "#e8e5ff",
+                    "success": "#2E7D32",
+                    "primary-fixed-dim": "#96ccff",
+                    "session-dark-bg": "#000000",
+                    "secondary": "#006876",
+                    "text-secondary": "#546E7A",
+                    "on-surface-variant": "#3f4851",
+                    "surface-container-highest": "#e2e0fc",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#004a75",
+                    "primary-fixed": "#cee5ff",
+                    "on-primary-fixed": "#001d32",
+                    "tertiary": "#006385",
+                    "on-secondary-fixed": "#001f25",
+                    "joint-cyan": "#00BCD4",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f2efff",
+                    "divider": "#ECEFF1",
+                    "error": "#C62828",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#bfc7d2",
+                    "secondary-fixed": "#a1efff",
+                    "surface-tint": "#00639a",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f5f2ff",
+                    "primary": "#006096",
+                    "inverse-surface": "#2f2e43",
+                    "on-secondary-fixed-variant": "#004e59",
+                    "secondary-fixed-dim": "#44d8f1",
+                    "tertiary-fixed": "#c2e8ff",
+                    "on-tertiary-container": "#fbfcff",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "on-secondary-container": "#006573",
+                    "surface-container": "#efecff",
+                    "on-tertiary-fixed": "#001e2b",
+                    "surface-bright": "#fcf8ff",
+                    "inverse-primary": "#96ccff",
+                    "primary-container": "#007abc",
+                    "on-surface": "#1a1a2e",
+                    "on-primary-container": "#fdfcff",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#75d1ff",
+                    "surface-elevated": "#E8EEF4",
+                    "secondary-container": "#58e6ff",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#007ea7",
+                    "surface-dim": "#dad7f3",
+                    "on-background": "#1a1a2e",
+                    "background": "#fcf8ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "touch-target-large": "64px",
+                    "lg": "24px",
+                    "margin-mobile": "16px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "margin-tablet": "32px",
+                    "sm": "8px",
+                    "touch-target": "48px",
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "title-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "session-rep-count": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "title-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "session-rep-count": ["57px", {"lineHeight": "64px", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .option-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card:hover {
+            transform: translateY(-2px);
+        }
+        .option-card.active {
+            border-color: #006096;
+            background-color: #e8e5ff;
+        }
+        .option-card.active .radio-inner {
+            transform: scale(1);
+        }
+        .arctic-gradient {
+            background: linear-gradient(135deg, #F0F4F8 0%, #FFFFFF 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-arctic font-body-md text-on-background min-h-screen flex flex-col">
+<!-- Top App Bar (Shared Component Logic) -->
+<header class="w-full top-0 sticky z-50 bg-background dark:bg-session-dark-bg flex items-center justify-between px-md h-touch-target">
+<div class="flex items-center gap-sm">
+<button class="w-touch-target h-touch-target flex items-center justify-center text-primary hover:bg-surface-elevated transition-colors duration-200 rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-title-md text-title-md text-primary">FitLife</span>
+</div>
+<div class="font-label-sm text-label-sm text-outline px-sm py-xs bg-surface-container-high rounded-lg">
+            Step 1 of 3
+        </div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col px-margin-mobile pt-xl pb-xl max-w-lg mx-auto w-full">
+<!-- Headline Section -->
+<div class="mb-xl text-center md:text-left">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-sm">
+                What's your current split?
+            </h1>
+<p class="font-body-md text-body-md text-text-secondary leading-relaxed">
+                Select your existing routine so we can optimize your progression.
+            </p>
+</div>
+<!-- Selection Grid/List -->
+<div class="space-y-md mb-xl" id="options-container">
+<!-- Full Body -->
+<label class="option-card relative flex items-center p-lg bg-surface border-2 border-divider rounded-xl cursor-pointer shadow-sm group">
+<input class="hidden peer" name="split" type="radio" value="full-body"/>
+<div class="flex-grow">
+<h3 class="font-title-md text-on-surface group-hover:text-primary transition-colors">Full Body</h3>
+<p class="text-sm text-text-secondary">Hit every muscle group in a single session.</p>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center peer-checked:border-primary transition-colors">
+<div class="radio-inner w-3 h-3 rounded-full bg-primary scale-0 transition-transform"></div>
+</div>
+</label>
+<!-- Upper/Lower -->
+<label class="option-card relative flex items-center p-lg bg-surface border-2 border-divider rounded-xl cursor-pointer shadow-sm group">
+<input class="hidden peer" name="split" type="radio" value="upper-lower"/>
+<div class="flex-grow">
+<h3 class="font-title-md text-on-surface group-hover:text-primary transition-colors">Upper/Lower</h3>
+<p class="text-sm text-text-secondary">Split sessions between upper and lower body movements.</p>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center peer-checked:border-primary transition-colors">
+<div class="radio-inner w-3 h-3 rounded-full bg-primary scale-0 transition-transform"></div>
+</div>
+</label>
+<!-- Push/Pull/Legs -->
+<label class="option-card relative flex items-center p-lg bg-surface border-2 border-divider rounded-xl cursor-pointer shadow-sm group">
+<input class="hidden peer" name="split" type="radio" value="ppl"/>
+<div class="flex-grow">
+<h3 class="font-title-md text-on-surface group-hover:text-primary transition-colors">Push/Pull/Legs</h3>
+<p class="text-sm text-text-secondary">A classic bodybuilding split for balanced muscle growth.</p>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center peer-checked:border-primary transition-colors">
+<div class="radio-inner w-3 h-3 rounded-full bg-primary scale-0 transition-transform"></div>
+</div>
+</label>
+<!-- Custom/Other -->
+<label class="option-card relative flex items-center p-lg bg-surface border-2 border-divider rounded-xl cursor-pointer shadow-sm group">
+<input class="hidden peer" name="split" type="radio" value="custom"/>
+<div class="flex-grow">
+<h3 class="font-title-md text-on-surface group-hover:text-primary transition-colors">Custom/Other</h3>
+<p class="text-sm text-text-secondary">You have a unique schedule or specialized routine.</p>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center peer-checked:border-primary transition-colors">
+<div class="radio-inner w-3 h-3 rounded-full bg-primary scale-0 transition-transform"></div>
+</div>
+</label>
+</div>
+<!-- Illustration / Mood Decor -->
+<div class="mt-auto py-xl">
+<div class="w-full aspect-video rounded-xl overflow-hidden shadow-sm border border-white/50 relative">
+<img class="w-full h-full object-cover" data-alt="A minimalist, professional health-tech illustration showcasing a clean arctic blue environment. A stylized digital human silhouette is shown with subtle glowing joint markers, surrounded by floating transparent data cards representing workout metrics. The lighting is soft, high-key, and creates a serene, clinical-chic atmosphere using a palette of white, arctic grey, and primary blue." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7uT5jhJONwF6vVHmoGRpzh4b9cslg4Q3KldpRkQPPnlH5AULue8o5JKhJS6TtGQ0zRJL2k_W3bxO5sWgQWomLxVn54E-C9SHBFKSz1LMGkhKECOvBa9h2_n75jOJ5xztK-j12P35QM9flj5vce4BjVrevRPfw_4QDVh4SRW0g79DTdxnhe2YmfQtOiPENq_iOeuhgpuOPXh1l3WHZXfjOlKMjpald4LMf_s_smg5gu6GMRkUf_2O4on0N0bSnrm0VNOd9iVItKM14"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-arctic/80 to-transparent pointer-events-none"></div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation / Action Shell -->
+<div class="sticky bottom-0 w-full bg-surface border-t border-divider p-md flex items-center justify-center">
+<button class="w-full max-w-lg h-touch-target-large bg-outline-variant text-on-primary rounded-xl font-title-md shadow-md transition-all duration-300 opacity-50 cursor-not-allowed" disabled="" id="continue-btn">
+            Continue
+        </button>
+</div>
+<!-- Scripts for Micro-interactions -->
+<script>
+        const radioButtons = document.querySelectorAll('input[name="split"]');
+        const cards = document.querySelectorAll('.option-card');
+        const continueBtn = document.getElementById('continue-btn');
+
+        radioButtons.forEach((radio, index) => {
+            radio.addEventListener('change', () => {
+                // Clear previous active states
+                cards.forEach(card => {
+                    card.classList.remove('active', 'border-primary', 'bg-surface-container-high');
+                    card.classList.add('border-divider', 'bg-surface');
+                });
+
+                // Apply active state to parent card
+                const card = radio.closest('.option-card');
+                card.classList.add('active', 'border-primary', 'bg-surface-container-high');
+                card.classList.remove('border-divider', 'bg-surface');
+
+                // Enable primary button
+                continueBtn.disabled = false;
+                continueBtn.classList.remove('bg-outline-variant', 'opacity-50', 'cursor-not-allowed');
+                continueBtn.classList.add('bg-primary', 'hover:bg-primary-container', 'active:scale-95');
+                
+                // Visual ripple/feedback
+                console.log(`Selected split: ${radio.value}`);
+            });
+        });
+
+        // Continue button interaction
+        continueBtn.addEventListener('click', () => {
+            if(!continueBtn.disabled) {
+                continueBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+                setTimeout(() => {
+                    alert('Progressing to Step 2...');
+                    continueBtn.innerText = 'Continue';
+                }, 800);
+            }
+        });
+    </script>
+</body></html>

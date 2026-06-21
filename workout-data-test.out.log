@@ -1,0 +1,66 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+
+> Task :core:core-domain:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:core-domain:compileKotlin UP-TO-DATE
+> Task :core:core-domain:compileJava NO-SOURCE
+> Task :core:core-domain:processResources NO-SOURCE
+> Task :core:core-domain:classes UP-TO-DATE
+> Task :core:core-domain:jar UP-TO-DATE
+> Task :feature:workout:workout-domain:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :feature:workout:workout-domain:compileKotlin UP-TO-DATE
+> Task :feature:workout:workout-domain:compileJava NO-SOURCE
+> Task :feature:workout:workout-domain:processResources NO-SOURCE
+> Task :feature:workout:workout-domain:classes UP-TO-DATE
+> Task :feature:workout:workout-domain:jar UP-TO-DATE
+> Task :core:core-data:preBuild UP-TO-DATE
+> Task :core:core-data:preDebugBuild UP-TO-DATE
+> Task :core:core-data:generateDebugResources UP-TO-DATE
+> Task :core:core-data:packageDebugResources UP-TO-DATE
+> Task :core:core-data:processDebugNavigationResources UP-TO-DATE
+> Task :core:core-data:parseDebugLocalResources UP-TO-DATE
+> Task :core:core-data:generateDebugRFile UP-TO-DATE
+> Task :core:core-data:kspDebugKotlin UP-TO-DATE
+> Task :core:core-data:compileDebugKotlin UP-TO-DATE
+> Task :core:core-data:javaPreCompileDebug UP-TO-DATE
+> Task :core:core-data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:core-data:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:core-data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:core-data:processDebugJavaRes UP-TO-DATE
+> Task :feature:workout:workout-data:preBuild UP-TO-DATE
+> Task :feature:workout:workout-data:preDebugBuild UP-TO-DATE
+> Task :core:core-data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:workout:workout-data:generateDebugResources UP-TO-DATE
+> Task :feature:workout:workout-data:packageDebugResources UP-TO-DATE
+> Task :feature:workout:workout-data:processDebugNavigationResources UP-TO-DATE
+> Task :feature:workout:workout-data:parseDebugLocalResources UP-TO-DATE
+> Task :feature:workout:workout-data:generateDebugRFile UP-TO-DATE
+> Task :feature:workout:workout-data:kspDebugKotlin UP-TO-DATE
+> Task :feature:workout:workout-data:compileDebugKotlin UP-TO-DATE
+> Task :feature:workout:workout-data:javaPreCompileDebug UP-TO-DATE
+> Task :feature:workout:workout-data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:workout:workout-data:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:workout:workout-data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:workout:workout-data:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:workout:workout-data:generateDebugUnitTestStubRFile UP-TO-DATE
+> Task :feature:workout:workout-data:processDebugJavaRes UP-TO-DATE
+> Task :feature:workout:workout-data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:workout:workout-data:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :feature:workout:workout-data:kspDebugUnitTestKotlin
+> Task :feature:workout:workout-data:compileDebugUnitTestKotlin
+> Task :feature:workout:workout-data:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :feature:workout:workout-data:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:workout:workout-data:hiltSyncDebugUnitTest
+> Task :feature:workout:workout-data:hiltAggregateDepsDebugUnitTest UP-TO-DATE
+> Task :feature:workout:workout-data:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:workout:workout-data:transformDebugUnitTestClassesWithAsm
+> Task :feature:workout:workout-data:testDebugUnitTest
+w: Detected multiple Kotlin daemon sessions at 
+
+BUILD SUCCESSFUL in 2m 47s
+38 actionable tasks: 4 executed, 34 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.4.1/userguide/configuration_cache_enabling.html

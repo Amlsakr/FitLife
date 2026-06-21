@@ -120,7 +120,7 @@ flowchart TD
 #### Beginner Path (max 5 screens)
 1. **Goals** – multi‑select chips (primary accent).
 2. **Equipment** – toggle list with icons.
-3. **Frequency** – slider (24‑hour range).
+3. **Frequency** – discrete weekly frequency choice (1–7 workouts/week).
 4. **(Optional) Additional Info** – free‑text note.
 5. **Completion** – summary card + `FinishButton`.
 - **Common Layout:** Headline, description, component list, bottom `Next` button.

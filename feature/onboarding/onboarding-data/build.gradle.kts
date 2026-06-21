@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -23,5 +25,11 @@ android {
 dependencies {
     implementation(project(":core:core-data"))
     implementation(project(":feature:onboarding:onboarding-domain"))
+    implementation(libs.hilt.android)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

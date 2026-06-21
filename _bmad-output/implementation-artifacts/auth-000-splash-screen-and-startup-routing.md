@@ -7,7 +7,7 @@ Design Status: Linked
 
 As a user,
 I want FitLife to open with a branded loading screen and route me to the right next screen,
-so that the app starts smoothly and predictably.
+so that the app starts smoothly and predictably. 
 
 ## Acceptance Criteria
 

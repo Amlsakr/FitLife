@@ -6,8 +6,7 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.AuthUiConstants
 
 enum class AuthMode {
     SignIn,
-    SignUp,
-    VerifyEmail
+    SignUp
 }
 
 data class AuthState(
@@ -18,7 +17,6 @@ data class AuthState(
     @param:StringRes val emailErrorResId: Int? = null,
     @param:StringRes val passwordErrorResId: Int? = null,
     @param:StringRes val confirmPasswordErrorResId: Int? = null,
-    val verificationEmail: String? = null,
     val isDeleteAccountConfirmationVisible: Boolean = false,
     val isGoogleSignInInProgress: Boolean = false,
     val isLoading: Boolean = false

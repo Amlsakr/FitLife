@@ -1,0 +1,45 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+
+> Task :core:core-domain:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:core-domain:compileKotlin UP-TO-DATE
+> Task :core:core-domain:compileJava NO-SOURCE
+> Task :core:core-domain:processResources NO-SOURCE
+> Task :core:core-domain:classes UP-TO-DATE
+> Task :core:core-domain:jar UP-TO-DATE
+> Task :core:core-data:preBuild UP-TO-DATE
+> Task :core:core-data:preDebugBuild UP-TO-DATE
+> Task :core:core-data:generateDebugResources UP-TO-DATE
+> Task :core:core-data:packageDebugResources UP-TO-DATE
+> Task :core:core-data:processDebugNavigationResources UP-TO-DATE
+> Task :core:core-data:parseDebugLocalResources UP-TO-DATE
+> Task :core:core-data:generateDebugRFile UP-TO-DATE
+> Task :core:core-data:javaPreCompileDebug UP-TO-DATE
+> Task :core:core-data:preDebugAndroidTestBuild UP-TO-DATE
+> Task :core:core-data:generateDebugAndroidTestResources UP-TO-DATE
+> Task :core:core-data:packageDebugAndroidTestResources UP-TO-DATE
+> Task :core:core-data:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :core:core-data:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :core:core-data:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :core:core-data:kspDebugKotlin
+> Task :core:core-data:compileDebugKotlin
+w: file:///D:/LinkDevProject/FitLife/core/core-data/src/main/java/com/aml_sakr/fitlife/core/data/connectivity/AndroidConnectivityMonitor.kt:10:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to field.
+- To opt in to applying to both value parameter and field, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+
+> Task :core:core-data:compileDebugJavaWithJavac
+> Task :core:core-data:transformDebugClassesWithAsm
+> Task :core:core-data:bundleLibCompileToJarDebug
+> Task :core:core-data:kspDebugAndroidTestKotlin
+> Task :core:core-data:compileDebugAndroidTestKotlin
+w: Detected multiple Kotlin daemon sessions at 
+
+BUILD SUCCESSFUL in 3m 8s
+20 actionable tasks: 7 executed, 13 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.4.1/userguide/configuration_cache_enabling.html
