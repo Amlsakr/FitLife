@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife AI - Equipment Selection</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Design System -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2f2e43",
+                    "success": "#2E7D32",
+                    "surface-container-high": "#e8e5ff",
+                    "primary-fixed": "#cee5ff",
+                    "primary-container": "#007abc",
+                    "surface-variant": "#e2e0fc",
+                    "surface-container-highest": "#e2e0fc",
+                    "outline": "#707882",
+                    "on-secondary-fixed": "#001f25",
+                    "surface-bright": "#fcf8ff",
+                    "joint-cyan": "#00BCD4",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#007ea7",
+                    "surface": "#fcf8ff",
+                    "on-background": "#1a1a2e",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#dad7f3",
+                    "on-primary-fixed-variant": "#004a75",
+                    "outline-variant": "#bfc7d2",
+                    "on-primary-container": "#fdfcff",
+                    "inverse-on-surface": "#f2efff",
+                    "divider": "#ECEFF1",
+                    "secondary": "#006876",
+                    "on-surface-variant": "#3f4851",
+                    "on-tertiary-fixed": "#001e2b",
+                    "secondary-fixed-dim": "#44d8f1",
+                    "surface-elevated": "#E8EEF4",
+                    "on-primary-fixed": "#001d32",
+                    "secondary-fixed": "#a1efff",
+                    "error": "#C62828",
+                    "on-primary": "#ffffff",
+                    "warning": "#F57C00",
+                    "surface-tint": "#00639a",
+                    "primary": "#006096",
+                    "background": "#fcf8ff",
+                    "background-arctic": "#F0F4F8",
+                    "session-dark-bg": "#000000",
+                    "inverse-primary": "#96ccff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f5f2ff",
+                    "on-tertiary-container": "#fbfcff",
+                    "on-secondary-fixed-variant": "#004e59",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#75d1ff",
+                    "on-surface": "#1a1a2e",
+                    "primary-fixed-dim": "#96ccff",
+                    "secondary-container": "#58e6ff",
+                    "text-secondary": "#546E7A",
+                    "surface-container": "#efecff",
+                    "tertiary": "#006385",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#c2e8ff",
+                    "on-secondary-container": "#006573",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "touch-target-large": "64px",
+                    "touch-target": "48px",
+                    "margin-mobile": "16px",
+                    "unit": "4px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "margin-tablet": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "session-rep-count": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "title-md": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "session-rep-count": ["57px", { "lineHeight": "64px", "fontWeight": "800" }],
+                    "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+                    "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                    "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "title-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-arctic text-on-surface font-body-md min-h-screen flex flex-col antialiased">
+<!-- Top App Bar (Onboarding Variant) -->
+<header class="flex items-center justify-between px-md w-full h-touch-target-large bg-background-arctic sticky top-0 z-50">
+<button class="flex items-center justify-center w-touch-target h-touch-target rounded-full hover:bg-surface-elevated transition-colors text-on-surface-variant active:scale-95">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-title-md text-title-md-mobile text-on-surface font-semibold tracking-tight">Step 2 of 3</span>
+<div class="w-touch-target"></div> <!-- Spacer to maintain centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-md pb-[120px] pt-md flex flex-col gap-xl">
+<!-- Header Section -->
+<div class="flex flex-col gap-sm">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">What equipment do you have?</h1>
+<p class="font-body-md text-body-md text-text-secondary">No equipment? No problem. We have bodyweight plans too.</p>
+</div>
+<!-- Equipment Selection Grid (Bento Style) -->
+<div class="grid grid-cols-2 gap-md">
+<!-- Dumbbells -->
+<button class="equipment-toggle relative flex flex-col items-start p-md rounded-xl bg-surface-container text-text-secondary text-left hover:bg-surface-container-high transition-all duration-200 min-h-[140px] justify-between border border-transparent">
+<span class="material-symbols-outlined text-[32px] mb-sm main-icon">fitness_center</span>
+<span class="font-title-md text-title-md-mobile title-text mt-auto">Dumbbells</span>
+<!-- Selected Checkmark -->
+<div class="check-icon absolute top-sm right-sm hidden w-6 h-6 bg-on-primary rounded-full items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-joint-cyan font-bold" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</button>
+<!-- Resistance Bands -->
+<button class="equipment-toggle relative flex flex-col items-start p-md rounded-xl bg-surface-container text-text-secondary text-left hover:bg-surface-container-high transition-all duration-200 min-h-[140px] justify-between border border-transparent">
+<span class="material-symbols-outlined text-[32px] mb-sm main-icon">sync_alt</span>
+<span class="font-title-md text-title-md-mobile title-text mt-auto leading-tight">Resistance<br/>Bands</span>
+<div class="check-icon absolute top-sm right-sm hidden w-6 h-6 bg-on-primary rounded-full items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-joint-cyan font-bold" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</button>
+<!-- Kettlebells -->
+<button class="equipment-toggle relative flex flex-col items-start p-md rounded-xl bg-surface-container text-text-secondary text-left hover:bg-surface-container-high transition-all duration-200 min-h-[140px] justify-between border border-transparent">
+<span class="material-symbols-outlined text-[32px] mb-sm main-icon">monitor_weight</span>
+<span class="font-title-md text-title-md-mobile title-text mt-auto">Kettlebells</span>
+<div class="check-icon absolute top-sm right-sm hidden w-6 h-6 bg-on-primary rounded-full items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-joint-cyan font-bold" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</button>
+<!-- Pull-up Bar -->
+<button class="equipment-toggle relative flex flex-col items-start p-md rounded-xl bg-surface-container text-text-secondary text-left hover:bg-surface-container-high transition-all duration-200 min-h-[140px] justify-between border border-transparent">
+<span class="material-symbols-outlined text-[32px] mb-sm main-icon">align_horizontal_center</span>
+<span class="font-title-md text-title-md-mobile title-text mt-auto leading-tight">Pull-up<br/>Bar</span>
+<div class="check-icon absolute top-sm right-sm hidden w-6 h-6 bg-on-primary rounded-full items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-joint-cyan font-bold" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</button>
+<!-- Jump Rope -->
+<button class="equipment-toggle relative flex flex-col items-start p-md rounded-xl bg-surface-container text-text-secondary text-left hover:bg-surface-container-high transition-all duration-200 min-h-[140px] justify-between border border-transparent">
+<span class="material-symbols-outlined text-[32px] mb-sm main-icon">timeline</span>
+<span class="font-title-md text-title-md-mobile title-text mt-auto leading-tight">Jump<br/>Rope</span>
+<div class="check-icon absolute top-sm right-sm hidden w-6 h-6 bg-on-primary rounded-full items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-joint-cyan font-bold" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</button>
+<!-- Full Gym Access -->
+<button class="equipment-toggle col-span-2 relative flex flex-row items-center p-md rounded-xl bg-surface-container text-text-secondary text-left hover:bg-surface-container-high transition-all duration-200 min-h-[80px] border border-transparent">
+<span class="material-symbols-outlined text-[32px] mr-md main-icon">business</span>
+<span class="font-title-md text-title-md-mobile title-text">Full Gym Access</span>
+<div class="check-icon absolute top-1/2 -translate-y-1/2 right-md hidden w-6 h-6 bg-on-primary rounded-full items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-joint-cyan font-bold" style="font-variation-settings: 'wght' 600;">check</span>
+</div>
+</button>
+</div>
+</main>
+<!-- Fixed Bottom Action Area -->
+<footer class="fixed bottom-0 w-full px-md py-md bg-background-arctic/90 backdrop-blur-md z-50 pb-8">
+<button class="w-full h-touch-target-large bg-primary text-on-primary font-title-md text-title-md-mobile rounded-lg flex items-center justify-center shadow-[0_4px_14px_0_rgba(0,96,150,0.39)] hover:bg-surface-tint hover:shadow-[0_6px_20px_rgba(0,96,150,0.23)] active:scale-[0.98] transition-all duration-200">
+            Continue
+        </button>
+</footer>
+<!-- Interaction Logic -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggles = document.querySelectorAll('.equipment-toggle');
+            
+            toggles.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.classList.toggle('is-selected');
+                    const checkIcon = this.querySelector('.check-icon');
+                    const isSelected = this.classList.contains('is-selected');
+
+                    if (isSelected) {
+                        // Apply Selected State (from Style Guidance: Cyan bg, white text)
+                        this.classList.remove('bg-surface-container', 'text-text-secondary');
+                        this.classList.add('bg-joint-cyan', 'text-on-primary', 'shadow-md', 'scale-[1.02]');
+                        checkIcon.classList.remove('hidden');
+                        checkIcon.classList.add('flex');
+                    } else {
+                        // Revert to Default State
+                        this.classList.add('bg-surface-container', 'text-text-secondary');
+                        this.classList.remove('bg-joint-cyan', 'text-on-primary', 'shadow-md', 'scale-[1.02]');
+                        checkIcon.classList.add('hidden');
+                        checkIcon.classList.remove('flex');
+                    }
+                });
+            });
+        });
+    </script>
+</body></html>

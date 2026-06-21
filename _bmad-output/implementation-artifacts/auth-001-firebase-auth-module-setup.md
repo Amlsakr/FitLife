@@ -13,17 +13,17 @@ so that my FitLife account is secure, persists across launches, and protects wor
 
 ## Acceptance Criteria
 
-1. Given a visitor enters a valid email and acceptable password, when registration succeeds, then a Firebase Auth account is created, a verification email is requested, and the UI shows a verification-required state without granting onboarding, home, or workout access.
+1. Given a visitor enters a valid email and acceptable password, when registration succeeds, then a Firebase Auth account is created, a verification email is requested, and the app navigates directly to Home without showing a verification screen.
 2. Given a registered user enters valid email/password credentials, when sign-in succeeds, then the domain returns an authenticated user model containing a non-blank Firebase UID, email, and current email-verification status.
-3. Given an authenticated user's email is verified, when authentication or startup routing is evaluated, then the user may continue to onboarding or home according to the existing onboarding-completion check.
-4. Given an authenticated user's email is not verified, when authentication or startup routing is evaluated, then the user remains in the auth flow and can resend verification or refresh verification status; the user cannot reach onboarding, home, or a workout.
+3. Given an authenticated user is evaluated at startup or after login, when navigation resolves, then the app routes directly to Home instead of showing a verification screen.
+4. Given an authenticated user's email is not verified, when authentication or startup routing is evaluated, then the app still routes directly to Home and does not show a verification screen after login.
 5. Given a signed-in user chooses sign out, when sign-out succeeds, then the Firebase session is cleared and the app returns to the unauthenticated auth destination with protected destinations removed from the back stack.
 6. Given registration or sign-in fails, when Firebase returns invalid email, weak password, email already in use, invalid credentials, disabled user, rate-limit, network, or unknown failures, then the data layer maps the exception to an explicit domain auth error and the UI displays a safe actionable message without exposing raw exception text.
-7. Given the app restarts with an existing Firebase session, when AUTH-000 reads the current auth session, then it uses the real Firebase-backed `AuthSessionReader`; blank UIDs and unverified email sessions route to auth, while verified sessions preserve the existing onboarding/home decision.
+7. Given the app restarts with an existing Firebase session, when AUTH-000 reads the current auth session, then it uses the real Firebase-backed `AuthSessionReader`; blank UIDs route to auth, while authenticated sessions continue to Home.
 8. Given the auth UI is loading, when an auth request is active, then duplicate submissions are disabled, progress is visible, entered passwords are never logged or persisted, and coroutine cancellation is rethrown rather than converted to an auth failure.
 9. Given the project uses Clean Architecture and MVI, when AUTH-001 is implemented, then Firebase SDK types stay in `:feature:auth:auth-data`, repository contracts/models/errors/use cases stay in `:feature:auth:auth-domain`, and Compose state/events/actions/ViewModels stay in `:feature:auth:auth-ui`.
 10. Given automated verification runs, then repository/use-case/ViewModel tests use fakes for JVM coverage, Firebase integration coverage uses the Authentication Emulator rather than production accounts, and focused tests plus `:app:assembleDebug` pass.
-11. Given verified authentication completes, when startup routing resolves Onboarding or Home, then the app atomically replaces Auth in the Navigation 3 back stack and does not retain Splash or Auth as a back destination.
+11. Given authentication completes, when the app navigates to Home, then the app atomically replaces Auth in the Navigation 3 back stack and does not retain Splash or Auth as a back destination.
 
 ## Tasks / Subtasks
 
@@ -53,15 +53,15 @@ so that my FitLife account is secure, persists across launches, and protects wor
   - [x] Reconnect the existing state-driven `SplashRoute` and `NavigateToAuth` callback; do not duplicate splash routing or create a second startup state machine.
   - [x] Preserve splash back-stack removal and the single-activity Compose host.
 - [x] Build email/password auth MVI and Compose UI. (AC: 1-6, 8, 9)
-  - [x] Add sign-in, sign-up, and verification-required state/event/action/ViewModel flows using `BaseMviViewModel`.
+  - [x] Add sign-in and sign-up state/event/action/ViewModel flows using `BaseMviViewModel`.
   - [x] Implement email, password, and confirm-password validation before repository calls; keep validation errors field-specific.
-  - [x] Render functional Sign In, Register, and Verify Email states using `FitnessAppTheme`, Material3, core-ui tokens, 48dp minimum targets, dynamic text support, and polite screen-reader error announcements.
+  - [x] Render functional Sign In and Register states using `FitnessAppTheme`, Material3, core-ui tokens, 48dp minimum targets, dynamic text support, and polite screen-reader error announcements.
   - [x] Keep navigation and snackbars as one-time actions; Compose screens render immutable state and send events upward.
   - [x] Disable submit/resend/refresh controls during their own request and prevent concurrent duplicate requests.
   - [x] Use the UX specification as the baseline because the design-story map has no linked AUTH-001 Stitch asset; do not claim pixel matching.
 - [x] Wire the current app route without absorbing later auth stories. (AC: 3-5, 7)
-  - [x] Replace the current `"Sign in"` placeholder with the AUTH-001 auth route and handle successful verified authentication.
-  - [x] Replace verified Auth with the resolved typed Navigation 3 Onboarding or Home key.
+  - [x] Replace the current `"Sign in"` placeholder with the AUTH-001 auth route and handle successful authentication by replacing Auth with Home.
+  - [x] Replace authenticated Auth with the resolved typed Navigation 3 Home key.
   - [x] Keep temporary app-owned keys compatible with AUTH-007, which will move auth keys and entry-provider registration into auth-ui.
   - [x] Do not implement Google sign-in, forgot-password behavior, account deletion, Firestore profile creation, or Firebase security rules in this story.
 - [x] Add focused automated verification. (AC: 1-10)
@@ -134,7 +134,7 @@ interface AuthRepository {
 
 - Login baseline: email, password, submit, register link, loading state, and error feedback.
 - Register baseline: email, password, confirm password, submit, sign-in link, field validation, loading state, and error feedback.
-- Verification baseline: explain that workout access is blocked pending verification, show the account email when available, and provide resend, refresh/check, and sign-out actions.
+- Pending-verification baseline: explain that workout access is blocked pending verification, show the account email when available, and provide resend, refresh/check, and sign-out actions.
 - Password fields must use obscured input and appropriate keyboard/autofill semantics. Do not store passwords in saved state, logs, analytics, Crashlytics keys, or test fixtures.
 - The design-story map marks AUTH-001 as `TODO`; use the UX spec and core tokens for a functional implementation and leave pixel-specific design refinement for a linked design.
 
@@ -226,7 +226,7 @@ GPT-5 Codex
 
 - Add Firebase-free auth models, errors, repository contracts, and focused use cases in auth-domain.
 - Wrap Firebase Auth behind an auth-data gateway, repository, exception mapper, session reader, and Hilt module.
-- Add one MVI auth flow covering sign-in, registration, verification recovery, resend, refresh, and sign-out.
+- Add one MVI auth flow covering sign-in, registration, resend, refresh, and sign-out.
 - Replace the app auth placeholder and temporary startup reader with the Hilt-provided production implementations.
 - Verify with focused JVM tests, guarded emulator integration coverage, navigation tests, APK builds, full regression, and lint.
 
@@ -258,14 +258,16 @@ GPT-5 Codex
 - Added explicit guardrails for real AUTH-000 session integration, unverified-user startup gating, auth-specific error mapping, emulator-first tests, and deprecated KTX avoidance.
 - Added Firebase-free `AuthUser`, `AuthError`, `AuthRepository`, and focused auth use cases.
 - Added Firebase Auth gateway/repository mapping, explicit Firebase error translation, cancellation propagation, verification refresh, session reading, and Hilt bindings.
-- Added sign-in, registration, and verification-required Compose screens backed by a single MVI ViewModel with validation, loading guards, snackbars, resend, refresh, and sign-out.
-- Account-created/verification-email-failed is handled as a recoverable verification state so the user can resend instead of attempting duplicate registration.
-- Wired the real Firebase session into AUTH-000 startup routing and blocked unverified users from onboarding/home.
-- Replaced the app auth placeholder and added verified-user Navigation 3 root replacement that removes Splash/Auth from the typed back stack.
-- Added 39 focused auth/startup JVM tests with zero failures plus guarded Firebase Auth Emulator and app navigation instrumentation coverage.
+- Added sign-in and registration auth flows backed by a single MVI ViewModel with validation, loading guards, snackbars, resend, refresh, and sign-out.
+- Wired the real Firebase session into AUTH-000 startup routing.
+- Replaced the app auth placeholder and added Home root replacement that removes Splash/Auth from the typed back stack after auth success.
+- Added focused auth/startup JVM tests with zero failures plus guarded Firebase Auth Emulator and app navigation instrumentation coverage.
 - Verified the debug APK, full JVM regression suite, lint, and Android-test APK compilation.
 - Removed Navigation 2 production/testing artifacts and updated navigation instrumentation coverage to inspect the app-owned typed back stack.
 - Resolved all code-review findings and moved the story to done.
+- Implemented the onboarding-first post-sign-up routing correction so sign-up now lands on onboarding, while login resolves to onboarding or home based on onboarding completion state.
+- Kept onboarding completion separate from the level selector; the actual completion flag remains an onboarding-owned concern for OB-004.
+- Extended auth/navigation tests to cover sign-up -> onboarding, login with completed onboarding -> home, and login with incomplete onboarding -> onboarding.
 
 ### File List
 
@@ -312,3 +314,4 @@ GPT-5 Codex
 - 2026-06-11: Implemented Firebase email/password auth, verification gating, MVI auth UI, startup integration, and automated coverage; moved story to review.
 - 2026-06-14: Approved course correction migrated AUTH-001 post-auth routing and navigation coverage to Navigation 3.
 - 2026-06-14: Applied all code-review patches, expanded verification, and marked AUTH-001 done.
+- 2026-06-18: Applied the onboarding-first routing correction so sign-up goes to onboarding and login resolves onboarding/home through the onboarding completion contract.

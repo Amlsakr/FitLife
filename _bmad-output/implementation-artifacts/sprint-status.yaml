@@ -1,5 +1,5 @@
 # generated: 2026-06-01T13:15:32+03:00
-# last_updated: 2026-06-17T13:24:59.8875046+03:00
+# last_updated: 2026-06-21T00:00:00+03:00
 # project: FitnessApp
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review
 
 generated: 2026-06-01T13:15:32+03:00
-last_updated: 2026-06-17T15:58:21.1373312+03:00
+last_updated: 2026-06-21T00:00:00+03:00
 project: FitnessApp
 project_key: NOKEY
 tracking_system: file-system
@@ -57,20 +57,21 @@ development_status:
   auth-003-forgot-password-account-deletion: done
   auth-004-firebase-security-rules: done
   auth-005-gdpr-account-deletion: review
-  auth-006-camera-permission-privacy-disclosure: backlog
-  auth-007-auth-navigation-graph: backlog
+  auth-006-camera-permission-privacy-disclosure: review
+  auth-007-auth-navigation-graph: review
   epic-1-retrospective: optional
-  epic-2: backlog
-  ob-001-welcome-level-selector-screen: backlog
-  ob-002-beginner-path-goals-equipment-frequency: backlog
-  ob-003-intermediate-path-split-goals-optional-1rm: backlog
-  ob-004-onboarding-completion-flag-navigation-graph: backlog
-  epic-2-retrospective: optional
-  epic-3: backlog
-  wp-001-gemini-api-service-prompt-builder: backlog
-  wp-002-generateworkoutplan-use-case-with-fallback-asset: backlog
-  wp-003-workoutplan-room-entities-daos: backlog
-  wp-004-home-screen-ui-plan-states: backlog
+  epic-2: done
+  ob-001-welcome-level-screen: done
+  ob-002-beginner-path-goals-equipment-frequency: done
+  ob-003-intermediate-path-split-goals-optional-1rm: done
+  ob-004-onboarding-completion-flag-navigation-graph: done
+  epic-2-retrospective: done
+  epic-3: in-progress
+  shell-001-app-shell-with-bottom-navigation: ready-for-dev
+  wp-001-gemini-api-service-prompt-builder: done
+  wp-002-generateworkoutplan-use-case-with-fallback-asset: done
+  wp-003-workoutplan-room-entities-daos: done
+  wp-004-home-screen-ui-plan-states: ready-for-dev
   wp-005-weekly-overview-component: backlog
   epic-3-retrospective: optional
   epic-4: backlog

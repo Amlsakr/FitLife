@@ -2,6 +2,8 @@ import org.gradle.api.tasks.testing.Test
 
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -34,7 +36,9 @@ dependencies {
     implementation(project(":core:core-data"))
     implementation(project(":feature:workout:workout-domain"))
     implementation(libs.gson)
+    implementation(libs.hilt.android)
     implementation(libs.kotlinx.coroutines.core)
+    ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 }

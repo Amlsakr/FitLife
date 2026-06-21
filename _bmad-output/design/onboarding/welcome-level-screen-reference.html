@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FitLife AI - Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed": "#001f25",
+                    "tertiary-fixed": "#c2e8ff",
+                    "session-dark-bg": "#000000",
+                    "surface-bright": "#fcf8ff",
+                    "surface-elevated": "#E8EEF4",
+                    "on-tertiary-container": "#fbfcff",
+                    "surface-container-low": "#f5f2ff",
+                    "on-surface": "#1a1a2e",
+                    "on-surface-variant": "#3f4851",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#007ea7",
+                    "text-secondary": "#546E7A",
+                    "background-arctic": "#F0F4F8",
+                    "secondary-fixed-dim": "#44d8f1",
+                    "tertiary-fixed-dim": "#75d1ff",
+                    "inverse-surface": "#2f2e43",
+                    "secondary": "#006876",
+                    "tertiary": "#006385",
+                    "surface-dim": "#dad7f3",
+                    "on-secondary-container": "#006573",
+                    "surface-container-lowest": "#ffffff",
+                    "warning": "#F57C00",
+                    "secondary-container": "#58e6ff",
+                    "primary-fixed": "#cee5ff",
+                    "on-tertiary-fixed": "#001e2b",
+                    "surface-container-high": "#e8e5ff",
+                    "primary-container": "#007abc",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#1a1a2e",
+                    "background": "#fcf8ff",
+                    "divider": "#ECEFF1",
+                    "surface-tint": "#00639a",
+                    "success": "#2E7D32",
+                    "surface-variant": "#e2e0fc",
+                    "on-primary-fixed": "#001d32",
+                    "surface-container-highest": "#e2e0fc",
+                    "primary": "#006096",
+                    "inverse-on-surface": "#f2efff",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#004a75",
+                    "outline-variant": "#bfc7d2",
+                    "on-tertiary": "#ffffff",
+                    "outline": "#707882",
+                    "secondary-fixed": "#a1efff",
+                    "on-secondary-fixed-variant": "#004e59",
+                    "primary-fixed-dim": "#96ccff",
+                    "joint-cyan": "#00BCD4",
+                    "surface": "#fcf8ff",
+                    "inverse-primary": "#96ccff",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "surface-container": "#efecff",
+                    "error": "#C62828",
+                    "on-primary-container": "#fdfcff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "gutter": "16px",
+                    "margin-tablet": "32px",
+                    "md": "16px",
+                    "touch-target-large": "64px",
+                    "unit": "4px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "touch-target": "48px",
+                    "sm": "8px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "session-rep-count": ["Inter"],
+                    "title-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                    "session-rep-count": ["57px", {"lineHeight": "64px", "fontWeight": "800"}],
+                    "title-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        .selection-card {
+            transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .selection-card.selected {
+            border-color: #006096; /* primary */
+            background-color: #f0f7ff;
+            box-shadow: 0 4px 12px rgba(0, 96, 150, 0.1);
+        }
+        .selection-card.selected .check-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .arctic-blur {
+            backdrop-filter: blur(8px);
+            background: rgba(252, 248, 255, 0.8);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-arctic font-body-md text-on-background min-h-screen flex flex-col">
+<!-- Top AppBar (from Shared Components) -->
+<header class="bg-surface docked full-width top-0 sticky z-50 flex items-center justify-between px-md w-full h-touch-target-large">
+<div class="flex items-center gap-sm">
+<button class="hover:bg-surface-elevated rounded-full transition-colors p-2 active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-primary">FitLife AI</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-margin-mobile py-xl max-w-4xl mx-auto w-full">
+<!-- Header Section -->
+<div class="text-center mb-xl animate-fade-in-up">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-xs">
+                Welcome to FitLife
+            </h1>
+<p class="text-text-secondary font-body-md max-w-md mx-auto">
+                Select your fitness level to personalize your journey.
+            </p>
+</div>
+<!-- Selection Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg w-full mb-xl">
+<!-- Beginner Card -->
+<button class="selection-card relative flex flex-col items-start p-xl bg-surface-container-lowest border-2 border-divider rounded-xl text-left hover:border-outline-variant group active:scale-98" id="card-beginner" onclick="selectLevel('beginner')">
+<div class="absolute top-4 right-4 check-badge opacity-0 scale-50 transition-all duration-300">
+<div class="bg-primary text-on-primary rounded-full p-1">
+<span class="material-symbols-outlined text-sm leading-none" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+</div>
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center mb-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-secondary-container text-4xl">eco</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-sm">Beginner</h3>
+<p class="text-on-surface-variant font-body-md">
+                    New to fitness or returning after a long break. We'll start with the basics.
+                </p>
+<!-- Decor Image Placeholder -->
+<div class="mt-xl w-full h-32 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A serene, minimalist digital illustration of a green sprout growing from clean, arctic white soil. The background is a soft gradient of light blue and white, conveying a sense of fresh beginnings and calm energy. The style is clean and professional, matching a high-end health tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgXzy7VHkhEFlPODI3wB3pHudUa_C4UnTptYq9b_KMalqFRD1k3-5XLRxmWt8ESgz3NqIll25e2JYa_690dQAPlKv91nbt_JQFsKfs5yR3zY1enZzthntyvh1yokmB6KBhp8_kYsGIh6rUKfLzIA8TJF70nVB2r6o7A6usSpb_7gZyGKjWWwQKriusbAFWAXapJVJ7EYhJkwpbgw8lGr8t9mXSfAk5E8k3psp5YRRexEkUcNrUD65QVLEZ0HUU-FUYRU5fXOhjIfaJ"/>
+</div>
+</button>
+<!-- Intermediate Card -->
+<button class="selection-card relative flex flex-col items-start p-xl bg-surface-container-lowest border-2 border-divider rounded-xl text-left hover:border-outline-variant group active:scale-98" id="card-intermediate" onclick="selectLevel('intermediate')">
+<div class="absolute top-4 right-4 check-badge opacity-0 scale-50 transition-all duration-300">
+<div class="bg-primary text-on-primary rounded-full p-1">
+<span class="material-symbols-outlined text-sm leading-none" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+</div>
+<div class="w-16 h-16 rounded-full bg-tertiary-fixed flex items-center justify-center mb-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant text-4xl">bolt</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-sm">Intermediate</h3>
+<p class="text-on-surface-variant font-body-md">
+                    Regularly active and looking to level up performance with AI guidance.
+                </p>
+<!-- Decor Image Placeholder -->
+<div class="mt-xl w-full h-32 rounded-lg overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A dynamic, minimalist digital art piece showing stylized, glowing energy waves in deep cyan and primary blue against a crisp white background. The lines are sharp and represent strength, growth, and forward momentum. The lighting is bright and modern, suggesting a professional and high-performance fitness environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHoG5O7t0bpe4JCunja5EBe9Uwz7Z8fCgOZJ4vF_wc37Z4Ac51oRw_b05oylviznM03rj5xv1S9onyr0GucZHp0RB6kGrM0XFodKpe7lu8Yc-IVeG-TVLNW2PQUuEidPMu7YUiaNVJR5ZKCZ2qxnf1O9_wzXl2dkeNIZvaJEbkZMpVz88XIpMaM3r_mubbnRuINowsDFj9M7ry1wM0k1VWojVDua_ucFSUp35AdPDiwckupVOpT4e1vkVEOY7-3uRMivJ8BHAip5rD"/>
+</div>
+</button>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 w-full p-md arctic-blur border-t border-divider md:relative md:bg-transparent md:border-none md:p-xl md:flex md:justify-center">
+<div class="max-w-4xl w-full">
+<button class="w-full py-touch-target bg-outline text-on-primary font-bold text-title-md rounded-xl shadow-lg transition-all duration-300 opacity-50 cursor-not-allowed transform active:scale-95 disabled:hover:scale-100" disabled="" id="continue-btn">
+                Continue
+            </button>
+</div>
+</footer>
+<script>
+        let selectedLevel = null;
+
+        function selectLevel(level) {
+            selectedLevel = level;
+            
+            // UI Updates
+            const cards = ['beginner', 'intermediate'];
+            cards.forEach(id => {
+                const card = document.getElementById(`card-${id}`);
+                if (id === level) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // Enable Button
+            const btn = document.getElementById('continue-btn');
+            btn.disabled = false;
+            btn.classList.remove('bg-outline', 'opacity-50', 'cursor-not-allowed');
+            btn.classList.add('bg-primary', 'hover:bg-primary-container', 'opacity-100', 'cursor-pointer');
+            
+            // Add Ripple-like effect or micro-interaction
+            console.log(`Level selected: ${level}`);
+        }
+
+        // Optional: Simple entry animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.animate-fade-in-up');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s ease-out';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body></html>

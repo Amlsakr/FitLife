@@ -17,7 +17,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -32,17 +35,21 @@ import com.aml_sakr.fitlife.feature.auth.auth_ui.google.GoogleSignInLauncher
 import com.aml_sakr.fitlife.feature.auth.auth_ui.google.GoogleSignInResult
 import com.aml_sakr.fitlife.feature.auth.auth_ui.state.AuthMode
 import com.aml_sakr.fitlife.feature.auth.auth_ui.state.AuthState
+import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.auth_ui.signin.SignInScreenContent
 import com.aml_sakr.fitlife.feature.auth.auth_ui.viewmodel.AuthViewModel
 import com.aml_sakr.fitlife.feature.auth.auth_ui.signup.SignUpScreenContent
-import com.aml_sakr.fitlife.feature.auth.auth_ui.verification.VerificationScreenContent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 @Composable
 fun AuthRoute(
     viewModel: AuthViewModel,
-    onAuthenticated: suspend () -> Unit,
+    onAuthenticated: suspend (AuthUser) -> Unit,
+    onNavigateToOnboarding: () -> Unit,
+    onNavigateToSignIn: (() -> Unit)? = null,
+    onNavigateToSignUp: (() -> Unit)? = null,
+    onNavigateToForgotPassword: (() -> Unit)? = null,
     googleClientId: String,
     googleSignInLauncher: GoogleSignInLauncher = DefaultGoogleSignInLauncher,
     modifier: Modifier = Modifier
@@ -51,15 +58,19 @@ fun AuthRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val snackbarMessages = remember { mutableStateListOf<SnackbarMessage>() }
+    var nextSnackbarMessageId by remember { mutableLongStateOf(0L) }
+    val nextSnackbarMessage = snackbarMessages.firstOrNull()
+    val snackbarMessage = nextSnackbarMessage?.let { stringResource(it.messageResId) }
 
     LaunchedEffect(viewModel) {
         viewModel.actions.collect { action ->
             when (action) {
-                AuthAction.NavigateToAuthenticatedUser -> {
+                is AuthAction.NavigateToAuthenticatedUser -> {
                     var retryNavigation = true
                     while (retryNavigation) {
                         retryNavigation = try {
-                            onAuthenticated()
+                            onAuthenticated(action.user)
                             false
                         } catch (cancellation: CancellationException) {
                             throw cancellation
@@ -67,10 +78,11 @@ fun AuthRoute(
                             snackbarHostState.showSnackbar(
                                 message = AuthUiConstants.CONTINUE_UNAVAILABLE_MESSAGE,
                                 actionLabel = AuthUiConstants.RETRY_ACTION_LABEL
-                            ) == SnackbarResult.ActionPerformed
+                                ) == SnackbarResult.ActionPerformed
                         }
                     }
                 }
+                AuthAction.NavigateToOnboarding -> onNavigateToOnboarding()
                 AuthAction.NavigateToSignIn -> Unit
                 AuthAction.LaunchGoogleSignIn -> {
                     coroutineScope.launch {
@@ -94,8 +106,46 @@ fun AuthRoute(
                     }
                 }
                 is AuthAction.ShowMessage ->
-                    snackbarHostState.showSnackbar(context.getString(action.messageResId))
+                    snackbarMessages.add(
+                        SnackbarMessage(
+                            id = nextSnackbarMessageId++,
+                            messageResId = action.messageResId
+                        )
+                    )
             }
+        }
+    }
+
+    LaunchedEffect(nextSnackbarMessage?.id) {
+        val message = snackbarMessage ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(message)
+        snackbarMessages.removeAt(0)
+    }
+
+    val routedOnEvent: (AuthEvent) -> Unit = { event ->
+        when (event) {
+            AuthEvent.ShowSignIn -> {
+                if (onNavigateToSignIn != null) {
+                    onNavigateToSignIn()
+                } else {
+                    viewModel.onEvent(event)
+                }
+            }
+            AuthEvent.ShowSignUp -> {
+                if (onNavigateToSignUp != null) {
+                    onNavigateToSignUp()
+                } else {
+                    viewModel.onEvent(event)
+                }
+            }
+            AuthEvent.ResetPasswordRequested -> {
+                if (onNavigateToForgotPassword != null) {
+                    onNavigateToForgotPassword()
+                } else {
+                    viewModel.onEvent(event)
+                }
+            }
+            else -> viewModel.onEvent(event)
         }
     }
 
@@ -141,7 +191,6 @@ fun AuthScreen(
                     googleSignInEnabled = googleSignInEnabled,
                     isGoogleSignInInProgress = isGoogleSignInInProgress
                 )
-                AuthMode.VerifyEmail -> VerificationScreenContent(state = state, onEvent = onEvent)
             }
         }
     }
@@ -175,6 +224,11 @@ private fun DeleteAccountConfirmationDialog(
         }
     )
 }
+
+private data class SnackbarMessage(
+    val id: Long,
+    val messageResId: Int
+)
 
 @Preview(showBackground = true)
 @Composable

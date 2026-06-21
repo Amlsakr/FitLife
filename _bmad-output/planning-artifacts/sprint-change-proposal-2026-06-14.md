@@ -127,7 +127,7 @@ Rollback is not recommended because AUTH-007 has not started and Navigation 2 ha
 
 **NEW:**
 
-- Define serializable typed auth `NavKey` destinations for Splash, SignIn, SignUp, ForgotPassword, and verification-required state.
+- Define serializable typed auth `NavKey` destinations for Splash, SignIn, SignUp, and ForgotPassword.
 - Register auth destinations through a feature-owned Navigation 3 entry-provider builder.
 - Expose navigation callbacks or events that mutate an app-owned back stack without exposing data/UI internals.
 - Keep auth-ui independent of `:app`, auth-data, and other feature modules.

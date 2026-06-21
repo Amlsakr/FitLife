@@ -8,6 +8,7 @@
     <string name="auth_sign_up_description">Join FitLife to start your AI-powered fitness journey.</string>
     <string name="auth_verify_email_description">Workout access stays locked until your email address is verified.</string>
     <string name="auth_email_label">Email</string>
+    <string name="auth_email_address_label">Email Address</string>
     <string name="auth_email_placeholder">name@company.com</string>
     <string name="auth_password_label">Password</string>
     <string name="auth_password_placeholder">Enter password</string>
@@ -21,6 +22,15 @@
     <string name="auth_new_to_fitlife">New to FitLife?</string>
     <string name="auth_register_button">Register</string>
     <string name="auth_forgot_password">Forgot password?</string>
+    <string name="auth_forgot_password_title">Forgot password?</string>
+    <string name="auth_forgot_password_description">Enter your email address and we’ll send a reset link.</string>
+    <string name="auth_send_reset_email_button">Send reset email</string>
+    <string name="auth_back_to_sign_in">Back to sign in</string>
+    <string name="auth_reset_password_title">Reset Password</string>
+    <string name="auth_reset_password_description">Enter your registered email address and we’ll send you a link to reset your password.</string>
+    <string name="auth_send_reset_link_button">Send Reset Link</string>
+    <string name="auth_send_reset_link_loading">Sending...</string>
+    <string name="auth_back_to_login">Back to Login</string>
     <string name="auth_terms_disclaimer">By registering, you agree to our Terms of Service and Privacy Policy.</string>
     <string name="auth_secure_data">Secure Data</string>
     <string name="auth_ai_powered">AI Powered</string>

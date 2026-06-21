@@ -68,6 +68,21 @@ class DetermineStartupDestinationUseCaseTest {
     }
 
     @Test
+    fun invoke_returnsOnboarding_whenCompletionCheckFails() = runTest {
+        val useCase = DetermineStartupDestinationUseCase(
+            authSessionReader = FakeAuthSessionReader(
+                session = AuthSession(userId = "user-1", isEmailVerified = true)
+            ),
+            onboardingCompletionReader = FakeOnboardingCompletionReader(
+                isComplete = true,
+                failure = IllegalStateException("preferences unavailable")
+            )
+        )
+
+        assertEquals(StartupDestination.Onboarding, useCase())
+    }
+
+    @Test
     fun invoke_propagatesStartupCheckFailure() = runTest {
         val failure = IllegalStateException("session unavailable")
         val useCase = DetermineStartupDestinationUseCase(
@@ -94,8 +109,12 @@ class DetermineStartupDestinationUseCaseTest {
     }
 
     private class FakeOnboardingCompletionReader(
-        private val isComplete: Boolean
+        private val isComplete: Boolean,
+        private val failure: Exception? = null
     ) : OnboardingCompletionReader {
-        override suspend fun isOnboardingComplete(userId: String): Boolean = isComplete
+        override suspend fun isOnboardingComplete(userId: String): Boolean {
+            failure?.let { throw it }
+            return isComplete
+        }
     }
 }
