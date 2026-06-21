@@ -1,18 +1,18 @@
-# Story WP-004: Home Screen UI - Plan States
+# Story WP-004: Workout Dashboard UI - Plan States
 
 Status: ready-for-dev
 
-Completion Note: Comprehensive implementation context created for the workout home screen state machine and plan rendering flow.
+Completion Note: Comprehensive implementation context created for the Home tab workout dashboard state machine and plan rendering flow.
 
 ## Story
 
 As a FitLife user,
-I want to see my weekly plan on the home screen with clear states for loading, success, empty, and error,
+I want to see my weekly plan on the Home tab with clear states for loading, success, empty, and error,
 so that I always understand whether my plan is ready, refreshing, missing, or failed without guessing.
 
 ## Acceptance Criteria
 
-1. A production home-screen workout UI exists in `:feature:workout:workout-ui` and renders four explicit states: loading, success, empty, and error.
+1. A production Home tab workout dashboard UI exists in `:feature:workout:workout-ui` and renders four explicit states: loading, success, empty, and error.
 2. The screen uses the existing workout domain boundary and `GenerateWorkoutPlanUseCase`; it does not call Gemini, Room, Firebase, or any transport/data-layer API directly.
 3. The refresh action triggers `GenerateWorkoutPlanUseCase` exactly once per user action, disables repeat taps while loading, and preserves the current visible state until the new result arrives.
 4. The empty state shows the copy `Generate a plan` and gives the user a clear CTA to start plan generation.
@@ -25,7 +25,7 @@ so that I always understand whether my plan is ready, refreshing, missing, or fa
 
 ## Tasks / Subtasks
 
-- [ ] Add the home-screen MVI state layer in `:feature:workout:workout-ui`.
+- [ ] Add the Home tab workout dashboard MVI state layer in `:feature:workout:workout-ui`.
   - [ ] Create `WorkoutHomeState`, `WorkoutHomeEvent`, and `WorkoutHomeAction` with explicit branches for loading, success, empty, and error.
   - [ ] Add `WorkoutHomeViewModel` that depends on `GenerateWorkoutPlanUseCase` and a pure `WorkoutGenerationRequest` input.
   - [ ] Keep loading, success, empty, and error transitions deterministic and easy to test.
@@ -48,7 +48,7 @@ so that I always understand whether my plan is ready, refreshing, missing, or fa
 ### Current State
 
 - `feature/workout/workout-ui` currently contains only `build.gradle.kts`; there is no production source or test code yet.
-- `app/src/main/java/com/aml_sakr/fitlife/MainActivity.kt` still uses a placeholder `Home` destination and a generic `ProtectedDestination` scaffold. It does not yet host a dedicated workout home screen.
+- `app/src/main/java/com/aml_sakr/fitlife/MainActivity.kt` still uses a placeholder `Home` destination inside the App Shell scaffold. It does not yet host the final workout dashboard content.
 - `feature/workout/workout-domain/src/main/java/com/aml_sakr/fitlife/feature/workout/domain/usecase/GenerateWorkoutPlanUseCase.kt` already exists and is the correct orchestration entry point for loading or regenerating plans.
 - `feature/workout/workout-domain/src/main/java/com/aml_sakr/fitlife/feature/workout/domain/model/WorkoutPlan.kt` already defines the pure plan model and freshness behavior.
 - `feature/workout/workout-domain/src/main/java/com/aml_sakr/fitlife/feature/workout/domain/repository/WorkoutPlanRepository.kt` already separates cache, remote generation, fallback loading, and save responsibilities.
@@ -56,7 +56,7 @@ so that I always understand whether my plan is ready, refreshing, missing, or fa
 
 ### What This Story Changes
 
-- Introduces the workout home-screen presentation layer for the plan lifecycle states.
+- Introduces the Home tab workout dashboard presentation layer for the plan lifecycle states.
 - Connects the screen to the existing workout domain use case through a narrow ViewModel boundary.
 - Defines the user experience for loading, empty, success, and error without leaking transport or persistence details.
 - Prepares the workout feature for later weekly-overview and navigation work without implementing those stories early.
@@ -117,7 +117,7 @@ Likely new files in the workout UI package:
 ### Project Structure Notes
 
 - The workout UI module is currently empty, so this story should create the first production source files there rather than modifying unrelated modules.
-- The home screen should stay small and composable. If plan-summary formatting becomes more complex, keep the formatting helper private to the workout UI boundary.
+- The Home tab workout dashboard should stay small and composable. If plan-summary formatting becomes more complex, keep the formatting helper private to the workout UI boundary.
 - If the screen needs an initial plan input from the caller, keep that input pure and explicit instead of reading onboarding state directly from the UI layer.
 - Success-state presentation should stay compact enough that WP-005 can later add the dedicated weekly overview component without untangling duplicated layout code.
 
@@ -138,7 +138,7 @@ Likely new files in the workout UI package:
 
 ## Change Log
 
-- 2026-06-20: Created WP-004 implementation story context for the workout home-screen plan state UI.
+- 2026-06-20: Created WP-004 implementation story context for the Home tab workout dashboard plan state UI.
 
 ## Dev Agent Record
 
@@ -148,14 +148,14 @@ GPT-5 Codex
 
 ### Debug Log References
 
-- Story context loaded from the WP-004 spec in `docs/fitlife-stories-v1.md`, the current sprint status, the PRD, architecture, the workout domain use case and repository contract, the app home placeholder, and existing onboarding/auth MVI examples.
+- Story context loaded from the WP-004 spec in `docs/fitlife-stories-v1.md`, the current sprint status, the PRD, architecture, the workout domain use case and repository contract, the app shell placeholder Home destination, and existing onboarding/auth MVI examples.
 - Confirmed the workout UI module currently has no source files, so the first implementation should establish the UI state machine and screen contract cleanly.
-- Confirmed the app still exposes a placeholder `Home` destination, so this story should stay within the workout UI boundary and not attempt to solve navigation integration yet.
+- Confirmed the app still exposes a placeholder `Home` destination inside the App Shell, so this story should stay within the workout UI boundary and not attempt to solve navigation integration yet.
 - Confirmed the workout domain already owns generation, caching, fallback, and persistence orchestration. The UI layer should only request refresh and render state.
 
 ### Completion Notes
 
-- Story file created for the workout home screen plan-state UI.
+- Story file created for the Home tab workout dashboard plan-state UI.
 - Sprint tracking should move `wp-004-home-screen-ui-plan-states` from `backlog` to `ready-for-dev` after this artifact is saved.
 
 ### File List

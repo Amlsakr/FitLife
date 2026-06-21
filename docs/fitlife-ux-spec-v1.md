@@ -29,7 +29,11 @@ flowchart TD
     OnboardingCurrentSplit --> OnboardingCompletion
     Onboarding1RM --> OnboardingCompletion
     OnboardingGoals --> OnboardingCompletion
-    OnboardingCompletion --> Home
+    OnboardingCompletion --> AppShell
+    AppShell --> Home
+    AppShell --> Workout
+    AppShell --> Progress
+    AppShell --> Profile
     Home --> SessionPre
     SessionPre --> SessionActive
     SessionActive --> SessionAudioFallback
@@ -37,10 +41,9 @@ flowchart TD
     SessionActive --> EquipmentUnavailable
     SessionActive --> SessionPost
     SessionPost --> Home
-    Home --> Progress
-    Home --> Profile
     Progress --> Home
     Profile --> Home
+    Workout --> Home
 ```
 ---
 
@@ -134,8 +137,15 @@ flowchart TD
 5. **Completion** – summary.
 - **Interactions:** Selecting split auto‑populates suggested exercises.
 ---
-### 3.3 Home Screen (Workout Plan)
-- **Layout:** Scaffold with BottomNavigation (primary active tab). Top app bar "Workout Plan".
+### 3.3 App Shell / Bottom Navigation
+- **Layout:** Persistent bottom navigation scaffold that wraps the signed-in experience and owns the top-level tab container.
+- **Tabs:** Home, Workout, Progress, Profile.
+- **State:** Preserves each tab's navigation state and restores the last selected tab.
+- **Interactions:** Switching tabs keeps each tab's back stack and returns users to the tab's last visible screen.
+- **Notes:** The App Shell is the technical container; the Home tab is only the dashboard surface inside it.
+
+### 3.4 Home Screen (Workout Dashboard)
+- **Layout:** Tab content within the App Shell. Top app bar "Home" or a product-specific dashboard title if finalized.
 - **Components:** `TodayWorkoutCard`, `WeeklyPlanOverview`, `LoadingOverlay`, `EmptyStateView`, `ErrorStateView`.
 - **States:**
   - **Success:** Shows card with CTA "Start Session".
@@ -144,7 +154,7 @@ flowchart TD
   - **Error:** Banner (warning color) with retry.
 - **Interactions:** Tap card → Session Pre‑screen; pull‑to‑refresh regenerates plan.
 ---
-### 3.4 Session Screen (most complex)
+### 3.5 Session Screen (most complex)
 #### Pre‑Session
 - **Layout:** Column with `ExerciseListPreview` (lazy column) and `StartButton` (64dp, primary accent).
 - **States:** Normal, Loading (exercise details).
@@ -176,13 +186,13 @@ flowchart TD
 - **Components:** `ConfettiAnimation` (Lottie, 1 s), `ShareWhatsAppButton` (primary), `DoneButton` (primary).
 - **States:** Success (confetti), Error (analytics fail message).
 ---
-### 3.5 Progress Screen
+### 3.6 Progress Screen
 - **Layout:** Scaffold, top app bar "Progress", vertical scroll.
 - **Components:** `WeeklyStatsRow` (4 metric cards), `MPAndroidChartBar` (volume), `SessionHistoryList` (lazy column), `EmptyStateView`.
 - **States:** Normal, Empty, Loading.
 - **Interactions:** Tap chart bar → day‑view drill‑down; tap history item → session detail.
 ---
-### 3.6 Profile Screen
+### 3.7 Profile Screen
 - **Layout:** Column with avatar, info rows, edit goals, notification & audio switches, sign‑out, delete account.
 - **Components:** `AvatarImage`, `InfoItem`, `Switch`, `DestructiveButton`.
 - **States:** Normal, Loading (profile fetch), Error (snackbar).

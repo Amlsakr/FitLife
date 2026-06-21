@@ -67,6 +67,7 @@ development_status:
   ob-004-onboarding-completion-flag-navigation-graph: done
   epic-2-retrospective: done
   epic-3: in-progress
+  shell-001-app-shell-with-bottom-navigation: ready-for-dev
   wp-001-gemini-api-service-prompt-builder: done
   wp-002-generateworkoutplan-use-case-with-fallback-asset: done
   wp-003-workoutplan-room-entities-daos: done

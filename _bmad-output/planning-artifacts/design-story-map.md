@@ -8,7 +8,9 @@ If a Stitch screen conflicts with architecture boundaries, PRD expectations, nav
 
 | Story ID | Screen Name | Stitch Link / Export      | States | Notes | Status |
 |----------| ----------- |---------------------------| ------ | ----- | ------ |
-| auth-000 | Splash | _bmad-output/design/auth/splash.png | loading, route-to-login, route-to-onboarding, route-to-home | No camera permission | Linked |
+| auth-000 | Splash | _bmad-output/design/auth/splash.png | loading, route-to-login, route-to-onboarding, route-to-shell | No camera permission | Linked |
+| SHELL-001 | App Shell / Bottom Navigation | TODO | tab-switching, restored-state, signed-in-only | Persistent bottom nav container | Planned |
+| WP-004 | Home Tab / Workout Dashboard | TODO | loading, success, empty, error | Home tab content only | Planned |
 | AUTH-001 | Sign In / Sign Up | TODO                      | empty, loading, error, success | Firebase Auth |
 
 ## Usage Workflow

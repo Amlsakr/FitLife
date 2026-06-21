@@ -109,7 +109,7 @@
 **Acceptance Criteria**:
 - Splash screen displays the FitLife brand mark or wordmark centered on a fullscreen branded background.
 - Loading state is visible while startup routing checks complete.
-- Authenticated users with completed onboarding route to the main/home flow.
+- Authenticated users with completed onboarding route to the App Shell and land on the Home tab.
 - Authenticated users without completed onboarding route to onboarding.
 - Unauthenticated users route to the login/sign-in flow.
 - The splash screen has no blocking user interactions and avoids requesting camera permission at launch.
@@ -129,10 +129,10 @@
 **User Story**: *As a new user, I want to create an account and sign in with email/password so that my account persists securely and workout access remains blocked until email verification.*
 **Acceptance Criteria**:
 - Email/password sign-up, sign-in, sign-out, resend verification, and verification refresh flows work.
-- Successful authentication routes directly to Home without showing a verification screen.
+- Successful authentication routes directly to the App Shell without showing a verification screen.
 - Firebase failures map to explicit domain errors and safe UI messages.
 - AUTH-000 reads the real Firebase session on startup.
-- Authentication atomically replaces Auth with Home in the Navigation 3 back stack.
+- Authentication atomically replaces Auth with the App Shell in the Navigation 3 back stack.
 **Technical Tasks**:
 - Add the supported `firebase-auth` main artifact through the Firebase BoM; do not use the removed KTX artifact.
 - Create Firebase-free domain models, errors, `AuthRepository`, and focused use cases.
@@ -289,11 +289,12 @@
 
 **Story ID**: OB-004
 **Title**: Onboarding Completion Flag & Navigation Graph
-**User Story**: *As a developer, I need a flag indicating onboarding finished and a dedicated graph so main app flows only after completion.*
+**User Story**: *As a developer, I need a flag indicating onboarding finished and a dedicated graph so the App Shell only appears after completion.*
 **Acceptance Criteria**:
 - Flag stored in `PreferencesDataSource`.
 - NavGraph checks flag on launch.
 - Onboarding screens removed after flag set.
+- Completion routes into the App Shell with the Home tab selected.
 **Technical Tasks**:
 - Add `isOnboardingComplete` boolean.
 - Update splash logic.
@@ -303,7 +304,28 @@
 
 ---
 
-## EPIC 3: WORKOUT PLAN (Weeks 3‑4)
+## EPIC 3: APP SHELL / NAVIGATION (Week 3)
+
+**Story ID**: SHELL-001
+**Title**: App Shell with Bottom Navigation
+**User Story**: *As a signed-in user, I want a persistent bottom navigation shell so I can move between Home, Workout, Progress, and Profile without losing app context.*
+**Acceptance Criteria**:
+- Persistent bottom navigation is visible only in the signed-in experience.
+- Tabs exist for Home, Workout, Progress, and Profile.
+- The shell preserves tab state and back stack per top-level destination.
+- The shell owns the main app container and does not hold workout plan generation or session state logic.
+- The shell does not expose app-wide navigation internals to feature screens.
+**Technical Tasks**:
+- Create the app-owned shell host in `:app`.
+- Add typed Navigation 3 destinations for the tab container and its top-level tabs.
+- Wire bottom navigation state to the app-owned back stack.
+- Keep feature screens isolated behind navigation callbacks or MVI actions.
+**Modules Affected**: `:app`, `:feature:auth:auth-ui`, `:feature:onboarding:onboarding-ui`, `:feature:workout:workout-ui`, `:feature:progress:progress-ui`.
+**Dependencies**: AUTH-007, OB-004.
+**Size**: M
+
+---
+## EPIC 4: WORKOUT PLAN (Weeks 3-4)
 
 **Story ID**: WP-001
 **Title**: Gemini API Service & Prompt Builder
@@ -350,17 +372,17 @@
 **Size**: S
 
 **Story ID**: WP-004
-**Title**: Home Screen UI – Plan States
-**User Story**: *As a user, I want to see my weekly plan on the home screen with clear states (loading, success, empty, error).*
+**Title**: Workout Dashboard UI - Plan States
+**User Story**: *As a user, I want to see my weekly plan on the Home tab with clear states (loading, success, empty, error).*
 **Acceptance Criteria**:
 - Four composable states implemented.
 - Refresh button triggers `GenerateWorkoutPlanUseCase`.
-- Empty state shows “Generate a plan”.
+- Empty state shows "Generate a plan".
 **Technical Tasks**:
-- Create `HomeScreen` composable.
+- Create `WorkoutDashboardScreen` composable for the Home tab content.
 - Wire ViewModel to repository.
 **Modules Affected**: `:feature:workout:workout-ui`, `:feature:workout:workout-domain`.
-**Dependencies**: WP-002.
+**Dependencies**: SHELL-001, WP-002.
 **Size**: M
 
 **Story ID**: WP-005

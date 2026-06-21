@@ -326,7 +326,7 @@ flowchart TD
 - `rememberSaveableStateHolderNavEntryDecorator()` and `rememberViewModelStoreNavEntryDecorator()` preserve destination state and scope ViewModels to individual back-stack entries.
 - Splash, authentication, sign-out, and onboarding completion use atomic root replacement so protected transitions cannot return to obsolete destinations.
 - Feature UI modules own their navigation keys and entry-provider registration helpers. They expose navigation callbacks or MVI actions and do not receive a `NavController`.
-- The initial AUTH-000/AUTH-001 flow uses one app-owned stack. When bottom navigation is implemented, Home, Session, Progress, and Profile each retain an independent top-level back stack.
+- The initial AUTH-000/AUTH-001 flow uses one app-owned stack. When bottom navigation is implemented, the App Shell hosts the Home, Workout, Progress, and Profile tabs, each retaining an independent top-level back stack. Session remains a nested flow reachable from the tab content that launches it.
 - Incoming deep links are parsed at the app boundary and translated into typed keys. Planned links include plan sharing (`app://fitlife/plan/{planId}`) and session resume.
 
 ```mermaid
@@ -335,9 +335,12 @@ flowchart LR
     NavDisplay --> AppBackStack
     AppBackStack --> AuthEntries
     AppBackStack --> OnboardingEntries
-    AppBackStack --> WorkoutEntries
+    AppBackStack --> AppShellEntries
+    AppShellEntries --> HomeEntries
+    AppShellEntries --> WorkoutEntries
+    AppShellEntries --> ProgressEntries
+    AppShellEntries --> ProfileEntries
     AppBackStack --> SessionEntries
-    AppBackStack --> ProgressEntries
 ```
 
 Navigation dependencies are centralized in `gradle/libs.versions.toml`: Navigation 3 runtime/UI `1.1.2`, Lifecycle Navigation 3 integration aligned to Lifecycle `2.10.0`, and Kotlin serialization aligned to Kotlin `2.2.10`.
