@@ -1,5 +1,6 @@
 package com.aml_sakr.fitlife
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -233,6 +234,7 @@ fun FitLifeApp(
                                     )
                                 },
                                 onFinish = {
+                                    Log.e("onboarding", "navigate to home")
                                     backStack.replaceRoot(
                                         AppRoute.BeginnerOnboarding,
                                         AppRoute.Shell
@@ -301,6 +303,7 @@ fun FitLifeApp(
                                     )
                                 },
                                 onFinish = {
+                                    Log.e("onboarding", "navigate to home")
                                     backStack.replaceRoot(
                                         AppRoute.IntermediateOnboarding,
                                         AppRoute.Shell

@@ -20,7 +20,7 @@ class DetermineStartupDestinationUseCaseTest {
     fun invoke_returnsAuth_whenAuthenticatedSessionHasBlankUserId() = runTest {
         val useCase = DetermineStartupDestinationUseCase(
             authSessionReader = FakeAuthSessionReader(
-                session = AuthSession(userId = "  ", isEmailVerified = true)
+                session = AuthSession(userId = "  ")
             ),
             onboardingCompletionReader = FakeOnboardingCompletionReader(isComplete = true)
         )
@@ -33,8 +33,7 @@ class DetermineStartupDestinationUseCaseTest {
         val useCase = DetermineStartupDestinationUseCase(
             authSessionReader = FakeAuthSessionReader(
                 session = AuthSession(
-                    userId = "user-1",
-                    isEmailVerified = false
+                    userId = "user-1"
                 )
             ),
             onboardingCompletionReader = FakeOnboardingCompletionReader(isComplete = true)
@@ -47,7 +46,7 @@ class DetermineStartupDestinationUseCaseTest {
     fun invoke_returnsOnboarding_whenUserIsAuthenticatedAndOnboardingIsIncomplete() = runTest {
         val useCase = DetermineStartupDestinationUseCase(
             authSessionReader = FakeAuthSessionReader(
-                session = AuthSession(userId = "user-1", isEmailVerified = true)
+                session = AuthSession(userId = "user-1")
             ),
             onboardingCompletionReader = FakeOnboardingCompletionReader(isComplete = false)
         )
@@ -59,7 +58,7 @@ class DetermineStartupDestinationUseCaseTest {
     fun invoke_returnsHome_whenUserIsAuthenticatedAndOnboardingIsComplete() = runTest {
         val useCase = DetermineStartupDestinationUseCase(
             authSessionReader = FakeAuthSessionReader(
-                session = AuthSession(userId = "user-1", isEmailVerified = true)
+                session = AuthSession(userId = "user-1")
             ),
             onboardingCompletionReader = FakeOnboardingCompletionReader(isComplete = true)
         )
@@ -71,7 +70,7 @@ class DetermineStartupDestinationUseCaseTest {
     fun invoke_returnsOnboarding_whenCompletionCheckFails() = runTest {
         val useCase = DetermineStartupDestinationUseCase(
             authSessionReader = FakeAuthSessionReader(
-                session = AuthSession(userId = "user-1", isEmailVerified = true)
+                session = AuthSession(userId = "user-1")
             ),
             onboardingCompletionReader = FakeOnboardingCompletionReader(
                 isComplete = true,

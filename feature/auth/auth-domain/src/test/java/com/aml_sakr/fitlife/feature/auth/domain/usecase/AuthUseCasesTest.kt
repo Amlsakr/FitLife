@@ -11,8 +11,7 @@ import org.junit.Test
 class AuthUseCasesTest {
     private val user = AuthUser(
         id = "user-1",
-        email = "amal@example.com",
-        isEmailVerified = false
+        email = "amal@example.com"
     )
 
     @Test
@@ -86,7 +85,7 @@ class AuthUseCasesTest {
 
     @Test
     fun refreshCurrentUser_delegatesToRepository() = runTest {
-        val verifiedUser = user.copy(isEmailVerified = true)
+        val verifiedUser = user
         val repository = FakeAuthRepository(refreshResult = Result.Success(verifiedUser))
 
         assertEquals(Result.Success(verifiedUser), RefreshCurrentUserUseCase(repository)())

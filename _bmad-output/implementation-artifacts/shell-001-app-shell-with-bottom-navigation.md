@@ -1,6 +1,6 @@
 # Story SHELL-001: App Shell with Bottom Navigation
 
-Status: review
+Status: done
 
 Design Status: Planned (no dedicated Stitch export; see UX spec and design-story-map TODO)
 
