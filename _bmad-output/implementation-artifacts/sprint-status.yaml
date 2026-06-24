@@ -71,7 +71,7 @@ development_status:
   wp-001-gemini-api-service-prompt-builder: done
   wp-002-generateworkoutplan-use-case-with-fallback-asset: done
   wp-003-workoutplan-room-entities-daos: done
-  wp-004-home-screen-ui-plan-states: review
+  wp-004-home-screen-ui-plan-states: done
   wp-005-weekly-overview-component: backlog
   epic-3-retrospective: optional
   epic-4: in-progress

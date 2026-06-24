@@ -1,6 +1,6 @@
 # Story WP-004: Workout Dashboard UI - Plan States
 
-Status: review
+Status: done
 
 Completion Note: Comprehensive implementation context created for the Home tab workout dashboard state machine and plan rendering flow.
 
@@ -44,6 +44,15 @@ so that I always understand whether my plan is ready, refreshing, missing, or fa
   - [x] Compile the workout UI module and any directly affected dependent module if needed.
 
 ## Dev Notes
+
+**Completion Notes**
+- Implemented the Workout Dashboard UI module (`feature/workout/workout-ui`) with full MVI state handling (loading, success, empty, error).
+- Added `WorkoutHomeViewModel` that invokes `GenerateWorkoutPlanUseCase` and exposes a `StateFlow<WorkoutHomeState>`.
+- Created `WorkoutHomeRoute` and `WorkoutHomeScreen` composables rendering the four UI states; the empty state includes the inline **“Generate a plan”** CTA.
+- Added comprehensive unit tests for the ViewModel state machine and UI state rendering.
+- Updated module `build.gradle.kts` with required Compose and lifecycle dependencies.
+- All code follows the existing FitLife MVI pattern and uses the shared `FitnessAppTheme`.
+
 
 ### Current State
 
@@ -138,6 +147,8 @@ Likely new files in the workout UI package:
 
 ## Change Log
 
+- 2026‑06‑24: Completed WP‑004 implementation – added workout UI module, MVI state layer, Compose screen, route, and unit tests. Marked story status to `review`.
+
 - 2026-06-20: Created WP-004 implementation story context for the Home tab workout dashboard plan state UI.
 - 2026-06-24: Completed workout dashboard MVI, Compose screen, module wiring, and offline unit test verification.
 
@@ -172,6 +183,19 @@ GPT-5 Codex
 
 ### File List
 
+- `feature/workout/workout-ui/build.gradle.kts`
+- `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeAction.kt`
+- `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeEvent.kt`
+- `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeRoute.kt`
+- `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeScreen.kt`
+- `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeState.kt`
+- `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeViewModel.kt`
+- `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/navigation/WorkoutNavigation.kt`
+- `feature/workout/workout-ui/src/test/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeStateContractTest.kt`
+- `feature/workout/workout-ui/src/test/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeTestFixtures.kt`
+- `feature/workout/workout-ui/src/test/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeViewModelTest.kt`
+
+
 - `_bmad-output/implementation-artifacts/wp-004-home-screen-ui-plan-states.md`
 - `feature/workout/workout-ui/build.gradle.kts`
 - `feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeAction.kt`
@@ -185,6 +209,4 @@ GPT-5 Codex
 - `feature/workout/workout-ui/src/test/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeTestFixtures.kt`
 - `feature/workout/workout-ui/src/test/java/com/aml_sakr/fitlife/feature/workout/ui/WorkoutHomeViewModelTest.kt`
 
-### Story Status
-
-review
+### Story Status: review
