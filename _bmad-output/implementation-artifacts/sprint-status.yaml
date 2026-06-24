@@ -1,5 +1,5 @@
 # generated: 2026-06-01T13:15:32+03:00
-# last_updated: 2026-06-24T11:54:36+03:00
+# last_updated: 2026-06-24T22:16:43+03:00
 # project: FitnessApp
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review
 
 generated: 2026-06-01T13:15:32+03:00
-last_updated: 2026-06-24T11:54:36+03:00
+last_updated: 2026-06-24T22:16:43+03:00
 project: FitnessApp
 project_key: NOKEY
 tracking_system: file-system
@@ -72,7 +72,7 @@ development_status:
   wp-002-generateworkoutplan-use-case-with-fallback-asset: done
   wp-003-workoutplan-room-entities-daos: done
   wp-004-home-screen-ui-plan-states: done
-  wp-005-weekly-overview-component: backlog
+  wp-005-weekly-overview-component: ready-for-dev
   epic-3-retrospective: optional
   epic-4: in-progress
   session-001-camerax-preview-composable: ready-for-dev

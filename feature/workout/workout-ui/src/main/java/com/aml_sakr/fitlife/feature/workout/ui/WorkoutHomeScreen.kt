@@ -1,6 +1,7 @@
 package com.aml_sakr.fitlife.feature.workout.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -49,6 +52,7 @@ import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
 fun WorkoutHomeScreen(
     state: WorkoutHomeState,
     onRequestPlan: () -> Unit,
+    onNavigateToDayDetail: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -73,7 +77,8 @@ fun WorkoutHomeScreen(
                 )
                 is WorkoutHomeState.Success -> SuccessPlanState(
                     state = state,
-                    onRequestPlan = onRequestPlan
+                    onRequestPlan = onRequestPlan,
+                    onNavigateToDayDetail = onNavigateToDayDetail
                 )
                 is WorkoutHomeState.Error -> ErrorPlanState(
                     state = state,
@@ -169,7 +174,8 @@ private fun EmptyPlanState(
 @Composable
 private fun SuccessPlanState(
     state: WorkoutHomeState.Success,
-    onRequestPlan: () -> Unit
+    onRequestPlan: () -> Unit,
+    onNavigateToDayDetail: (Int) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(FitLifeDimens.SpaceMd)) {
         Row(
@@ -206,6 +212,11 @@ private fun SuccessPlanState(
                 modifier = Modifier.weight(1f)
             )
         }
+
+        WeeklyOverview(
+            days = state.plan.days,
+            onDayClick = onNavigateToDayDetail
+        )
 
         WorkoutPlanSummaryCard(plan = state.plan)
     }
@@ -411,7 +422,8 @@ private fun WorkoutHomeEmptyPreview() {
     FitnessAppTheme {
         WorkoutHomeScreen(
             state = WorkoutHomeState.Empty,
-            onRequestPlan = {}
+            onRequestPlan = {},
+            onNavigateToDayDetail = {}
         )
     }
 }
@@ -422,7 +434,8 @@ private fun WorkoutHomeSuccessPreview() {
     FitnessAppTheme {
         WorkoutHomeScreen(
             state = WorkoutHomeState.Success(previewPlan()),
-            onRequestPlan = {}
+            onRequestPlan = {},
+            onNavigateToDayDetail = {}
         )
     }
 }
@@ -459,3 +472,94 @@ private fun previewPlan(): WorkoutPlan =
         expiresAtEpochMillis = 2_000L,
         isFallback = false
     )
+
+fun WorkoutDay.calculateTotalReps(): Int {
+    return exercises.sumOf { exercise ->
+        val cleanReps = exercise.reps.split('-', ' ', '/').firstOrNull { part ->
+            part.any { it.isDigit() }
+        }?.filter { it.isDigit() }?.toIntOrNull() ?: 0
+        exercise.sets * cleanReps
+    }
+}
+
+@Composable
+private fun WeeklyOverview(
+    days: List<WorkoutDay>,
+    onDayClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(FitLifeDimens.SpaceSm)
+    ) {
+        Text(
+            text = "Weekly overview",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(FitLifeDimens.SpaceMd),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(days.size) { index ->
+                val day = days[index]
+                WorkoutDayCard(
+                    day = day,
+                    onClick = { onDayClick(day.day) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkoutDayCard(
+    day: WorkoutDay,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val totalReps = day.calculateTotalReps()
+    Card(
+        modifier = modifier
+            .width(160.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(FitLifeDimens.CornerMd),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(FitLifeDimens.SpaceMd)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(FitLifeDimens.SpaceXs)
+        ) {
+            Text(
+                text = "Day ${day.day}",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = day.title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(FitLifeDimens.SpaceXs))
+            Text(
+                text = "${day.durationMinutes} min",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "$totalReps reps",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
