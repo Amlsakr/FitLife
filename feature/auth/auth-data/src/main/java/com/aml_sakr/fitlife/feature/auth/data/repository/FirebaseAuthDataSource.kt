@@ -3,7 +3,6 @@ package com.aml_sakr.fitlife.feature.auth.data.repository
 internal data class FirebaseAuthUserData(
     val id: String,
     val email: String?,
-    val isEmailVerified: Boolean
 )
 
 internal interface FirebaseAuthDataSource {

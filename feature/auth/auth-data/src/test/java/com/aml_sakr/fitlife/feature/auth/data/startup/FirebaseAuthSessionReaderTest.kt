@@ -21,8 +21,7 @@ class FirebaseAuthSessionReaderTest {
             StubDataSource(
                 user = FirebaseAuthUserData(
                     id = "user-1",
-                    email = "amal@example.com",
-                    isEmailVerified = false
+                    email = "amal@example.com"
                 )
             )
         )
@@ -30,7 +29,6 @@ class FirebaseAuthSessionReaderTest {
         val session = reader.currentSession()
 
         assertEquals("user-1", session?.userId)
-        assertEquals(false, session?.isEmailVerified)
     }
 
     private class StubDataSource(

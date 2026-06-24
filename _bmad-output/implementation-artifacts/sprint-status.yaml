@@ -1,5 +1,5 @@
 # generated: 2026-06-01T13:15:32+03:00
-# last_updated: 2026-06-21T00:00:00+03:00
+# last_updated: 2026-06-24T11:54:36+03:00
 # project: FitnessApp
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review
 
 generated: 2026-06-01T13:15:32+03:00
-last_updated: 2026-06-21T00:00:00+03:00
+last_updated: 2026-06-24T11:54:36+03:00
 project: FitnessApp
 project_key: NOKEY
 tracking_system: file-system
@@ -67,15 +67,15 @@ development_status:
   ob-004-onboarding-completion-flag-navigation-graph: done
   epic-2-retrospective: done
   epic-3: in-progress
-  shell-001-app-shell-with-bottom-navigation: ready-for-dev
+  shell-001-app-shell-with-bottom-navigation: done
   wp-001-gemini-api-service-prompt-builder: done
   wp-002-generateworkoutplan-use-case-with-fallback-asset: done
   wp-003-workoutplan-room-entities-daos: done
-  wp-004-home-screen-ui-plan-states: ready-for-dev
+  wp-004-home-screen-ui-plan-states: done
   wp-005-weekly-overview-component: backlog
   epic-3-retrospective: optional
-  epic-4: backlog
-  session-001-camerax-preview-composable: backlog
+  epic-4: in-progress
+  session-001-camerax-preview-composable: ready-for-dev
   session-002-ml-kit-posedetector-integration: backlog
   session-003-fatigue-detection-use-case: backlog
   session-004-lighting-condition-use-case-audio-fallback: backlog

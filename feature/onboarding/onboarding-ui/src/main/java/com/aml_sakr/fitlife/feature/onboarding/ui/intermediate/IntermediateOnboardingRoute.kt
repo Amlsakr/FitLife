@@ -1,9 +1,11 @@
 package com.aml_sakr.fitlife.feature.onboarding.ui.intermediate
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun IntermediateOnboardingRoute(
@@ -17,7 +19,9 @@ fun IntermediateOnboardingRoute(
         viewModel.actions.collect { action ->
             when (action) {
                 IntermediateOnboardingAction.NavigateBackToLevelSelector -> onBackToLevelSelector()
-                IntermediateOnboardingAction.Finish -> onFinish()
+                IntermediateOnboardingAction.Finish -> {
+                   Log.e("onboarding", "navigate to home")
+                    onFinish() }
             }
         }
     }

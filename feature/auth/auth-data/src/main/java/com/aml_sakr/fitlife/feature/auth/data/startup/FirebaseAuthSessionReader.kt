@@ -12,7 +12,6 @@ class FirebaseAuthSessionReader @Inject internal constructor(
         dataSource.currentUser()?.let { user ->
             AuthSession(
                 userId = user.id,
-                isEmailVerified = user.isEmailVerified
             )
         }
 }

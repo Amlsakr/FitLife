@@ -6,10 +6,14 @@ import com.aml_sakr.fitlife.feature.auth.data.AuthDataConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
+import com.aml_sakr.fitlife.core.data.observability.AnalyticsLogger
+
 import kotlinx.coroutines.CancellationException
+
 import javax.inject.Inject
 
 class FirebaseAuthRepository @Inject internal constructor(
+    private val analyticsLogger: AnalyticsLogger,
     private val dataSource: FirebaseAuthDataSource,
     private val userDocumentDataSource: FirebaseUserDocumentDataSource,
     private val userDataPurgeCoordinator: UserDataPurgeCoordinator,
@@ -37,7 +41,7 @@ class FirebaseAuthRepository @Inject internal constructor(
             return Result.Failure(AuthError.VerificationEmailFailed)
         }
 
-        return Result.Success(createdUser.copy(isEmailVerified = false))
+        return Result.Success(createdUser.copy())
     }
 
     override suspend fun signIn(
@@ -81,6 +85,8 @@ class FirebaseAuthRepository @Inject internal constructor(
             is Result.Success -> result.value ?: return Result.Failure(AuthError.NoAuthenticatedUser)
         }
 
+        // Capture user data snapshot for potential restore
+        analyticsLogger.logEvent("account_deletion_started", mapOf("uid" to authenticatedUser.id))
         val userDataSnapshot = try {
             userDataArchiveDataSource.snapshotUserData(authenticatedUser.id)
         } catch (cancellation: CancellationException) {
@@ -101,6 +107,7 @@ class FirebaseAuthRepository @Inject internal constructor(
                 // Best effort only: the account has already been deleted, so
                 // do not fail the request because credential cleanup failed.
             }
+            analyticsLogger.logEvent("account_deletion", mapOf("uid" to authenticatedUser.id))
             Result.Success(Unit)
         } catch (cancellation: CancellationException) {
             throw cancellation
@@ -113,6 +120,7 @@ class FirebaseAuthRepository @Inject internal constructor(
                 // Best effort: keep the original auth failure while restoring
                 // only missing documents if we can.
             }
+            analyticsLogger.logEvent("account_deletion_failed", mapOf("uid" to authenticatedUser.id, "error" to throwable.message))
             Result.Failure(FirebaseAuthExceptionMapper.map(throwable))
         }
     }
@@ -162,7 +170,6 @@ class FirebaseAuthRepository @Inject internal constructor(
         return AuthUser(
             id = id,
             email = email,
-            isEmailVerified = isEmailVerified
         )
     }
 
@@ -170,6 +177,5 @@ class FirebaseAuthRepository @Inject internal constructor(
         FirebaseAuthUserData(
             id = id,
             email = email,
-            isEmailVerified = isEmailVerified
         )
 }

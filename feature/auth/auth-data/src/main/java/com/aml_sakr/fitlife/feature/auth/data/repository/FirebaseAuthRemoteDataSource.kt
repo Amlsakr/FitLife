@@ -56,6 +56,5 @@ internal class FirebaseAuthRemoteDataSource @Inject constructor(
         FirebaseAuthUserData(
             id = uid,
             email = email,
-            isEmailVerified = isEmailVerified
         )
 }

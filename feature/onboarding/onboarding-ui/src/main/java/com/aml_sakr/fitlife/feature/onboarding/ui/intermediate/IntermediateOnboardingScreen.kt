@@ -1,5 +1,6 @@
 package com.aml_sakr.fitlife.feature.onboarding.ui.intermediate
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -10,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,7 +35,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -46,7 +48,6 @@ import com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessGoal
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateOnboardingStep
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateTrainingSplit
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.OneRepMaxLift
-import androidx.compose.foundation.layout.size
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +115,10 @@ fun IntermediateOnboardingScreen(
                     verticalArrangement = Arrangement.spacedBy(FitLifeDimens.SpaceSm)
                 ) {
                     Button(
-                        onClick = onContinue,
+                        onClick = {
+                            onContinue.invoke()
+                            Log.e("onboarding", "continue")
+                        },
                         enabled = !state.isLoading && state.canContinue,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -167,8 +171,10 @@ fun IntermediateOnboardingScreen(
                     text = when (state.currentStep) {
                         IntermediateOnboardingStep.Split ->
                             "Pick the routine that best matches how you already train."
+
                         IntermediateOnboardingStep.Goals ->
                             "Choose every goal you want the plan to support."
+
                         IntermediateOnboardingStep.OneRepMax ->
                             "Optional. Leave any lift blank if you do not know it yet."
                     },
@@ -193,11 +199,13 @@ fun IntermediateOnboardingScreen(
                     enabled = !state.isLoading,
                     onSplitSelected = onSplitSelected
                 )
+
                 IntermediateOnboardingStep.Goals -> GoalSelection(
                     selectedGoals = state.selectedGoals,
                     enabled = !state.isLoading,
                     onGoalToggled = onGoalToggled
                 )
+
                 IntermediateOnboardingStep.OneRepMax -> OneRepMaxSelection(
                     entries = state.oneRepMaxInputs,
                     enabled = !state.isLoading,

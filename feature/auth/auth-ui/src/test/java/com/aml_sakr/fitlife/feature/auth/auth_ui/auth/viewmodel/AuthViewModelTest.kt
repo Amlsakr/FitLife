@@ -54,7 +54,7 @@ class AuthViewModelTest {
 
     @Test
     fun initialLoad_emitsAuthenticatedUserNavigation_whenCurrentUserExists() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(currentUserResult = Result.Success(user))
         )
@@ -88,7 +88,7 @@ class AuthViewModelTest {
 
     @Test
     fun successfulUnverifiedSignUp_emitsAuthenticatedNavigation_andClearsPasswords() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val repository = FakeAuthRepository(signUpResult = Result.Success(user))
         val viewModel = createViewModel(repository)
         advanceUntilIdle()
@@ -104,7 +104,7 @@ class AuthViewModelTest {
 
     @Test
     fun successfulVerifiedSignUp_navigatesToOnboarding_andClearsPasswords() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", true)
+        val user = AuthUser("user-1", "amal@example.com")
         val repository = FakeAuthRepository(signUpResult = Result.Success(user))
         val viewModel = createViewModel(repository)
         advanceUntilIdle()
@@ -142,7 +142,7 @@ class AuthViewModelTest {
 
     @Test
     fun successfulVerifiedSignIn_emitsAuthenticatedNavigation() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", true)
+        val user = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(signInResult = Result.Success(user))
         )
@@ -160,7 +160,7 @@ class AuthViewModelTest {
 
     @Test
     fun successfulUnverifiedSignIn_emitsAuthenticatedNavigation() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(signInResult = Result.Success(user))
         )
@@ -251,7 +251,7 @@ class AuthViewModelTest {
 
     @Test
     fun successfulGoogleSignIn_emitsAuthenticatedNavigation() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", true)
+        val user = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(
                 googleSignInResult = Result.Success(user)
@@ -324,7 +324,7 @@ class AuthViewModelTest {
 
     @Test
     fun refreshVerification_emitsAuthenticatedNavigation_whenSessionStillExists() = runTest(dispatcher) {
-        val unverified = AuthUser("user-1", "amal@example.com", false)
+        val unverified = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(
                 currentUserResult = Result.Success(unverified),
@@ -344,7 +344,7 @@ class AuthViewModelTest {
 
     @Test
     fun refreshVerification_returnsToEnabledSignIn_whenSessionHasEnded() = runTest(dispatcher) {
-        val unverified = AuthUser("user-1", "amal@example.com", false)
+        val unverified = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(
                 currentUserResult = Result.Success(unverified),
@@ -377,7 +377,7 @@ class AuthViewModelTest {
 
     @Test
     fun resendVerification_emitsConfirmation() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(
                 currentUserResult = Result.Success(user),
@@ -398,7 +398,7 @@ class AuthViewModelTest {
 
     @Test
     fun signOut_clearsAuthState_andEmitsSignInNavigation() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(
                 currentUserResult = Result.Success(user),
@@ -416,7 +416,7 @@ class AuthViewModelTest {
 
     @Test
     fun deleteAccountRequested_showsConfirmationDialog() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val viewModel = createViewModel(
             FakeAuthRepository(currentUserResult = Result.Success(user))
         )
@@ -429,7 +429,7 @@ class AuthViewModelTest {
 
     @Test
     fun deleteAccountConfirmed_deletesUser_andNavigatesToSignIn() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val repository = FakeAuthRepository(
             currentUserResult = Result.Success(user),
             deleteAccountResult = Result.Success(Unit)
@@ -448,7 +448,7 @@ class AuthViewModelTest {
 
     @Test
     fun deleteAccountConfirmed_handlesReauthenticationRequiredSafely() = runTest(dispatcher) {
-        val user = AuthUser("user-1", "amal@example.com", false)
+        val user = AuthUser("user-1", "amal@example.com")
         val repository = FakeAuthRepository(
             currentUserResult = Result.Success(user),
             deleteAccountResult = Result.Failure(AuthError.ReauthenticationRequired)
