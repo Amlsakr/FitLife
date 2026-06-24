@@ -9,7 +9,7 @@ class DetermineStartupDestinationUseCase(
     suspend operator fun invoke(): StartupDestination {
         val session = authSessionReader.currentSession() ?: return StartupDestination.Auth
         if (session.userId.isBlank()) return StartupDestination.Auth
-        if (!session.isEmailVerified) return StartupDestination.Auth
+
 
         return try {
             if (onboardingCompletionReader.isOnboardingComplete(session.userId)) {

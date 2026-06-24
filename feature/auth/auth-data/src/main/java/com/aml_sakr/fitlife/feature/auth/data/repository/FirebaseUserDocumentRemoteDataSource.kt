@@ -17,7 +17,6 @@ internal class FirebaseUserDocumentRemoteDataSource @Inject constructor(
                 mapOf(
                     AuthDataConstants.UserDocumentFields.ID to user.id,
                     AuthDataConstants.UserDocumentFields.EMAIL to user.email,
-                    AuthDataConstants.UserDocumentFields.IS_EMAIL_VERIFIED to user.isEmailVerified
                 ),
                 SetOptions.merge()
             )

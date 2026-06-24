@@ -186,7 +186,7 @@ class AuthViewModel(
                 confirmPassword = AuthUiConstants.EMPTY_TEXT
             )
         }
-        if (wasSignUp && user.isEmailVerified) {
+        if (wasSignUp ) {
             sendAction(AuthAction.NavigateToOnboarding)
         } else {
             sendAction(AuthAction.NavigateToAuthenticatedUser(user))

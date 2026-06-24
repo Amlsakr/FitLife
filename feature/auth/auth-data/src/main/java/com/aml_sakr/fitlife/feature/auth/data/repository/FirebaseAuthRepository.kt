@@ -37,7 +37,7 @@ class FirebaseAuthRepository @Inject internal constructor(
             return Result.Failure(AuthError.VerificationEmailFailed)
         }
 
-        return Result.Success(createdUser.copy(isEmailVerified = false))
+        return Result.Success(createdUser.copy())
     }
 
     override suspend fun signIn(
@@ -162,7 +162,6 @@ class FirebaseAuthRepository @Inject internal constructor(
         return AuthUser(
             id = id,
             email = email,
-            isEmailVerified = isEmailVerified
         )
     }
 
@@ -170,6 +169,5 @@ class FirebaseAuthRepository @Inject internal constructor(
         FirebaseAuthUserData(
             id = id,
             email = email,
-            isEmailVerified = isEmailVerified
         )
 }

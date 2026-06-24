@@ -57,6 +57,7 @@ class FitLifeAppNavigationTest {
             expectedRoute = AuthDestination.SignIn,
             expectedTitle = "Login"
         )
+        assertShellTabsHidden()
     }
 
     @Test
@@ -66,15 +67,17 @@ class FitLifeAppNavigationTest {
             expectedRoute = AppRoute.Onboarding,
             expectedTitle = "Welcome to FitLife"
         )
+        assertShellTabsHidden()
     }
 
     @Test
-    fun homeAction_navigatesToHomeAndRemovesSplash() {
+    fun homeAction_navigatesToShellAndRemovesSplash() {
         assertStartupNavigation(
             destination = StartupDestination.Home,
-            expectedRoute = AppRoute.Home,
+            expectedRoute = AppRoute.Shell,
             expectedTitle = "Home"
         )
+        assertShellTabsVisible()
     }
 
     @Test
@@ -90,7 +93,7 @@ class FitLifeAppNavigationTest {
         }
 
         waitForText("Home")
-        composeRule.onNodeWithText("Home").assertIsDisplayed()
+        assertShellTabsVisible()
         assertTrue(
             composeRule.onAllNodesWithText("Keep your form analysis private")
                 .fetchSemanticsNodes()
@@ -99,12 +102,13 @@ class FitLifeAppNavigationTest {
     }
 
     @Test
-    fun verifiedAuthUser_navigatesToHomeAndRemovesAuth() {
+    fun verifiedAuthUser_navigatesToShellAndRemovesAuth() {
         assertPostAuthNavigation(
             onboardingComplete = true,
-            expectedRoute = AppRoute.Home,
+            expectedRoute = AppRoute.Shell,
             expectedTitle = "Home"
         )
+        assertShellTabsVisible()
     }
 
     @Test
@@ -470,9 +474,9 @@ class FitLifeAppNavigationTest {
         composeRule.onNodeWithContentDescription("Frequency 3 days per week").performClick()
         composeRule.onNodeWithText("Finish").performClick()
         waitForText("Home")
-        composeRule.onNodeWithText("Home").assertIsDisplayed()
+        assertShellTabsVisible()
         composeRule.runOnIdle {
-            assertEquals(listOf(AppRoute.Home), backStack.toList())
+            assertEquals(listOf(AppRoute.Shell), backStack.toList())
         }
     }
 
@@ -508,9 +512,9 @@ class FitLifeAppNavigationTest {
         composeRule.onNodeWithText("Finish").assertIsDisplayed()
         composeRule.onNodeWithText("Finish").performClick()
         waitForText("Home")
-        composeRule.onNodeWithText("Home").assertIsDisplayed()
+        assertShellTabsVisible()
         composeRule.runOnIdle {
-            assertEquals(listOf(AppRoute.Home), backStack.toList())
+            assertEquals(listOf(AppRoute.Shell), backStack.toList())
         }
     }
 
@@ -567,11 +571,11 @@ class FitLifeAppNavigationTest {
     }
 
     @Test
-    fun protectedDestination_signOutReplacesRootWithAuth() {
+    fun profileTab_signOutReplacesRootWithAuth() {
         lateinit var backStack: NavBackStack<NavKey>
 
         composeRule.setContent {
-            backStack = rememberNavBackStack(AppRoute.Home)
+            backStack = rememberNavBackStack(AppRoute.Shell)
 
             FitnessAppTheme {
                 FitLifeApp(
@@ -583,6 +587,8 @@ class FitLifeAppNavigationTest {
         }
 
         waitForText("Home")
+        composeRule.onNodeWithContentDescription("Profile tab", useUnmergedTree = true).performClick()
+        waitForText("Profile")
         composeRule.onNodeWithText("Sign out").performClick()
         waitForText("Login")
         composeRule.onNodeWithText("Login").assertIsDisplayed()
@@ -592,11 +598,11 @@ class FitLifeAppNavigationTest {
     }
 
     @Test
-    fun protectedDestination_deleteAccountReplacesRootWithAuth() {
+    fun profileTab_deleteAccountReplacesRootWithAuth() {
         lateinit var backStack: NavBackStack<NavKey>
 
         composeRule.setContent {
-            backStack = rememberNavBackStack(AppRoute.Home)
+            backStack = rememberNavBackStack(AppRoute.Shell)
 
             FitnessAppTheme {
                 FitLifeApp(
@@ -608,6 +614,8 @@ class FitLifeAppNavigationTest {
         }
 
         waitForText("Home")
+        composeRule.onNodeWithContentDescription("Profile tab", useUnmergedTree = true).performClick()
+        waitForText("Profile")
         composeRule.onNodeWithText("Delete account").performClick()
         composeRule.onNodeWithText("Delete permanently").performClick()
         waitForText("Login")
@@ -640,9 +648,46 @@ class FitLifeAppNavigationTest {
         waitForText("Sign in with Google")
         composeRule.onNodeWithText("Sign in with Google").performClick()
         waitForText("Home")
-        composeRule.onNodeWithText("Home").assertIsDisplayed()
+        assertShellTabsVisible()
         composeRule.runOnIdle {
-            assertEquals(listOf(AppRoute.Home), backStack.toList())
+            assertEquals(listOf(AppRoute.Shell), backStack.toList())
+        }
+    }
+
+    @Test
+    fun shellTabSwitching_preservesSelectedTabAndHomeBackStackAcrossStateRestore() {
+        val restorationTester = StateRestorationTester(composeRule)
+        lateinit var backStack: NavBackStack<NavKey>
+
+        restorationTester.setContent {
+            backStack = rememberNavBackStack(AuthDestination.Splash)
+
+            FitnessAppTheme {
+                FitLifeApp(
+                    backStack = backStack,
+                    determineStartupDestination = { StartupDestination.Home },
+                    startupRouteErrorLogger = NoOpStartupRouteErrorLogger
+                )
+            }
+        }
+
+        waitForText("Home")
+        composeRule.onNodeWithText("Open home detail").performClick()
+        waitForText("Home detail")
+        composeRule.onNodeWithContentDescription("Workout tab", useUnmergedTree = true).performClick()
+        waitForText("Your workout planning tools will live here.")
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        composeRule.onNodeWithContentDescription("Workout tab", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithText("Your workout planning tools will live here.")
+            .assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Home tab", useUnmergedTree = true).performClick()
+        waitForText("Home detail")
+        composeRule.onNodeWithText("Home detail").assertIsDisplayed()
+
+        composeRule.runOnIdle {
+            assertEquals(listOf(AppRoute.Shell), backStack.toList())
         }
     }
 
@@ -757,7 +802,7 @@ class FitLifeAppNavigationTest {
         }
 
         waitForText(expectedTitle)
-        composeRule.onNodeWithText(expectedTitle).assertIsDisplayed()
+        assertTrue(composeRule.onAllNodesWithText(expectedTitle).fetchSemanticsNodes().isNotEmpty())
         composeRule.runOnIdle {
             assertEquals(listOf(expectedRoute), backStack.toList())
         }
@@ -783,7 +828,7 @@ class FitLifeAppNavigationTest {
         }
 
         waitForText(expectedTitle)
-        composeRule.onNodeWithText(expectedTitle).assertIsDisplayed()
+        assertTrue(composeRule.onAllNodesWithText(expectedTitle).fetchSemanticsNodes().isNotEmpty())
         composeRule.runOnIdle {
             assertEquals(listOf(expectedRoute), backStack.toList())
         }
@@ -801,6 +846,20 @@ class FitLifeAppNavigationTest {
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
+    }
+
+    private fun assertShellTabsVisible() {
+        assertTrue(composeRule.onAllNodesWithContentDescription("Home tab", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
+        assertTrue(composeRule.onAllNodesWithContentDescription("Workout tab", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
+        assertTrue(composeRule.onAllNodesWithContentDescription("Progress tab", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
+        assertTrue(composeRule.onAllNodesWithContentDescription("Profile tab", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty())
+    }
+
+    private fun assertShellTabsHidden() {
+        assertTrue(composeRule.onAllNodesWithContentDescription("Home tab", useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
+        assertTrue(composeRule.onAllNodesWithContentDescription("Workout tab", useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
+        assertTrue(composeRule.onAllNodesWithContentDescription("Progress tab", useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
+        assertTrue(composeRule.onAllNodesWithContentDescription("Profile tab", useUnmergedTree = true).fetchSemanticsNodes().isEmpty())
     }
 
     private object NoOpStartupRouteErrorLogger : StartupRouteErrorLogger {

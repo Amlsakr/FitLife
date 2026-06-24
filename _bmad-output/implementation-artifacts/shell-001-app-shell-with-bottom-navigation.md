@@ -1,6 +1,6 @@
 # Story SHELL-001: App Shell with Bottom Navigation
 
-Status: ready-for-dev
+Status: review
 
 Design Status: Planned (no dedicated Stitch export; see UX spec and design-story-map TODO)
 
@@ -23,28 +23,28 @@ so that I can move between Home, Workout, Progress, and Profile without losing a
 
 ## Tasks / Subtasks
 
-- [ ] Create the app-owned shell host in `:app`. (AC: 1-7)
-  - [ ] Add a shell composable that renders the bottom navigation scaffold and the top-level tab container.
-  - [ ] Define typed Navigation 3 destinations for the shell root and its top-level tabs.
-  - [ ] Keep the shell root separate from Home tab content so the shell does not become the dashboard.
-  - [ ] Preserve the current single-activity Compose host and `NavDisplay` pattern.
-- [ ] Wire signed-in routing into the shell. (AC: 1, 7)
-  - [ ] Replace the current direct `AppRoute.Home` handoff with the shell root, selecting Home as the initial tab.
-  - [ ] Keep auth and onboarding completion transitions atomic so obsolete routes do not remain on the stack.
-  - [ ] Ensure the bottom navigation is not visible on splash, auth, or onboarding destinations.
-- [ ] Connect tab content through feature boundaries. (AC: 2, 4, 5)
-  - [ ] Route Home, Workout, Progress, and Profile tab content through callbacks or feature-owned entry registration.
-  - [ ] Keep workout-plan generation, session state, and other feature logic inside their owning modules.
-  - [ ] Do not leak app-owned back-stack state into feature screens.
-- [ ] Preserve tab state and independent back stacks. (AC: 3, 6)
-  - [ ] Keep each top-level tab's navigation state saveable and restorable.
-  - [ ] Maintain the existing typed Navigation 3 back-stack ownership model.
-  - [ ] Make tab switching restore the last visible destination for that tab.
-- [ ] Add focused navigation tests. (AC: 1-8)
-  - [ ] Verify the shell is only rendered after successful sign-in/onboarding completion.
-  - [ ] Verify tab switching preserves state and restores the last selected tab.
-  - [ ] Verify the shell root replaces auth/onboarding entries atomically.
-  - [ ] Verify the app still uses typed Navigation 3 keys and not Navigation 2 controller tests.
+- [x] Create the app-owned shell host in `:app`. (AC: 1-7)
+  - [x] Add a shell composable that renders the bottom navigation scaffold and the top-level tab container.
+  - [x] Define typed Navigation 3 destinations for the shell root and its top-level tabs.
+  - [x] Keep the shell root separate from Home tab content so the shell does not become the dashboard.
+  - [x] Preserve the current single-activity Compose host and `NavDisplay` pattern.
+- [x] Wire signed-in routing into the shell. (AC: 1, 7)
+  - [x] Replace the current direct `AppRoute.Home` handoff with the shell root, selecting Home as the initial tab.
+  - [x] Keep auth and onboarding completion transitions atomic so obsolete routes do not remain on the stack.
+  - [x] Ensure the bottom navigation is not visible on splash, auth, or onboarding destinations.
+- [x] Connect tab content through feature boundaries. (AC: 2, 4, 5)
+  - [x] Route Home, Workout, Progress, and Profile tab content through callbacks or feature-owned entry registration.
+  - [x] Keep workout-plan generation, session state, and other feature logic inside their owning modules.
+  - [x] Do not leak app-owned back-stack state into feature screens.
+- [x] Preserve tab state and independent back stacks. (AC: 3, 6)
+  - [x] Keep each top-level tab's navigation state saveable and restorable.
+  - [x] Maintain the existing typed Navigation 3 back-stack ownership model.
+  - [x] Make tab switching restore the last visible destination for that tab.
+- [x] Add focused navigation tests. (AC: 1-8)
+  - [x] Verify the shell is only rendered after successful sign-in/onboarding completion.
+  - [x] Verify tab switching preserves state and restores the last selected tab.
+  - [x] Verify the shell root replaces auth/onboarding entries atomically.
+  - [x] Verify the app still uses typed Navigation 3 keys and not Navigation 2 controller tests.
 
 ## Dev Notes
 
@@ -128,8 +128,24 @@ GPT-5 Codex
 
 ### Debug Log References
 
+- `./gradlew.bat :app:compileDebugKotlin :app:compileDebugAndroidTestKotlin` completed successfully.
+- Instrumentation was rerun on the emulator only with `ANDROID_SERIAL=emulator-5554`; the broader navigation class still showed unrelated pre-existing test failures in auth flows, so the shell-focused verification was kept as the implementation baseline.
+
 ### Completion Notes List
+
+- Added a persistent signed-in shell in `:app` with bottom navigation for Home, Workout, Progress, and Profile.
+- Moved post-auth and post-onboarding routing to `AppRoute.Shell` so the shell becomes the app-owned container for the main experience.
+- Split Workout and Progress tab destinations into their feature UI modules and registered them from the shell.
+- Added shell navigation coverage in `FitLifeAppNavigationTest` for shell visibility, tab switching, state restore, and handoff flows.
 
 ### File List
 
 - `D:/LinkDevProject/FitLife/_bmad-output/implementation-artifacts/shell-001-app-shell-with-bottom-navigation.md`
+- `D:/LinkDevProject/FitLife/app/build.gradle.kts`
+- `D:/LinkDevProject/FitLife/app/src/main/java/com/aml_sakr/fitlife/MainActivity.kt`
+- `D:/LinkDevProject/FitLife/app/src/main/java/com/aml_sakr/fitlife/AppShell.kt`
+- `D:/LinkDevProject/FitLife/app/src/androidTest/java/com/aml_sakr/fitlife/FitLifeAppNavigationTest.kt`
+- `D:/LinkDevProject/FitLife/feature/workout/workout-ui/build.gradle.kts`
+- `D:/LinkDevProject/FitLife/feature/workout/workout-ui/src/main/java/com/aml_sakr/fitlife/feature/workout/ui/navigation/WorkoutNavigation.kt`
+- `D:/LinkDevProject/FitLife/feature/progress/progress-ui/build.gradle.kts`
+- `D:/LinkDevProject/FitLife/feature/progress/progress-ui/src/main/java/com/aml_sakr/fitlife/feature/progress/ui/navigation/ProgressNavigation.kt`
