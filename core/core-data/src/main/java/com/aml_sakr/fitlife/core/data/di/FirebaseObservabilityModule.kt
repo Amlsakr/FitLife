@@ -1,8 +1,8 @@
 package com.aml_sakr.fitlife.core.data.di
 
 import android.content.Context
-import com.aml_sakr.fitlife.core.data.observability.AnalyticsLogger
-import com.aml_sakr.fitlife.core.data.observability.CrashReporter
+import com.aml_sakr.fitlife.core.domain.AnalyticsLogger
+import com.aml_sakr.fitlife.core.domain.CrashReporter
 import com.aml_sakr.fitlife.core.data.observability.FirebaseAnalyticsLogger
 import com.aml_sakr.fitlife.core.data.observability.FirebaseCrashReporter
 import com.google.firebase.analytics.FirebaseAnalytics

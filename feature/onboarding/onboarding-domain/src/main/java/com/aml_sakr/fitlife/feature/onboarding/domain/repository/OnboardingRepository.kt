@@ -7,13 +7,13 @@ import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateOnboardi
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessLevel
 
 interface OnboardingRepository {
-    suspend fun getSelectedFitnessLevel(): Result<FitnessLevel?, OnboardingError>
+    suspend fun getSelectedFitnessLevel(userId: String): Result<FitnessLevel?, OnboardingError>
 
-    suspend fun saveSelectedFitnessLevel(level: FitnessLevel): Result<Unit, OnboardingError>
+    suspend fun saveSelectedFitnessLevel(userId: String, level: FitnessLevel): Result<Unit, OnboardingError>
 
-    suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError>
+    suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError>
 
-    suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError>
+    suspend fun saveBeginnerDraft(userId: String, draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError>
 
     suspend fun syncBeginnerProfile(userId: String, draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError>
 
@@ -21,9 +21,10 @@ interface OnboardingRepository {
 
     suspend fun markOnboardingComplete(userId: String): Result<Unit, OnboardingError>
 
-    suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError>
+    suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError>
 
     suspend fun saveIntermediateDraft(
+        userId: String,
         draft: IntermediateOnboardingDraft
     ): Result<Unit, OnboardingError>
 

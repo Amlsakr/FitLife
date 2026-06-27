@@ -11,18 +11,17 @@ class SaveBeginnerProfileUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         draft: BeginnerOnboardingDraft,
-        userId: String? = null
+        userId: String
     ): Result<Unit, OnboardingError> {
-        when (val localResult = repository.saveBeginnerDraft(draft)) {
+        when (val localResult = repository.saveBeginnerDraft(userId, draft)) {
             is Result.Failure -> return localResult
             is Result.Success -> Unit
         }
 
-        val resolvedUserId = userId.orEmpty()
-        if (resolvedUserId.isBlank()) {
+        if (userId.isBlank()) {
             return Result.Success(Unit)
         }
 
-        return repository.syncBeginnerProfile(resolvedUserId, draft)
+        return repository.syncBeginnerProfile(userId, draft)
     }
 }

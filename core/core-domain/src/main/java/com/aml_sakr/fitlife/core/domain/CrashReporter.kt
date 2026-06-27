@@ -1,4 +1,4 @@
-package com.aml_sakr.fitlife.core.data.observability
+package com.aml_sakr.fitlife.core.domain
 
 interface CrashReporter {
     fun recordException(

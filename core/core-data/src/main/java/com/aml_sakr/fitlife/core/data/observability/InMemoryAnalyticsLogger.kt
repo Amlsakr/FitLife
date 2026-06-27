@@ -1,5 +1,7 @@
 package com.aml_sakr.fitlife.core.data.observability
 
+import com.aml_sakr.fitlife.core.domain.AnalyticsLogger
+
 class InMemoryAnalyticsLogger : AnalyticsLogger {
     private val mutableEvents = mutableListOf<AnalyticsEvent>()
     val events: List<AnalyticsEvent> = mutableEvents

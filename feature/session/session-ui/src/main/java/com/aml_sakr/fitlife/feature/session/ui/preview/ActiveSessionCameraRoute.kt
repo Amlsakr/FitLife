@@ -34,11 +34,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.aml_sakr.fitlife.feature.session.domain.pose.AnalyzePoseUseCase
 import com.aml_sakr.fitlife.feature.session.ui.ActiveSessionEvent
 import com.aml_sakr.fitlife.feature.session.ui.ActiveSessionViewModel
 import com.aml_sakr.fitlife.feature.session.ui.R
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.camera.core.ImageProxy
+import com.aml_sakr.fitlife.feature.session.ui.components.FatigueWarningBanner
+import com.aml_sakr.fitlife.feature.session.ui.service.SessionAudioService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -58,14 +64,41 @@ fun ActiveSessionCameraRoute(
     onSwitchToAudioOnly: () -> Unit,
     modifier: Modifier = Modifier,
     analyzePoseUseCase: AnalyzePoseUseCase? = null,
-    viewModel: ActiveSessionViewModel = viewModel(),
+    viewModel: ActiveSessionViewModel = hiltViewModel(),
     cameraPreviewProvider: CameraPreviewProvider? = null
 ) {
+    val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        SessionAudioService.start(context)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            SessionAudioService.stop(context)
+        }
+    }
+
+    LaunchedEffect(state.isFatigued) {
+        if (state.isFatigued) {
+            SessionAudioService.playAlert(context)
+        }
+    }
+
     var previewState by remember { mutableStateOf<SessionCameraPreviewState>(SessionCameraPreviewState.Loading) }
     var retryKey by remember { mutableIntStateOf(0) }
 
     // Patch: Use a channel to decouple frame arrival from processing and prevent coroutine flooding.
-    val frameChannel = remember { Channel<Any>(Channel.CONFLATED) }
+    // Fix: Add onUndeliveredElement to ensure ImageProxy objects are closed if dropped due to conflation.
+    val frameChannel = remember { 
+        Channel<Any>(
+            capacity = Channel.CONFLATED,
+            onUndeliveredElement = { frame ->
+                (frame as? ImageProxy)?.close()
+            }
+        ) 
+    }
 
     LaunchedEffect(analyzePoseUseCase, viewModel) {
         if (analyzePoseUseCase == null) return@LaunchedEffect
@@ -73,6 +106,13 @@ fun ActiveSessionCameraRoute(
             analyzePoseUseCase(imageProxy).collect { poseData ->
                 viewModel.onEvent(ActiveSessionEvent.PoseDetected(poseData))
             }
+        }
+    }
+
+    // Fix: Lifecycle-safe shutdown of the detector to prevent memory leaks and process cleanup issues.
+    DisposableEffect(analyzePoseUseCase) {
+        onDispose {
+            analyzePoseUseCase?.close()
         }
     }
 
@@ -107,6 +147,8 @@ fun ActiveSessionCameraRoute(
         // Overlay Chrome
         ActiveSessionOverlay(
             previewState = previewState,
+            isFatigued = state.isFatigued,
+            onDismissFatigue = { viewModel.onEvent(ActiveSessionEvent.DismissFatigue) },
             onExitSession = onExitSession,
             onSwitchToAudioOnly = onSwitchToAudioOnly,
             onRetryCamera = {
@@ -120,11 +162,22 @@ fun ActiveSessionCameraRoute(
 @Composable
 private fun ActiveSessionOverlay(
     previewState: SessionCameraPreviewState,
+    isFatigued: Boolean,
+    onDismissFatigue: () -> Unit,
     onExitSession: () -> Unit,
     onSwitchToAudioOnly: () -> Unit,
     onRetryCamera: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
+        // Fatigue Warning Banner
+        FatigueWarningBanner(
+            visible = isFatigued,
+            onDismiss = onDismissFatigue,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 80.dp) // Below top bar
+        )
+
         // Top Bar
         Row(
             modifier = Modifier

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.onCompletion
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
+import javax.inject.Inject
 
 private const val TAG = "MlKitPoseDetector"
 
@@ -30,7 +31,7 @@ private const val TAG = "MlKitPoseDetector"
  * - Respects architecture boundaries.
  * - Lifecycle-safe resource management via [close].
  */
-class MlKitPoseDetector : PoseDetector {
+class MlKitPoseDetector @Inject constructor() : PoseDetector {
 
     private val detector = PoseDetection.getClient(
         PoseDetectorOptions.Builder()

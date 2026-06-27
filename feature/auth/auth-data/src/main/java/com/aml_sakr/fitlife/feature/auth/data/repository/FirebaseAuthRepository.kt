@@ -6,7 +6,7 @@ import com.aml_sakr.fitlife.feature.auth.data.AuthDataConstants
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
 import com.aml_sakr.fitlife.feature.auth.domain.repository.AuthRepository
-import com.aml_sakr.fitlife.core.data.observability.AnalyticsLogger
+import com.aml_sakr.fitlife.core.domain.AnalyticsLogger
 
 import kotlinx.coroutines.CancellationException
 

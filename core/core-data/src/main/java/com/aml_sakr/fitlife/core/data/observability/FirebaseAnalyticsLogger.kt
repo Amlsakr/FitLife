@@ -1,6 +1,7 @@
 package com.aml_sakr.fitlife.core.data.observability
 
 import android.os.Bundle
+import com.aml_sakr.fitlife.core.domain.AnalyticsLogger
 import com.google.firebase.analytics.FirebaseAnalytics
 import javax.inject.Inject
 

@@ -9,6 +9,6 @@ import javax.inject.Inject
 class ReadSelectedFitnessLevelUseCase @Inject constructor(
     private val repository: OnboardingRepository
 ) {
-    suspend operator fun invoke(): Result<FitnessLevel?, OnboardingError> =
-        repository.getSelectedFitnessLevel()
+    suspend operator fun invoke(userId: String): Result<FitnessLevel?, OnboardingError> =
+        repository.getSelectedFitnessLevel(userId)
 }

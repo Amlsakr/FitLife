@@ -13,4 +13,9 @@
     <string name="session_camera_error_title">Camera Error</string>
     <string name="session_camera_error_body">Something went wrong with the camera. You can continue with audio guidance instead.</string>
     <string name="session_camera_error_retry">Retry Camera</string>
+    <string name="fatigue_warning_title">Fatigue Detected</string>
+    <string name="fatigue_warning_body">Your form stability has decreased. Take a short rest or focus on your technique.</string>
+    <string name="fatigue_warning_dismiss">I feel fine — continue</string>
+    <string name="session_notification_title">Active Workout Session</string>
+    <string name="session_notification_body">FitLife is monitoring your form.</string>
 </resources>

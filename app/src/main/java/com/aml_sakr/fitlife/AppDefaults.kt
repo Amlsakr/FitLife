@@ -45,16 +45,22 @@ internal object DefaultAuthRepository : AuthRepository {
 }
 
 internal object DefaultOnboardingRepository : OnboardingRepository {
-    override suspend fun getSelectedFitnessLevel(): Result<FitnessLevel?, OnboardingError> =
+    override suspend fun getSelectedFitnessLevel(userId: String): Result<FitnessLevel?, OnboardingError> =
         Result.Success(null)
 
-    override suspend fun saveSelectedFitnessLevel(level: FitnessLevel): Result<Unit, OnboardingError> =
+    override suspend fun saveSelectedFitnessLevel(
+        userId: String,
+        level: FitnessLevel
+    ): Result<Unit, OnboardingError> =
         Result.Success(Unit)
 
-    override suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError> =
+    override suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> =
         Result.Success(BeginnerOnboardingDraft())
 
-    override suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> =
+    override suspend fun saveBeginnerDraft(
+        userId: String,
+        draft: BeginnerOnboardingDraft
+    ): Result<Unit, OnboardingError> =
         Result.Success(Unit)
 
     override suspend fun syncBeginnerProfile(
@@ -68,10 +74,11 @@ internal object DefaultOnboardingRepository : OnboardingRepository {
     override suspend fun markOnboardingComplete(userId: String): Result<Unit, OnboardingError> =
         Result.Success(Unit)
 
-    override suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError> =
+    override suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError> =
         Result.Success(IntermediateOnboardingDraft())
 
     override suspend fun saveIntermediateDraft(
+        userId: String,
         draft: IntermediateOnboardingDraft
     ): Result<Unit, OnboardingError> = Result.Success(Unit)
 

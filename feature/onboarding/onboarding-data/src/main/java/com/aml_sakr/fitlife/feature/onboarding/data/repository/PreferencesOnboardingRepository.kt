@@ -1,19 +1,20 @@
 package com.aml_sakr.fitlife.feature.onboarding.data.repository
 
+import android.util.Log
 import com.aml_sakr.fitlife.core.data.preferences.PreferencesDataSource
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.feature.onboarding.domain.error.OnboardingError
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.BeginnerOnboardingDraft
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.BeginnerOnboardingStep
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.Equipment
+import com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessGoal
+import com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessLevel
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateOnboardingDraft
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateOnboardingStep
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateOneRepMaxInput
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateTrainingSplit
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.OneRepMaxLift
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.OneRepMaxUnit
-import com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessLevel
-import com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessGoal
 import com.aml_sakr.fitlife.feature.onboarding.domain.repository.OnboardingRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
@@ -24,10 +25,10 @@ class PreferencesOnboardingRepository @Inject constructor(
     private val beginnerOnboardingRemoteDataSource: BeginnerOnboardingRemoteDataSource,
     private val intermediateOnboardingRemoteDataSource: IntermediateOnboardingRemoteDataSource
 ) : OnboardingRepository {
-    override suspend fun getSelectedFitnessLevel(): Result<FitnessLevel?, OnboardingError> {
+    override suspend fun getSelectedFitnessLevel(userId: String): Result<FitnessLevel?, OnboardingError> {
         return try {
             val storedValue = preferencesDataSource
-                .stringFlow(SELECTED_LEVEL_KEY, "")
+                .stringFlow(selectedLevelKey(userId), "")
                 .first()
 
             if (storedValue.isBlank()) {
@@ -41,37 +42,37 @@ class PreferencesOnboardingRepository @Inject constructor(
         }
     }
 
-    override suspend fun saveSelectedFitnessLevel(level: FitnessLevel): Result<Unit, OnboardingError> {
+    override suspend fun saveSelectedFitnessLevel(userId: String, level: FitnessLevel): Result<Unit, OnboardingError> {
         return try {
-            preferencesDataSource.putString(SELECTED_LEVEL_KEY, level.name)
+            preferencesDataSource.putString(selectedLevelKey(userId), level.name)
             Result.Success(Unit)
         } catch (_: Throwable) {
             Result.Failure(OnboardingError.StorageWriteFailure)
         }
     }
 
-    override suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError> {
+    override suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> {
         return try {
             val currentStep = preferencesDataSource
-                .stringFlow(BEGINNER_STEP_KEY, BeginnerOnboardingStep.Goals.name)
+                .stringFlow(beginnerStepKey(userId), BeginnerOnboardingStep.Goals.name)
                 .first()
                 .toBeginnerStepOrNull()
                 ?: return Result.Failure(OnboardingError.InvalidStoredBeginnerDraft)
 
             val goals = preferencesDataSource
-                .stringFlow(BEGINNER_GOALS_KEY, "")
+                .stringFlow(beginnerGoalsKey(userId), "")
                 .first()
                 .toFitnessGoalSetOrNull()
                 ?: return Result.Failure(OnboardingError.InvalidStoredBeginnerDraft)
 
             val equipment = preferencesDataSource
-                .stringFlow(BEGINNER_EQUIPMENT_KEY, "")
+                .stringFlow(beginnerEquipmentKey(userId), "")
                 .first()
                 .toEquipmentSetOrNull()
                 ?: return Result.Failure(OnboardingError.InvalidStoredBeginnerDraft)
 
             val weeklyFrequency = preferencesDataSource
-                .longFlow(BEGINNER_FREQUENCY_KEY, UNSET_FREQUENCY)
+                .longFlow(beginnerFrequencyKey(userId), UNSET_FREQUENCY)
                 .first()
                 .takeIf { it != UNSET_FREQUENCY }
                 ?.toInt()
@@ -89,13 +90,16 @@ class PreferencesOnboardingRepository @Inject constructor(
         }
     }
 
-    override suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> {
+    override suspend fun saveBeginnerDraft(userId: String, draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> {
         return try {
-            preferencesDataSource.putString(BEGINNER_STEP_KEY, draft.currentStep.name)
-            preferencesDataSource.putString(BEGINNER_GOALS_KEY, draft.goals.encodeEnumValues())
-            preferencesDataSource.putString(BEGINNER_EQUIPMENT_KEY, draft.equipment.encodeEnumValues())
+            preferencesDataSource.putString(beginnerStepKey(userId), draft.currentStep.name)
+            preferencesDataSource.putString(beginnerGoalsKey(userId), draft.goals.encodeEnumValues())
+            preferencesDataSource.putString(
+                beginnerEquipmentKey(userId),
+                draft.equipment.encodeEnumValues()
+            )
             preferencesDataSource.putLong(
-                BEGINNER_FREQUENCY_KEY,
+                beginnerFrequencyKey(userId),
                 draft.weeklyFrequency?.toLong() ?: UNSET_FREQUENCY
             )
             Result.Success(Unit)
@@ -116,7 +120,7 @@ class PreferencesOnboardingRepository @Inject constructor(
             beginnerOnboardingRemoteDataSource.upsertBeginnerProfile(userId, draft)
             Result.Success(Unit)
         } catch (e: Exception) {
-
+            Log.e("firebase", "Firestore write failed $e")
             Result.Failure(OnboardingError.RemoteSyncFailure)
         }
     }
@@ -157,16 +161,16 @@ class PreferencesOnboardingRepository @Inject constructor(
         }
     }
 
-    override suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError> {
+    override suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError> {
         return try {
             val currentStep = preferencesDataSource
-                .stringFlow(INTERMEDIATE_STEP_KEY, IntermediateOnboardingStep.Split.name)
+                .stringFlow(intermediateStepKey(userId), IntermediateOnboardingStep.Split.name)
                 .first()
                 .toIntermediateStepOrNull()
                 ?: return Result.Failure(OnboardingError.InvalidStoredIntermediateDraft)
 
             val currentSplit = preferencesDataSource
-                .stringFlow(INTERMEDIATE_SPLIT_KEY, "")
+                .stringFlow(intermediateSplitKey(userId), "")
                 .first()
                 .let { rawSplit ->
                     if (rawSplit.isBlank()) {
@@ -178,13 +182,13 @@ class PreferencesOnboardingRepository @Inject constructor(
                 }
 
             val goals = preferencesDataSource
-                .stringFlow(INTERMEDIATE_GOALS_KEY, "")
+                .stringFlow(intermediateGoalsKey(userId), "")
                 .first()
                 .toFitnessGoalSetOrNull()
                 ?: return Result.Failure(OnboardingError.InvalidStoredIntermediateDraft)
 
             val oneRepMax = preferencesDataSource
-                .stringFlow(INTERMEDIATE_ONE_REP_MAX_STATE_KEY, "")
+                .stringFlow(intermediateOneRepMaxKey(userId), "")
                 .first()
                 .toOneRepMaxInputsOrNull()
                 ?: return Result.Failure(OnboardingError.InvalidStoredIntermediateDraft)
@@ -203,20 +207,21 @@ class PreferencesOnboardingRepository @Inject constructor(
     }
 
     override suspend fun saveIntermediateDraft(
+        userId: String,
         draft: IntermediateOnboardingDraft
     ): Result<Unit, OnboardingError> {
         return try {
-            preferencesDataSource.putString(INTERMEDIATE_STEP_KEY, draft.currentStep.name)
+            preferencesDataSource.putString(intermediateStepKey(userId), draft.currentStep.name)
             preferencesDataSource.putString(
-                INTERMEDIATE_SPLIT_KEY,
+                intermediateSplitKey(userId),
                 draft.currentSplit?.name.orEmpty()
             )
             preferencesDataSource.putString(
-                INTERMEDIATE_GOALS_KEY,
+                intermediateGoalsKey(userId),
                 draft.goals.encodeEnumValues()
             )
             preferencesDataSource.putString(
-                INTERMEDIATE_ONE_REP_MAX_STATE_KEY,
+                intermediateOneRepMaxKey(userId),
                 draft.oneRepMaxInputs.encodeOneRepMaxInputs()
             )
             Result.Success(Unit)
@@ -283,7 +288,7 @@ class PreferencesOnboardingRepository @Inject constructor(
     }
 
     private fun String.parseOneRepMaxInputsOrNull():
-        Map<OneRepMaxLift, IntermediateOneRepMaxInput>? {
+            Map<OneRepMaxLift, IntermediateOneRepMaxInput>? {
         if (isBlank()) return null
 
         val parsed = defaultOneRepMaxInputs().toMutableMap()
@@ -295,10 +300,12 @@ class PreferencesOnboardingRepository @Inject constructor(
                     val parts = entry.splitEscaped(FIELD_SEPARATOR, limit = 3)
                     if (parts.size != 3) return@forEach
 
-                    val lift = runCatching { OneRepMaxLift.valueOf(parts[0].decodeEscapedValue()) }.getOrNull()
-                        ?: return@forEach
-                    val unit = runCatching { OneRepMaxUnit.valueOf(parts[2].decodeEscapedValue()) }.getOrNull()
-                        ?: return@forEach
+                    val lift =
+                        runCatching { OneRepMaxLift.valueOf(parts[0].decodeEscapedValue()) }.getOrNull()
+                            ?: return@forEach
+                    val unit =
+                        runCatching { OneRepMaxUnit.valueOf(parts[2].decodeEscapedValue()) }.getOrNull()
+                            ?: return@forEach
                     parsed[lift] = IntermediateOneRepMaxInput(
                         valueText = parts[1].decodeEscapedValue(),
                         unit = unit
@@ -331,13 +338,14 @@ class PreferencesOnboardingRepository @Inject constructor(
     }
 
     private fun Map<OneRepMaxLift, Float>.toOneRepMaxInputsOrNull():
-        Map<OneRepMaxLift, IntermediateOneRepMaxInput> = defaultOneRepMaxInputs().mapValues { (lift, input) ->
-        val savedValue = get(lift) ?: return@mapValues input
-        input.copy(
-            valueText = savedValue.formatDecimal(),
-            unit = OneRepMaxUnit.Kilograms
-        )
-    }
+            Map<OneRepMaxLift, IntermediateOneRepMaxInput> =
+        defaultOneRepMaxInputs().mapValues { (lift, input) ->
+            val savedValue = get(lift) ?: return@mapValues input
+            input.copy(
+                valueText = savedValue.formatDecimal(),
+                unit = OneRepMaxUnit.Kilograms
+            )
+        }
 
     private fun <T : Enum<T>> Set<T>.encodeEnumValues(): String =
         joinToString(separator = ENUM_SEPARATOR) { it.name }
@@ -367,6 +375,7 @@ class PreferencesOnboardingRepository @Inject constructor(
                     append(ESCAPE_CHAR)
                     append(char)
                 }
+
                 else -> append(char)
             }
         }
@@ -427,16 +436,16 @@ class PreferencesOnboardingRepository @Inject constructor(
         OneRepMaxLift.entries.associateWith { IntermediateOneRepMaxInput() }
 
     private companion object {
-        const val SELECTED_LEVEL_KEY = "onboarding_selected_fitness_level"
-        const val BEGINNER_STEP_KEY = "onboarding_beginner_step"
-        const val BEGINNER_GOALS_KEY = "onboarding_beginner_goals"
-        const val BEGINNER_EQUIPMENT_KEY = "onboarding_beginner_equipment"
-        const val BEGINNER_FREQUENCY_KEY = "onboarding_beginner_weekly_frequency"
+        const val SELECTED_LEVEL_KEY_PREFIX = "onboarding_selected_fitness_level_"
+        const val BEGINNER_STEP_KEY_PREFIX = "onboarding_beginner_step_"
+        const val BEGINNER_GOALS_KEY_PREFIX = "onboarding_beginner_goals_"
+        const val BEGINNER_EQUIPMENT_KEY_PREFIX = "onboarding_beginner_equipment_"
+        const val BEGINNER_FREQUENCY_KEY_PREFIX = "onboarding_beginner_weekly_frequency_"
         const val ONBOARDING_COMPLETION_KEY_PREFIX = "onboarding_complete_"
-        const val INTERMEDIATE_STEP_KEY = "onboarding_intermediate_step"
-        const val INTERMEDIATE_SPLIT_KEY = "onboarding_intermediate_split"
-        const val INTERMEDIATE_GOALS_KEY = "onboarding_intermediate_goals"
-        const val INTERMEDIATE_ONE_REP_MAX_STATE_KEY = "onboarding_intermediate_one_rep_max_state"
+        const val INTERMEDIATE_STEP_KEY_PREFIX = "onboarding_intermediate_step_"
+        const val INTERMEDIATE_SPLIT_KEY_PREFIX = "onboarding_intermediate_split_"
+        const val INTERMEDIATE_GOALS_KEY_PREFIX = "onboarding_intermediate_goals_"
+        const val INTERMEDIATE_ONE_REP_MAX_STATE_KEY_PREFIX = "onboarding_intermediate_one_rep_max_state_"
         const val RAW_ONE_REP_MAX_PREFIX = "v3;"
         const val ENUM_SEPARATOR = "|"
         const val KEY_VALUE_SEPARATOR = "="
@@ -448,4 +457,31 @@ class PreferencesOnboardingRepository @Inject constructor(
 
     private fun onboardingCompletionKey(userId: String): String =
         ONBOARDING_COMPLETION_KEY_PREFIX + userId
+
+    private fun selectedLevelKey(userId: String): String =
+        SELECTED_LEVEL_KEY_PREFIX + userId
+
+    private fun beginnerStepKey(userId: String): String =
+        BEGINNER_STEP_KEY_PREFIX + userId
+
+    private fun beginnerGoalsKey(userId: String): String =
+        BEGINNER_GOALS_KEY_PREFIX + userId
+
+    private fun beginnerEquipmentKey(userId: String): String =
+        BEGINNER_EQUIPMENT_KEY_PREFIX + userId
+
+    private fun beginnerFrequencyKey(userId: String): String =
+        BEGINNER_FREQUENCY_KEY_PREFIX + userId
+
+    private fun intermediateStepKey(userId: String): String =
+        INTERMEDIATE_STEP_KEY_PREFIX + userId
+
+    private fun intermediateSplitKey(userId: String): String =
+        INTERMEDIATE_SPLIT_KEY_PREFIX + userId
+
+    private fun intermediateGoalsKey(userId: String): String =
+        INTERMEDIATE_GOALS_KEY_PREFIX + userId
+
+    private fun intermediateOneRepMaxKey(userId: String): String =
+        INTERMEDIATE_ONE_REP_MAX_STATE_KEY_PREFIX + userId
 }

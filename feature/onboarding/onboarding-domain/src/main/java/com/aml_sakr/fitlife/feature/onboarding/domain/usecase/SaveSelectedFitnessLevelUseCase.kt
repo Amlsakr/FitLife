@@ -9,6 +9,6 @@ import javax.inject.Inject
 class SaveSelectedFitnessLevelUseCase @Inject constructor(
     private val repository: OnboardingRepository
 ) {
-    suspend operator fun invoke(level: FitnessLevel): Result<Unit, OnboardingError> =
-        repository.saveSelectedFitnessLevel(level)
+    suspend operator fun invoke(userId: String, level: FitnessLevel): Result<Unit, OnboardingError> =
+        repository.saveSelectedFitnessLevel(userId, level)
 }

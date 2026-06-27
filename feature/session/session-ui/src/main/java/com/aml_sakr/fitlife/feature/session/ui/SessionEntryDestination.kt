@@ -17,13 +17,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.aml_sakr.fitlife.feature.session.ui.permission.CameraPermissionGateRoute
 import com.aml_sakr.fitlife.feature.session.ui.preview.ActiveSessionCameraRoute
 
 @Composable
 fun SessionEntryDestination(
     onExitSession: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ActiveSessionViewModel = hiltViewModel()
 ) {
     var sessionMode by remember { mutableStateOf<SessionMode?>(null) }
 
@@ -46,7 +48,9 @@ fun SessionEntryDestination(
                 SessionMode.Camera -> {
                     ActiveSessionCameraRoute(
                         onExitSession = onExitSession,
-                        onSwitchToAudioOnly = { sessionMode = SessionMode.AudioOnly }
+                        onSwitchToAudioOnly = { sessionMode = SessionMode.AudioOnly },
+                        analyzePoseUseCase = viewModel.analyzePoseUseCase,
+                        viewModel = viewModel
                     )
                 }
 
