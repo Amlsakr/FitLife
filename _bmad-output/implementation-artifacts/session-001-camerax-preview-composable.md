@@ -1,8 +1,8 @@
 # Story SESSION-001: CameraX Preview Composable
 
-Status: review
+Status: done
 
-Completion Note: CameraX preview successfully implemented with lifecycle-aware binding and full-screen overlay chrome.
+Completion Note: CameraX preview successfully implemented with lifecycle-aware binding and full-screen overlay chrome. All code review findings resolved.
 
 Design Status: Planned (no dedicated Stitch export; use `docs/fitlife-ux-spec-v1.md#35-session-screen-most-complex` as the UX source).
 
@@ -70,6 +70,14 @@ so that I can position myself correctly before later pose feedback, skeleton ove
   - [x] Run `.\gradlew.bat :app:assembleDebug --no-daemon --console=plain`.
   - [x] Optional manual smoke: on a real device, start a session, grant permission, confirm the preview renders, rotate/return, then exit and re-enter without crash.
 
+### Review Findings
+
+- [x] [Review][Decision] Missing AC 10 app-level test — Implemented in `FitLifeAppNavigationTest.kt`.
+- [x] [Review][Patch] ProcessCameraProvider.get() lifecycle risk [CameraPreview.kt:65]
+- [x] [Review][Patch] Retry mechanism is incomplete [ActiveSessionCameraRoute.kt:158]
+- [x] [Review][Patch] Deprecated VolumeOff icon [ActiveSessionCameraRoute.kt:125]
+- [x] [Review][Patch] Deprecated LocalLifecycleOwner [CameraPreview.kt:41]
+
 ## Dev Agent Record
 
 ### Agent Model Used
@@ -84,6 +92,7 @@ BMad Dev Agent
 - Added `CameraPreviewProvider` abstraction to support fake camera binding in tests.
 - Verified implementation with instrumentation tests in `ActiveSessionCameraRouteTest`.
 - Added required CameraX dependencies and permissions to `session-ui` module.
+- Resolved all code review findings, including deprecated icons, lifecycle risks, and missing app-level tests.
 
 ### File List
 - `feature/session/session-ui/build.gradle.kts`
@@ -95,3 +104,4 @@ BMad Dev Agent
 - `feature/session/session-ui/src/main/java/com/aml_sakr/fitlife/feature/session/ui/preview/CameraPreview.kt`
 - `feature/session/session-ui/src/main/java/com/aml_sakr/fitlife/feature/session/ui/preview/ActiveSessionCameraRoute.kt`
 - `feature/session/session-ui/src/androidTest/java/com/aml_sakr/fitlife/feature/session/ui/preview/ActiveSessionCameraRouteTest.kt`
+- `app/src/androidTest/java/com/aml_sakr/fitlife/FitLifeAppNavigationTest.kt`

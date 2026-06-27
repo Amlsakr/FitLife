@@ -31,7 +31,7 @@ enum class PoseJoint {
     LEFT_EAR, RIGHT_EAR,
     LEFT_MOUTH, RIGHT_MOUTH,
     LEFT_SHOULDER, RIGHT_SHOULDER,
-    LEFT_ELBOW, RIGHT_SHOULDER_ELBOW, // Wait, ML Kit is LEFT_ELBOW, RIGHT_ELBOW
+    LEFT_ELBOW, RIGHT_ELBOW,
     LEFT_WRIST, RIGHT_WRIST,
     LEFT_PINKY, RIGHT_PINKY,
     LEFT_INDEX, RIGHT_INDEX,
@@ -40,10 +40,5 @@ enum class PoseJoint {
     LEFT_KNEE, RIGHT_KNEE,
     LEFT_ANKLE, RIGHT_ANKLE,
     LEFT_HEEL, RIGHT_HEEL,
-    LEFT_FOOT_INDEX, RIGHT_FOOT_INDEX;
-
-    companion object {
-        // Fix for the typo I was about to make
-        val RIGHT_ELBOW = RIGHT_SHOULDER_ELBOW // Wait, I should just fix the enum
-    }
+    LEFT_FOOT_INDEX, RIGHT_FOOT_INDEX
 }

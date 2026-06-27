@@ -2,6 +2,7 @@ package com.aml_sakr.fitlife.feature.session.ui.preview
 
 import androidx.activity.ComponentActivity
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -79,16 +80,17 @@ class ActiveSessionCameraRouteTest {
     private class FakeCameraPreviewProvider : CameraPreviewProvider {
         private var callback: ((Result<Unit>) -> Unit)? = null
 
-        override fun bindPreview(
+        override fun bindPreviewAndAnalysis(
             lifecycleOwner: LifecycleOwner,
             cameraSelector: CameraSelector,
             preview: Preview,
+            imageAnalysis: ImageAnalysis?,
             onResult: (Result<Unit>) -> Unit
         ) {
             callback = onResult
         }
 
-        override fun unbindPreview(preview: Preview) {}
+        override fun unbindAll(preview: Preview, imageAnalysis: ImageAnalysis?) {}
 
         fun respond(result: Result<Unit>) {
             callback?.invoke(result)

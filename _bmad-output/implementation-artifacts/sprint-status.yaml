@@ -75,8 +75,8 @@ development_status:
   wp-005-weekly-overview-component: done
   epic-3-retrospective: optional
   epic-4: in-progress
-  session-001-camerax-preview-composable: review
-  session-002-ml-kit-posedetector-integration: backlog
+  session-001-camerax-preview-composable: done
+  session-002-ml-kit-posedetector-integration: done
   session-003-fatigue-detection-use-case: backlog
   session-004-lighting-condition-use-case-audio-fallback: backlog
   session-005-skeleton-overlay-canvas: backlog

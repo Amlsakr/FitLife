@@ -1,5 +1,6 @@
 package com.aml_sakr.fitlife.feature.session.ui.preview
 
+import androidx.camera.core.ImageAnalysis
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -21,7 +22,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,12 +34,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.aml_sakr.fitlife.feature.session.domain.pose.AnalyzePoseUseCase
+import com.aml_sakr.fitlife.feature.session.ui.ActiveSessionEvent
+import com.aml_sakr.fitlife.feature.session.ui.ActiveSessionViewModel
 import com.aml_sakr.fitlife.feature.session.ui.R
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.consumeAsFlow
 
 /**
  * The production active-session route for camera-based sessions.
- * AC 1, 5, 6 compliance:
+ * AC 1, 3, 5, 6 compliance:
  * - Full-screen background preview.
+ * - Real-time pose detection integration via [AnalyzePoseUseCase].
  * - Dark session treatment.
  * - Exit and audio-only toggle controls.
  * - Error/fallback state.
@@ -46,9 +57,33 @@ fun ActiveSessionCameraRoute(
     onExitSession: () -> Unit,
     onSwitchToAudioOnly: () -> Unit,
     modifier: Modifier = Modifier,
+    analyzePoseUseCase: AnalyzePoseUseCase? = null,
+    viewModel: ActiveSessionViewModel = viewModel(),
     cameraPreviewProvider: CameraPreviewProvider? = null
 ) {
     var previewState by remember { mutableStateOf<SessionCameraPreviewState>(SessionCameraPreviewState.Loading) }
+    var retryKey by remember { mutableIntStateOf(0) }
+
+    // Patch: Use a channel to decouple frame arrival from processing and prevent coroutine flooding.
+    val frameChannel = remember { Channel<Any>(Channel.CONFLATED) }
+
+    LaunchedEffect(analyzePoseUseCase, viewModel) {
+        if (analyzePoseUseCase == null) return@LaunchedEffect
+        frameChannel.consumeAsFlow().collectLatest { imageProxy ->
+            analyzePoseUseCase(imageProxy).collect { poseData ->
+                viewModel.onEvent(ActiveSessionEvent.PoseDetected(poseData))
+            }
+        }
+    }
+
+    val analyzer = remember(analyzePoseUseCase) {
+        analyzePoseUseCase?.let {
+            ImageAnalysis.Analyzer { imageProxy ->
+                // Channel.CONFLATED ensures we only process the latest frame if processing is slow.
+                frameChannel.trySend(imageProxy)
+            }
+        }
+    }
 
     Box(
         modifier = modifier
@@ -57,8 +92,16 @@ fun ActiveSessionCameraRoute(
     ) {
         // Full-screen background preview
         CameraPreview(
-            onStateChanged = { previewState = it },
-            providerOverride = cameraPreviewProvider
+            onStateChanged = { 
+                previewState = it
+                viewModel.onEvent(ActiveSessionEvent.CameraStateChanged(it is SessionCameraPreviewState.Active))
+                if (it is SessionCameraPreviewState.Error) {
+                    viewModel.onEvent(ActiveSessionEvent.ErrorOccurred(it.throwable))
+                }
+            },
+            providerOverride = cameraPreviewProvider,
+            analyzer = analyzer, // Integrated with AnalyzePoseUseCase
+            retryKey = retryKey
         )
 
         // Overlay Chrome
@@ -67,6 +110,7 @@ fun ActiveSessionCameraRoute(
             onExitSession = onExitSession,
             onSwitchToAudioOnly = onSwitchToAudioOnly,
             onRetryCamera = {
+                retryKey++
                 previewState = SessionCameraPreviewState.Loading
             }
         )
@@ -106,7 +150,7 @@ private fun ActiveSessionOverlay(
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.VolumeOff,
+                    imageVector = Icons.AutoMirrored.Filled.VolumeOff,
                     contentDescription = stringResource(R.string.session_audio_only_toggle),
                     tint = Color.White
                 )

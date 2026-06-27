@@ -1,5 +1,6 @@
 package com.aml_sakr.fitlife.feature.session.data.pose
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
@@ -16,6 +17,11 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.onCompletion
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+
+private const val TAG = "MlKitPoseDetector"
 
 /**
  * ML Kit implementation of [PoseDetector].
@@ -32,10 +38,17 @@ class MlKitPoseDetector : PoseDetector {
             .build()
     )
 
+    private val isClosed = AtomicBoolean(false)
+    
+    // AC 2: FPS Monitoring
+    private val frameCount = AtomicInteger(0)
+    private val startTime = AtomicLong(System.currentTimeMillis())
+
     @OptIn(ExperimentalGetImage::class)
     override fun detectPose(imageProxy: Any): Flow<PoseData> = callbackFlow {
-        if (imageProxy !is ImageProxy) {
-            close()
+        if (imageProxy !is ImageProxy || isClosed.get()) {
+            if (imageProxy is ImageProxy) imageProxy.close()
+            channel.close()
             return@callbackFlow
         }
 
@@ -44,30 +57,49 @@ class MlKitPoseDetector : PoseDetector {
             val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
             detector.process(inputImage)
                 .addOnSuccessListener { pose ->
-                    trySend(mapToPoseData(pose, imageProxy.imageInfo.timestamp))
+                    if (!isClosed.get()) {
+                        trySend(mapToPoseData(pose, imageProxy.imageInfo.timestamp))
+                        monitorFps()
+                    }
                 }
-                .addOnFailureListener {
-                    // Log error or handle failure
+                .addOnFailureListener { e ->
+                    // Patch: Log failure instead of silent skip
+                    Log.e(TAG, "Pose detection failed", e)
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
+                    channel.close()
                 }
         } else {
             imageProxy.close()
+            channel.close()
         }
 
         awaitClose {
             // No-op here, detector is closed via explicit close() call from owner
         }
     }.onCompletion {
-        // Ensure imageProxy is closed if flow is cancelled
         if (imageProxy is ImageProxy) {
             imageProxy.close()
         }
     }
 
     override fun close() {
-        detector.close()
+        if (isClosed.compareAndSet(false, true)) {
+            detector.close()
+        }
+    }
+
+    private fun monitorFps() {
+        val count = frameCount.incrementAndGet()
+        if (count % 100 == 0) {
+            val now = System.currentTimeMillis()
+            val elapsed = now - startTime.getAndSet(now)
+            if (elapsed > 0) {
+                val fps = 100000.0 / elapsed // 100 frames / (elapsed/1000)
+                Log.d(TAG, "Production FPS: ${"%.2f".format(fps)}")
+            }
+        }
     }
 
     private fun mapToPoseData(pose: Pose, timestamp: Long): PoseData {
@@ -86,7 +118,6 @@ class MlKitPoseDetector : PoseDetector {
             }
         }
 
-        // Simplistic overall confidence: average of detected landmarks
         val overallConfidence = if (joints.isNotEmpty()) {
             joints.values.map { it.confidence }.average().toFloat()
         } else {

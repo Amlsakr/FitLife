@@ -5,7 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.aml_sakr.fitlife.feature.session.domain.pose.PoseJoint
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
+import com.google.mlkit.vision.common.PointF3D
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
@@ -16,29 +18,31 @@ class MlKitPoseDetectorMappingTest {
 
     @Test
     fun mapToPoseData_correctlyMapsLandmarks() {
-        // Given
         val detector = MlKitPoseDetector()
         val mockPose = mock(Pose::class.java)
         val mockLandmark = mock(PoseLandmark::class.java)
         
         `when`(mockLandmark.position).thenReturn(PointF(100f, 200f))
         `when`(mockLandmark.inFrameLikelihood).thenReturn(0.95f)
-        // Position3D for Z
-        val mockPosition3D = mock(com.google.mlkit.vision.common.PointF3D::class.java)
-        `when`(mockPosition3D.z).thenReturn(50f)
+        
+        val mockPosition3D = PointF3D.from(100f, 200f, 50f)
         `when`(mockLandmark.position3D).thenReturn(mockPosition3D)
 
-        // Map NOSE
+        // Mock NOSE landmark
         `when`(mockPose.getPoseLandmark(PoseLandmark.NOSE)).thenReturn(mockLandmark)
         
-        // We need to use reflection or a test-only internal method to test the private mapping logic
-        // or just verify the behavior through the public detectPose if we can feed it a mock result.
-        // Since ML Kit uses Task API, it's hard to mock without a wrapper.
+        // Use reflection to test the private mapToPoseData method
+        val method = detector.javaClass.getDeclaredMethod("mapToPoseData", Pose::class.java, Long::class.javaPrimitiveType)
+        method.isAccessible = true
         
-        // For AC 6 compliance, I will at least verify that our PoseJoint enum 
-        // covers the expected set of landmarks and mapping logic handles them.
+        val result = method.invoke(detector, mockPose, 1000L) as com.aml_sakr.fitlife.feature.session.domain.pose.PoseData
         
-        // Let's assume for this implementation that the mapping logic is correct if 
-        // it visits all PoseJoint entries.
+        assertEquals(1000L, result.timestampMillis)
+        val noseJoint = result.joints[PoseJoint.NOSE]
+        assertNotNull("Nose joint should be mapped", noseJoint)
+        assertEquals(100f, noseJoint!!.x)
+        assertEquals(200f, noseJoint.y)
+        assertEquals(50f, noseJoint.z)
+        assertEquals(0.95f, noseJoint.confidence)
     }
 }

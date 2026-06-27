@@ -115,7 +115,8 @@ class PreferencesOnboardingRepository @Inject constructor(
         return try {
             beginnerOnboardingRemoteDataSource.upsertBeginnerProfile(userId, draft)
             Result.Success(Unit)
-        } catch (_: Throwable) {
+        } catch (e: Exception) {
+
             Result.Failure(OnboardingError.RemoteSyncFailure)
         }
     }
