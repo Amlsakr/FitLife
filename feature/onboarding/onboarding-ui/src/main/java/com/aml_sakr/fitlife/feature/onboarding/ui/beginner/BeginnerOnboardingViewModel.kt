@@ -188,7 +188,6 @@ class BeginnerOnboardingViewModel(
 
     private fun saveDraft(
         draft: BeginnerOnboardingDraft,
-        userId: String? = null,
         onSuccess: () -> Unit = {},
         onFailure: (String) -> Unit = {}
     ) {

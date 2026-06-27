@@ -22,6 +22,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
+import com.aml_sakr.fitlife.feature.workout.ui.WorkoutDayDetailScreen
 
 @Composable
 fun WorkoutTabHost(
@@ -50,8 +51,8 @@ fun EntryProviderScope<WorkoutDestination>.registerWorkoutEntries(
         WorkoutTabScreen()
     }
 
-    entry<WorkoutDestination.DayDetail> { entry ->
-        val dayNumber = entry.key.day
+    entry<WorkoutDestination.DayDetail> { dayDetail ->
+        val dayNumber = dayDetail.day
         // Note: For pure UI navigation registration, we render the screen.
         // The host app can pass the specific day content when integrated, or we can use a placeholder day.
         WorkoutDayDetailScreen(
