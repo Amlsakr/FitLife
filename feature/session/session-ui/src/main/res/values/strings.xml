@@ -7,4 +7,10 @@
     <string name="camera_permission_audio_only">Use audio only</string>
     <string name="camera_permission_audio_only_body">Audio-only guidance is available, so you can keep training without camera access.</string>
     <string name="camera_permission_waiting_for_prompt">Waiting for the system camera prompt...</string>
+    <string name="session_active_preview_label">Live camera preview</string>
+    <string name="session_exit_action">Exit session</string>
+    <string name="session_audio_only_toggle">Switch to audio-only</string>
+    <string name="session_camera_error_title">Camera Error</string>
+    <string name="session_camera_error_body">Something went wrong with the camera. You can continue with audio guidance instead.</string>
+    <string name="session_camera_error_retry">Retry Camera</string>
 </resources>

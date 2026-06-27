@@ -22,6 +22,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
+import com.aml_sakr.fitlife.feature.workout.ui.WorkoutDayDetailScreen
 
 @Composable
 fun WorkoutTabHost(
@@ -38,14 +39,26 @@ fun WorkoutTabHost(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider<WorkoutDestination> {
-            registerWorkoutEntries()
+            registerWorkoutEntries(backStack)
         }
     )
 }
 
-fun EntryProviderScope<WorkoutDestination>.registerWorkoutEntries() {
+fun EntryProviderScope<WorkoutDestination>.registerWorkoutEntries(
+    backStack: NavBackStack<WorkoutDestination>
+) {
     entry<WorkoutDestination.Root> {
         WorkoutTabScreen()
+    }
+
+    entry<WorkoutDestination.DayDetail> { dayDetail ->
+        val dayNumber = dayDetail.day
+        // Note: For pure UI navigation registration, we render the screen.
+        // The host app can pass the specific day content when integrated, or we can use a placeholder day.
+        WorkoutDayDetailScreen(
+            workoutDay = null, // Can be integrated/populated by the host VM/repository
+            onBack = { if (backStack.size > 1) backStack.removeLastOrNull() }
+        )
     }
 }
 
@@ -53,6 +66,9 @@ fun EntryProviderScope<WorkoutDestination>.registerWorkoutEntries() {
 sealed interface WorkoutDestination : NavKey {
     @Serializable
     data object Root : WorkoutDestination
+
+    @Serializable
+    data class DayDetail(val day: Int) : WorkoutDestination
 }
 
 private fun Modifier.tabHostVisibility(isVisible: Boolean): Modifier =

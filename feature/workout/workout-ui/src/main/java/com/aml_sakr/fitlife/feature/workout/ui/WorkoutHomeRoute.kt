@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun WorkoutHomeRoute(
     viewModel: WorkoutHomeViewModel,
+    onNavigateToDayDetail: (Int) -> Unit,
     onMessage: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -25,6 +26,7 @@ fun WorkoutHomeRoute(
     WorkoutHomeScreen(
         state = state,
         onRequestPlan = { viewModel.onEvent(WorkoutHomeEvent.RequestPlan) },
+        onNavigateToDayDetail = onNavigateToDayDetail,
         modifier = modifier
     )
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.aml_sakr.fitlife.feature.session.ui.permission.CameraPermissionGateRoute
+import com.aml_sakr.fitlife.feature.session.ui.preview.ActiveSessionCameraRoute
 
 @Composable
 fun SessionEntryDestination(
@@ -41,18 +42,26 @@ fun SessionEntryDestination(
                 }
             )
         } else {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = when (mode) {
-                        SessionMode.Camera -> "SESSION-001 camera handoff is ready."
-                        SessionMode.AudioOnly -> "SESSION-001 audio-only guidance is active."
-                    },
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = onExitSession) {
-                    Text("Back to home")
+            when (mode) {
+                SessionMode.Camera -> {
+                    ActiveSessionCameraRoute(
+                        onExitSession = onExitSession,
+                        onSwitchToAudioOnly = { sessionMode = SessionMode.AudioOnly }
+                    )
+                }
+
+                SessionMode.AudioOnly -> {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "SESSION-001 audio-only guidance is active.",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = onExitSession) {
+                            Text("Back to home")
+                        }
+                    }
                 }
             }
         }

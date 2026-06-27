@@ -1,5 +1,7 @@
 package com.aml_sakr.fitlife.feature.onboarding.ui.beginner
 
+import android.util.Log
+import androidx.compose.ui.semantics.error
 import androidx.lifecycle.viewModelScope
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.core.ui.mvi.BaseMviViewModel
@@ -142,28 +144,44 @@ class BeginnerOnboardingViewModel(
         val draft = state.value.toDraft(BeginnerOnboardingStep.Frequency)
         setState { copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
+            Log.d("onboarding", "finalizeBeginnerProfile: started")
             saveMutex.withLock {
+                Log.d("onboarding", "finalizeBeginnerProfile: acquired lock")
                 when (val saveResult = saveBeginnerProfileUseCase(draft, userId)) {
-                    is Result.Failure -> setState {
-                        copy(
-                            isLoading = false,
-                            errorMessage = saveResult.error.message
-                        )
-                    }
-
-                    is Result.Success -> when (
-                        val completionResult = markOnboardingCompleteUseCase(userId)
-                    ) {
-                        is Result.Success -> {
-                            setState { copy(isLoading = false, errorMessage = null) }
-                            sendAction(BeginnerOnboardingAction.Finish)
-                        }
-
-                        is Result.Failure -> setState {
+                    is Result.Failure -> {
+                        Log.e("onboarding", "finalizeBeginnerProfile: save failed")
+                        setState {
                             copy(
                                 isLoading = false,
-                                errorMessage = completionResult.error.message
+                                errorMessage = saveResult.error.message
                             )
+                        }
+                    }
+
+                    is Result.Success -> {
+                        Log.e(
+                            "onboarding",
+                            "finalizeBeginnerProfile: save success, marking complete"
+                        )
+                        when (
+                            val completionResult = markOnboardingCompleteUseCase(userId)
+                        ) {
+
+                            is Result.Success -> {
+                                Log.e("onboarding", "finalizeBeginnerProfile: completion success, , sending Finish")
+                                setState { copy(isLoading = false, errorMessage = null) }
+                                sendAction(BeginnerOnboardingAction.Finish)
+                            }
+
+                            is Result.Failure -> {
+                                Log.e("onboarding", "finalizeBeginnerProfile: completion failed: ${completionResult.error}")
+                                setState {
+                                    copy(
+                                        isLoading = false,
+                                        errorMessage = completionResult.error.message
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -188,7 +206,6 @@ class BeginnerOnboardingViewModel(
 
     private fun saveDraft(
         draft: BeginnerOnboardingDraft,
-        userId: String? = null,
         onSuccess: () -> Unit = {},
         onFailure: (String) -> Unit = {}
     ) {

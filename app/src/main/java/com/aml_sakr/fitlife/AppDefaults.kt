@@ -1,5 +1,6 @@
 package com.aml_sakr.fitlife
 
+import android.util.Log
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.feature.auth.domain.error.AuthError
 import com.aml_sakr.fitlife.feature.auth.domain.model.AuthUser
@@ -84,7 +85,9 @@ internal class RepositoryOnboardingCompletionReader(
     private val onboardingRepository: OnboardingRepository
 ) : OnboardingCompletionReader {
     override suspend fun isOnboardingComplete(userId: String): Boolean {
-        return when (val result = onboardingRepository.isOnboardingComplete(userId)) {
+        val result = onboardingRepository.isOnboardingComplete(userId)
+        Log.e("RepositoryOnboarding", "isOnboardingComplete: $result")
+        return when (result) {
             is Result.Success -> result.value
             is Result.Failure -> false
         }

@@ -30,6 +30,8 @@ dependencies {
     implementation(libs.mlkit.pose.detection)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.androidx.camera.view)
     androidTestImplementation(libs.androidx.espresso.core)
 }

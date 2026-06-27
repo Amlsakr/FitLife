@@ -275,7 +275,6 @@ class IntermediateOnboardingViewModel(
 
     private fun saveDraft(
         draft: IntermediateOnboardingDraft,
-        userId: String? = null,
         onSuccess: () -> Unit = {},
         onFailure: (String) -> Unit = {}
     ) {
