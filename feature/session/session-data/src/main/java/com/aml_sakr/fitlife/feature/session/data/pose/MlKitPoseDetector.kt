@@ -59,7 +59,7 @@ class MlKitPoseDetector @Inject constructor() : PoseDetector {
             detector.process(inputImage)
                 .addOnSuccessListener { pose ->
                     if (!isClosed.get()) {
-                        trySend(mapToPoseData(pose, imageProxy.imageInfo.timestamp))
+                        trySend(mapToPoseData(pose, imageProxy.imageInfo.timestamp, inputImage.width, inputImage.height))
                         monitorFps()
                     }
                 }
@@ -103,7 +103,7 @@ class MlKitPoseDetector @Inject constructor() : PoseDetector {
         }
     }
 
-    private fun mapToPoseData(pose: Pose, timestamp: Long): PoseData {
+    private fun mapToPoseData(pose: Pose, timestamp: Long, width: Int, height: Int): PoseData {
         val joints = mutableMapOf<PoseJoint, JointCoordinate>()
         
         PoseJoint.entries.forEach { joint ->
@@ -128,7 +128,9 @@ class MlKitPoseDetector @Inject constructor() : PoseDetector {
         return PoseData(
             timestampMillis = timestamp,
             joints = joints,
-            overallConfidence = overallConfidence
+            overallConfidence = overallConfidence,
+            sourceWidth = width,
+            sourceHeight = height
         )
     }
 

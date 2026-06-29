@@ -18,4 +18,7 @@
     <string name="fatigue_warning_dismiss">I feel fine — continue</string>
     <string name="session_notification_title">Active Workout Session</string>
     <string name="session_notification_body">FitLife is monitoring your form.</string>
+    <string name="session_audio_only_mode_active">Audio-Only Mode Active</string>
+    <string name="session_audio_only_mode_description">Lighting is too low for reliable form tracking. Follow the audio guidance for your session.</string>
+    <string name="session_visual_mode_toggle">Switch to visual mode</string>
 </resources>

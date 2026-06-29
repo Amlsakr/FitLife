@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review
 
 generated: 2026-06-01T13:15:32+03:00
-last_updated: 2026-06-25T12:30:00+03:00
+last_updated: 2026-06-29T13:35:00+03:00
 project: FitnessApp
 project_key: NOKEY
 tracking_system: file-system
@@ -78,10 +78,10 @@ development_status:
   session-001-camerax-preview-composable: done
   session-002-ml-kit-posedetector-integration: done
   session-003-fatigue-detection-use-case: done
-  session-004-lighting-condition-use-case-audio-fallback: backlog
-  session-005-skeleton-overlay-canvas: backlog
-  session-006-equipment-rerouting-bottom-sheet-gemini-api: backlog
-  session-007-guided-session-ui-with-lottie-demos: backlog
+  session-004-lighting-condition-use-case-audio-fallback: done
+  session-005-skeleton-overlay-canvas: done
+  session-006-equipment-rerouting-bottom-sheet-gemini-api: review
+  session-007-guided-session-ui-with-lottie-demos: ready-for-dev
   session-008-session-persistence-summary-screen: backlog
   epic-4-retrospective: optional
   epic-5: backlog

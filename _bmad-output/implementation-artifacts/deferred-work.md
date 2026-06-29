@@ -20,3 +20,4 @@
 - Forgot-password tap falls back to reset-email flow instead of navigation. AuthNavigation currently keeps the existing auth-flow event path and does not expose the dedicated destination from the login route yet.
 - Sign-up success no-ops because onboarding callback expects Splash on top. MainActivity’s onboarding replacement path still assumes the splash/root stack shape.
 - Story docs now promise Home-only auth despite onboarding routing. The story narrative and the runtime onboarding flow are drifting apart and should be reconciled in a separate doc/update pass.
+## Deferred from: code review of session-005-skeleton-overlay-canvas.md (2026-06-28)\n\n- Potential pose data leak in state [feature/session/session-ui/src/main/java/com/aml_sakr/fitlife/feature/session/ui/ActiveSessionViewModel.kt] — deferred, pre-existing

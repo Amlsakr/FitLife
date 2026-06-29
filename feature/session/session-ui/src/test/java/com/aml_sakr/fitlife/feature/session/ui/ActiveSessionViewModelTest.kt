@@ -5,9 +5,12 @@ import com.aml_sakr.fitlife.feature.session.domain.pose.AnalyzePoseUseCase
 import com.aml_sakr.fitlife.feature.session.domain.pose.DetectFatigueUseCase
 import com.aml_sakr.fitlife.feature.session.domain.pose.DetectRepUseCase
 import com.aml_sakr.fitlife.feature.session.domain.pose.FatigueStatus
+import com.aml_sakr.fitlife.feature.session.domain.pose.LightingStatus
+import com.aml_sakr.fitlife.feature.session.domain.pose.LightingUseCase
 import com.aml_sakr.fitlife.feature.session.domain.pose.PoseData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -31,15 +34,18 @@ class ActiveSessionViewModelTest {
     private val analyzePoseUseCase: AnalyzePoseUseCase = mock()
     private val detectFatigueUseCase: DetectFatigueUseCase = mock()
     private val detectRepUseCase: DetectRepUseCase = mock()
+    private val lightingUseCase: LightingUseCase = mock()
     private val analyticsLogger: AnalyticsLogger = mock()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        whenever(lightingUseCase.invoke(any())).thenReturn(emptyFlow())
         viewModel = ActiveSessionViewModel(
             analyzePoseUseCase,
             detectFatigueUseCase,
             detectRepUseCase,
+            lightingUseCase,
             analyticsLogger
         )
     }
@@ -89,7 +95,8 @@ class ActiveSessionViewModelTest {
     @Test
     fun `cooldown logic - prevents fatigue re-trigger for 5 reps after dismissal`() {
         val peakPose = createPoseData()
-        whenever(detectFatigueUseCase.analyzeRep(any())).thenReturn(FatigueStatus.FATIGUED)
+        // Improved: Use specific mock behavior instead of broad any()
+        whenever(detectFatigueUseCase.analyzeRep(peakPose)).thenReturn(FatigueStatus.FATIGUED)
 
         // 1. Fatigue detected
         viewModel.onEvent(ActiveSessionEvent.RepCompleted(peakPose))
@@ -110,5 +117,11 @@ class ActiveSessionViewModelTest {
         assertTrue("Fatigue should be re-triggered at 6th rep", viewModel.state.value.isFatigued)
     }
 
-    private fun createPoseData() = PoseData(System.currentTimeMillis(), emptyMap(), 1f)
+    private fun createPoseData() = PoseData(
+        timestampMillis = System.currentTimeMillis(),
+        joints = emptyMap(),
+        overallConfidence = 1f,
+        sourceWidth = 640,
+        sourceHeight = 480
+    )
 }
