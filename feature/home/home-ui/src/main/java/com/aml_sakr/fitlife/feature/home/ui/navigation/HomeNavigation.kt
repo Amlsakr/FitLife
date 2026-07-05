@@ -109,7 +109,11 @@ private fun HomeTabScreen(
                 Text("Open home detail")
             }
             Spacer(modifier = Modifier.height(16.dp))
-            SessionStartButton()
+            SessionStartButton(
+                userId = "user-123",
+                planId = "plan-123",
+                workoutDayId = "1"
+            )
         }
     }
 }

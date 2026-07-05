@@ -143,42 +143,81 @@ fun FitLifeApp(
                 )
 
                 registerSessionEntries(
-                    onExitSession = { backStack.removeLastOrNull() }
+                    onExitSession = { backStack.removeLastOrNull() },
+                    onNavigateToSummary = { sessionId ->
+                        sessionNavigator.navigateToSummary(sessionId)
+                    },
+                    onNavigateHome = {
+                        backStack.clear()
+                        backStack.add(AppRoute.Shell)
+                    }
                 )
 
                 entry<AppRoute.Onboarding> {
-                    val onboardingViewModel = viewModel<WelcomeLevelViewModel>(
-                        factory = viewModelFactory {
-                            initializer {
-                                WelcomeLevelViewModel(
-                                    readSelectedFitnessLevel = ReadSelectedFitnessLevelUseCase(
-                                        onboardingRepository
-                                    ),
-                                    saveSelectedFitnessLevel = SaveSelectedFitnessLevelUseCase(
-                                        onboardingRepository
-                                    )
+                    val branchSession by produceState<OnboardingBranchSession>(
+                        initialValue = OnboardingBranchSession.Loading,
+                        authSessionReader
+                    ) {
+                        value = readOnboardingBranchSession(authSessionReader)
+                    }
+
+                    when (val session = branchSession) {
+                        OnboardingBranchSession.Invalid -> {
+                            LaunchedEffect(Unit) {
+                                backStack.replaceRoot(
+                                    AppRoute.Onboarding,
+                                    AuthDestination.SignIn
                                 )
                             }
-                        }
-                    )
-                    WelcomeLevelRoute(
-                        viewModel = onboardingViewModel,
-                        onNavigateToBeginner = {
-                            backStack.replaceRoot(
-                                AppRoute.Onboarding,
-                                AppRoute.BeginnerOnboarding
+                            LoadingBranchDestination(
+                                title = "Returning to sign in...",
+                                description = "We could not verify your signed-in session."
                             )
-                        },
-                        onNavigateToIntermediate = {
-                            backStack.replaceRoot(
-                                AppRoute.Onboarding,
-                                AppRoute.IntermediateOnboarding
-                            )
-                        },
-                        onBack = {
-                            backStack.replaceRoot(AppRoute.Onboarding, AuthDestination.SignIn)
                         }
-                    )
+
+                        OnboardingBranchSession.Loading -> {
+                            LoadingBranchDestination(
+                                title = "Preparing onboarding...",
+                                description = "Loading your signed-in session."
+                            )
+                        }
+
+                        is OnboardingBranchSession.Valid -> {
+                            val onboardingViewModel = viewModel<WelcomeLevelViewModel>(
+                                factory = viewModelFactory {
+                                    initializer {
+                                        WelcomeLevelViewModel(
+                                            userId = session.userId,
+                                            readSelectedFitnessLevel = ReadSelectedFitnessLevelUseCase(
+                                                onboardingRepository
+                                            ),
+                                            saveSelectedFitnessLevel = SaveSelectedFitnessLevelUseCase(
+                                                onboardingRepository
+                                            )
+                                        )
+                                    }
+                                }
+                            )
+                            WelcomeLevelRoute(
+                                viewModel = onboardingViewModel,
+                                onNavigateToBeginner = {
+                                    backStack.replaceRoot(
+                                        AppRoute.Onboarding,
+                                        AppRoute.BeginnerOnboarding
+                                    )
+                                },
+                                onNavigateToIntermediate = {
+                                    backStack.replaceRoot(
+                                        AppRoute.Onboarding,
+                                        AppRoute.IntermediateOnboarding
+                                    )
+                                },
+                                onBack = {
+                                    backStack.replaceRoot(AppRoute.Onboarding, AuthDestination.SignIn)
+                                }
+                            )
+                        }
+                    }
                 }
 
                 entry<AppRoute.BeginnerOnboarding> {

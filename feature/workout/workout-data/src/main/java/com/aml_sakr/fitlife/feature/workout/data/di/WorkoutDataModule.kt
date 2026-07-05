@@ -34,10 +34,6 @@ import android.content.Context
 object WorkoutDataModule {
     @Provides
     @Singleton
-    fun provideGson(): Gson = Gson()
-
-    @Provides
-    @Singleton
     fun provideWorkoutPlanClock(): WorkoutPlanClock = SystemWorkoutPlanClock
 
     @Provides
@@ -110,6 +106,13 @@ object WorkoutDataModule {
         roomMapper = roomMapper,
         clock = clock
     )
+
+    @Provides
+    @Singleton
+    fun provideCoreWorkoutPlanRepository(
+        impl: WorkoutPlanRepository
+    ): com.aml_sakr.fitlife.core.domain.repository.WorkoutPlanRepository =
+        impl as WorkoutPlanRepositoryImpl
 
     @Provides
     @Singleton

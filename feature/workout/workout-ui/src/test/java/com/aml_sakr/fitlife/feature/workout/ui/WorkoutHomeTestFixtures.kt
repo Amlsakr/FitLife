@@ -1,12 +1,12 @@
 package com.aml_sakr.fitlife.feature.workout.ui
 
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutDay
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutExercise
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutFitnessLevel
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGoal
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutLocation
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
+import com.aml_sakr.fitlife.core.domain.model.WorkoutDay
+import com.aml_sakr.fitlife.core.domain.model.WorkoutExercise
+import com.aml_sakr.fitlife.core.domain.model.WorkoutFitnessLevel
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGoal
+import com.aml_sakr.fitlife.core.domain.model.WorkoutLocation
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 
 object WorkoutHomeTestFixtures {
     fun sampleRequest(): WorkoutGenerationRequest =

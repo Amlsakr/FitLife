@@ -1,6 +1,6 @@
-package com.aml_sakr.fitlife.feature.workout.domain.model
+package com.aml_sakr.fitlife.core.domain.model
 
-import com.aml_sakr.fitlife.feature.workout.domain.WorkoutPlanDefaults
+import com.aml_sakr.fitlife.core.domain.WorkoutPlanConstants
 
 data class WorkoutPlan(
     val userId: String,
@@ -17,6 +17,6 @@ data class WorkoutPlan(
 
     companion object {
         fun expiresAt(generatedAtEpochMillis: Long): Long =
-            generatedAtEpochMillis + WorkoutPlanDefaults.CacheValidityMillis
+            generatedAtEpochMillis + WorkoutPlanConstants.CacheValidityMillis
     }
 }

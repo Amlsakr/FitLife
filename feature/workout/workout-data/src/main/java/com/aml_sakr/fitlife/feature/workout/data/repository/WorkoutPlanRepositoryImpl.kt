@@ -13,11 +13,11 @@ import com.aml_sakr.fitlife.feature.workout.domain.WorkoutPlanDefaults
 import com.aml_sakr.fitlife.feature.workout.domain.error.WorkoutGenerationError
 import com.aml_sakr.fitlife.feature.workout.domain.gemini.FitnessLevel
 import com.aml_sakr.fitlife.feature.workout.domain.gemini.GeminiWorkoutProfile
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutFitnessLevel
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGoal
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutLocation
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
+import com.aml_sakr.fitlife.core.domain.model.WorkoutFitnessLevel
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGoal
+import com.aml_sakr.fitlife.core.domain.model.WorkoutLocation
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 import com.aml_sakr.fitlife.feature.workout.domain.repository.WorkoutPlanRepository
 import com.aml_sakr.fitlife.feature.workout.domain.usecase.SystemWorkoutPlanClock
 import com.aml_sakr.fitlife.feature.workout.domain.usecase.WorkoutPlanClock
@@ -41,7 +41,7 @@ class WorkoutPlanRepositoryImpl(
     private val gson: Gson,
     private val roomMapper: WorkoutPlanRoomMapper = WorkoutPlanRoomMapper(gson),
     private val clock: WorkoutPlanClock = SystemWorkoutPlanClock
-) : WorkoutPlanRepository {
+) : WorkoutPlanRepository, com.aml_sakr.fitlife.core.domain.repository.WorkoutPlanRepository {
     override suspend fun getCachedPlan(
         request: WorkoutGenerationRequest
     ): Result<WorkoutPlan?, WorkoutGenerationError> {
@@ -53,6 +53,17 @@ class WorkoutPlanRepositoryImpl(
 
             val decodedPlan = roomMapper.toDomain(entity)
             Result.Success(decodedPlan?.takeIf { it.isValidCachedPlanFor(request) })
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (_: Exception) {
+            Result.Failure(WorkoutGenerationError.CacheUnavailable)
+        }
+    }
+
+    override suspend fun getPlanById(planId: String): Result<WorkoutPlan?, WorkoutGenerationError> {
+        return try {
+            val entity = workoutPlanDao.getPlanById(planId) ?: return Result.Success(null)
+            Result.Success(roomMapper.toDomain(entity))
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (_: Exception) {

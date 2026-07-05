@@ -1,11 +1,9 @@
 package com.aml_sakr.fitlife.feature.workout.domain.error
 
-import com.aml_sakr.fitlife.core.domain.DomainError
-
 sealed class WorkoutGenerationError(
     override val code: String,
     override val message: String
-) : DomainError {
+) : com.aml_sakr.fitlife.core.domain.error.WorkoutGenerationError {
     data object RemoteTimeout : WorkoutGenerationError(
         code = "workout_remote_timeout",
         message = "The workout plan request timed out."

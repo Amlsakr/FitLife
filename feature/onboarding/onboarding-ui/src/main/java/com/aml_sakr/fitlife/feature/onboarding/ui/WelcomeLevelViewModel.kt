@@ -10,6 +10,7 @@ import com.aml_sakr.fitlife.feature.onboarding.domain.usecase.SaveSelectedFitnes
 import kotlinx.coroutines.launch
 
 class WelcomeLevelViewModel(
+    private val userId: String,
     private val readSelectedFitnessLevel: ReadSelectedFitnessLevelUseCase,
     private val saveSelectedFitnessLevel: SaveSelectedFitnessLevelUseCase
 ) : BaseMviViewModel<WelcomeLevelState, WelcomeLevelEvent, WelcomeLevelAction>(WelcomeLevelState()) {
@@ -32,7 +33,7 @@ class WelcomeLevelViewModel(
         if (state.value.isLoading) return
         setState { copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            when (val result = readSelectedFitnessLevel()) {
+            when (val result = readSelectedFitnessLevel(userId)) {
                 is Result.Success -> setState {
                     copy(
                         selectedLevel = result.value,
@@ -66,7 +67,7 @@ class WelcomeLevelViewModel(
             )
         }
         viewModelScope.launch {
-            when (val result = saveSelectedFitnessLevel(level)) {
+            when (val result = saveSelectedFitnessLevel(userId, level)) {
                 is Result.Success -> {
                     setState {
                         copy(

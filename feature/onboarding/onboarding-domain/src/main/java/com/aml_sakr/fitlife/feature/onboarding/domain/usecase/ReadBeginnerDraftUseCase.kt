@@ -9,6 +9,6 @@ import javax.inject.Inject
 class ReadBeginnerDraftUseCase @Inject constructor(
     private val repository: OnboardingRepository
 ) {
-    suspend operator fun invoke(): Result<BeginnerOnboardingDraft, OnboardingError> =
-        repository.getBeginnerDraft()
+    suspend operator fun invoke(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> =
+        repository.getBeginnerDraft(userId)
 }

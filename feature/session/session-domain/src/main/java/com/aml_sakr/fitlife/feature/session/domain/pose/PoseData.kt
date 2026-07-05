@@ -7,8 +7,20 @@ package com.aml_sakr.fitlife.feature.session.domain.pose
 data class PoseData(
     val timestampMillis: Long,
     val joints: Map<PoseJoint, JointCoordinate>,
-    val overallConfidence: Float
-)
+    val overallConfidence: Float,
+    val sourceWidth: Int = 0,
+    val sourceHeight: Int = 0
+) {
+    companion object {
+        val EMPTY = PoseData(
+            timestampMillis = 0L,
+            joints = emptyMap(),
+            overallConfidence = 0f, // Corrected: Empty data should have zero confidence
+            sourceWidth = 0,
+            sourceHeight = 0
+        )
+    }
+}
 
 /**
  * Represents a single joint's coordinate and detection confidence.

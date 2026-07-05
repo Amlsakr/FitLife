@@ -1,7 +1,6 @@
 package com.aml_sakr.fitlife.feature.onboarding.ui.beginner
 
 import android.util.Log
-import androidx.compose.ui.semantics.error
 import androidx.lifecycle.viewModelScope
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.core.ui.mvi.BaseMviViewModel
@@ -47,7 +46,7 @@ class BeginnerOnboardingViewModel(
         if (state.value.isLoading) return
         setState { copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            when (val result = readBeginnerDraftUseCase()) {
+            when (val result = readBeginnerDraftUseCase(userId)) {
                 is Result.Success -> applyDraft(result.value)
                 is Result.Failure -> setState {
                     copy(

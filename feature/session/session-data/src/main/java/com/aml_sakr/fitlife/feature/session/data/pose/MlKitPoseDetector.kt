@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.onCompletion
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
+import javax.inject.Inject
 
 private const val TAG = "MlKitPoseDetector"
 
@@ -30,7 +31,7 @@ private const val TAG = "MlKitPoseDetector"
  * - Respects architecture boundaries.
  * - Lifecycle-safe resource management via [close].
  */
-class MlKitPoseDetector : PoseDetector {
+class MlKitPoseDetector @Inject constructor() : PoseDetector {
 
     private val detector = PoseDetection.getClient(
         PoseDetectorOptions.Builder()
@@ -58,7 +59,7 @@ class MlKitPoseDetector : PoseDetector {
             detector.process(inputImage)
                 .addOnSuccessListener { pose ->
                     if (!isClosed.get()) {
-                        trySend(mapToPoseData(pose, imageProxy.imageInfo.timestamp))
+                        trySend(mapToPoseData(pose, imageProxy.imageInfo.timestamp, inputImage.width, inputImage.height))
                         monitorFps()
                     }
                 }
@@ -102,7 +103,7 @@ class MlKitPoseDetector : PoseDetector {
         }
     }
 
-    private fun mapToPoseData(pose: Pose, timestamp: Long): PoseData {
+    private fun mapToPoseData(pose: Pose, timestamp: Long, width: Int, height: Int): PoseData {
         val joints = mutableMapOf<PoseJoint, JointCoordinate>()
         
         PoseJoint.entries.forEach { joint ->
@@ -127,7 +128,9 @@ class MlKitPoseDetector : PoseDetector {
         return PoseData(
             timestampMillis = timestamp,
             joints = joints,
-            overallConfidence = overallConfidence
+            overallConfidence = overallConfidence,
+            sourceWidth = width,
+            sourceHeight = height
         )
     }
 

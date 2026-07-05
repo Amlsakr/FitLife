@@ -11,6 +11,7 @@ import com.aml_sakr.fitlife.core.data.preferences.DataStorePreferencesDataSource
 import com.aml_sakr.fitlife.core.data.preferences.PreferencesDataSource
 import com.aml_sakr.fitlife.core.data.workout.WorkoutPlanDao
 import com.aml_sakr.fitlife.core.data.workout.WorkoutPlanDatabase
+import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -42,6 +43,10 @@ abstract class CoreDataBindingsModule {
 @Module
 @InstallIn(SingletonComponent::class)
 object CoreDataModule {
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = Gson()
+
     @Provides
     @Singleton
     fun providePreferencesDataStore(

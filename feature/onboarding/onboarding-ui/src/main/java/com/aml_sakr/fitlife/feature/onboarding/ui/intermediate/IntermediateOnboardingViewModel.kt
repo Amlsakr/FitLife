@@ -10,6 +10,7 @@ import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateOneRepMa
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.IntermediateTrainingSplit
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessGoal
 import com.aml_sakr.fitlife.feature.onboarding.domain.model.OneRepMaxLift
+import com.aml_sakr.fitlife.feature.onboarding.domain.model.OneRepMaxUnit
 import com.aml_sakr.fitlife.feature.onboarding.domain.usecase.MarkOnboardingCompleteUseCase
 import com.aml_sakr.fitlife.feature.onboarding.domain.usecase.ReadIntermediateDraftUseCase
 import com.aml_sakr.fitlife.feature.onboarding.domain.usecase.SaveIntermediateProfileUseCase
@@ -51,7 +52,7 @@ class IntermediateOnboardingViewModel(
         val restoredState = savedStateHandle.get<IntermediateOnboardingState>(SAVED_STATE_KEY)
         setState { copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            when (val result = readIntermediateDraftUseCase()) {
+            when (val result = readIntermediateDraftUseCase(userId)) {
                 is Result.Success -> applyDraft(
                     draft = result.value,
                     restoredState = restoredState
@@ -320,8 +321,8 @@ class IntermediateOnboardingViewModel(
         if (contains(value)) filterNot { it == value }.toSet() else plus(value)
 
     private fun Map<OneRepMaxLift, IntermediateOneRepMaxInput>.withDefaults():
-        Map<OneRepMaxLift, OneRepMaxInput> =
-        OneRepMaxLift.entries.associateWith { lift -> getOrDefault(lift, OneRepMaxInput()) }
+        Map<OneRepMaxLift, IntermediateOneRepMaxInput> =
+        OneRepMaxLift.entries.associateWith { lift -> getOrDefault(lift, IntermediateOneRepMaxInput()) }
 
     private companion object {
         const val SAVED_STATE_KEY = "intermediate_onboarding_state"

@@ -83,6 +83,7 @@ BMad Dev Agent
 - Implemented `MlKitPoseDetector` in `:feature:session:session-data` with AC 2 FPS monitoring and race condition guards.
 - Integrated `ImageAnalysis` with a `Channel`-based decoupled processing loop in `ActiveSessionCameraRoute`.
 - Resolved all code review findings (leaks, silent failures, deprecated icons).
+- **Added Hilt DI bindings for Pose Detection pipeline and fixed resource leaks (ImageProxy/Detector).**
 - Verified implementation with unit tests and `MlKitPoseDetectorMappingTest`.
 
 ### File List

@@ -11,18 +11,17 @@ class SaveIntermediateProfileUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         draft: IntermediateOnboardingDraft,
-        userId: String? = null
+        userId: String
     ): Result<Unit, OnboardingError> {
-        when (val localResult = repository.saveIntermediateDraft(draft)) {
+        when (val localResult = repository.saveIntermediateDraft(userId, draft)) {
             is Result.Failure -> return localResult
             is Result.Success -> Unit
         }
 
-        val resolvedUserId = userId.orEmpty()
-        if (resolvedUserId.isBlank()) {
+        if (userId.isBlank()) {
             return Result.Success(Unit)
         }
 
-        return repository.syncIntermediateProfile(resolvedUserId, draft)
+        return repository.syncIntermediateProfile(userId, draft)
     }
 }

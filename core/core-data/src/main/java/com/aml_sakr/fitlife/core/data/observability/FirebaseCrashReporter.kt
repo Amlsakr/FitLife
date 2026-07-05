@@ -1,5 +1,6 @@
 package com.aml_sakr.fitlife.core.data.observability
 
+import com.aml_sakr.fitlife.core.domain.CrashReporter
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import javax.inject.Inject
 

@@ -1,6 +1,6 @@
 package com.aml_sakr.fitlife.feature.auth.data.repository
 
-import com.aml_sakr.fitlife.core.data.observability.AnalyticsLogger
+import com.aml_sakr.fitlife.core.domain.AnalyticsLogger
 import com.aml_sakr.fitlife.core.data.observability.InMemoryAnalyticsLogger
 import com.aml_sakr.fitlife.core.data.purge.UserDataPurgeContributor
 import com.aml_sakr.fitlife.core.data.purge.UserDataPurgeCoordinator

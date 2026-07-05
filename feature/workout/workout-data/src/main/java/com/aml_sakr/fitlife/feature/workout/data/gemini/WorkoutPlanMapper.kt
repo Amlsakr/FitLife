@@ -3,10 +3,10 @@ package com.aml_sakr.fitlife.feature.workout.data.gemini
 import com.aml_sakr.fitlife.feature.workout.data.fallback.WorkoutPlanFallbackDay
 import com.aml_sakr.fitlife.feature.workout.data.fallback.WorkoutPlanFallbackExercise
 import com.aml_sakr.fitlife.feature.workout.data.fallback.WorkoutPlanFallbackTemplate
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutDay
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutExercise
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
+import com.aml_sakr.fitlife.core.domain.model.WorkoutDay
+import com.aml_sakr.fitlife.core.domain.model.WorkoutExercise
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 
 class WorkoutPlanMapper {
     fun fromGeminiDraft(

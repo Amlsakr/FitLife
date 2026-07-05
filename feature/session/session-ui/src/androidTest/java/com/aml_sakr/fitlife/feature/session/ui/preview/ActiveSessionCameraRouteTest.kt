@@ -11,8 +11,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.LifecycleOwner
 import com.aml_sakr.fitlife.core.ui.theme.FitnessAppTheme
+import com.aml_sakr.fitlife.feature.session.ui.ActiveSessionState
+import com.aml_sakr.fitlife.feature.session.ui.ActiveSessionViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class ActiveSessionCameraRouteTest {
     @get:Rule
@@ -75,6 +80,26 @@ class ActiveSessionCameraRouteTest {
 
         composeRule.onNodeWithContentDescription("Exit session").performClick()
         assert(exited)
+    }
+
+    @Test
+    fun session_showsFatigueBanner_whenFatigued() {
+        val viewModel: ActiveSessionViewModel = mock()
+        val state = ActiveSessionState(isFatigued = true)
+        whenever(viewModel.state).thenReturn(MutableStateFlow(state))
+
+        composeRule.setContent {
+            FitnessAppTheme {
+                ActiveSessionCameraRoute(
+                    onExitSession = {},
+                    onSwitchToAudioOnly = {},
+                    viewModel = viewModel
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Fatigue Detected").assertIsDisplayed()
+        composeRule.onNodeWithText("I feel fine — continue").assertIsDisplayed()
     }
 
     private class FakeCameraPreviewProvider : CameraPreviewProvider {

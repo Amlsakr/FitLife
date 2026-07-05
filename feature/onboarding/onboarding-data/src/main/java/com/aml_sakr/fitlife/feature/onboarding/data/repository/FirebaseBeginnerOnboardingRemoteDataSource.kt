@@ -12,18 +12,15 @@ class FirebaseBeginnerOnboardingRemoteDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : BeginnerOnboardingRemoteDataSource {
     override suspend fun upsertBeginnerProfile(userId: String, draft: BeginnerOnboardingDraft) {
+        Log.e("firebase", "upsertBeginnerProfile: $draft userId $userId")
         try {
             firestore.collection(FirestoreCollections.USERS)
                 .document(userId)
                 .set(draft.toFirestorePayload(userId), SetOptions.merge())
-                .addOnFailureListener {
-                    Log.e("firebase", "Firestore write failed $it")
-                    throw it
-                }
                 .await()
         } catch (e: Exception) {
             Log.e("firebase", "Firestore write failed $e")
-           //throw e
+            throw e
         }
 
     }
