@@ -52,3 +52,8 @@ data class GeminiAlternativeDraft(
     val muscle_groups: List<String>,
     val difficulty: String
 )
+
+data class FallbackExerciseGroup(
+    val exerciseName: String,
+    val alternatives: List<GeminiAlternativeDraft>
+)

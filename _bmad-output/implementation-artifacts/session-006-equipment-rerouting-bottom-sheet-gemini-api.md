@@ -1,6 +1,6 @@
 # Story 4.6: Equipment Rerouting Bottom Sheet (Gemini API)
 
-Status: review
+Status: done
 
 ## Story
 
@@ -255,3 +255,40 @@ data class EquipmentReroutingEntity(
 ### Completion Notes List
 
 ### File List
+
+### Review Findings
+
+**decision-needed**
+
+- [ ] [Review][Decision] `availableEquipment` hardcoded to `emptySet()` — The ViewModel always passes an empty equipment set to `RerouteEquipmentUseCase`. The entire rerouting feature produces nonsensical Gemini results because the LLM has no constraint on available equipment. Need to determine: where does the user's equipment list come from? (onboarding preferences, session config, or device capabilities?) [ActiveSessionViewModel.kt:handleEquipmentUnavailable]
+- [ ] [Review][Decision] `currentExerciseName` hardcoded to `"Barbell Squat"` in init — The initial exercise is a magic string with no mechanism to receive the actual current exercise from the session flow. Need to determine: how should the current exercise be provided to the ViewModel? [ActiveSessionViewModel.kt:init]
+- [ ] [Review][Decision] Missing exercise image in `AlternativeCard` — AC6 requires each AlternativeCard to show "exercise image, name, and 'Select' CTA button." The `lottieAssetPath` field exists in `ExerciseAlternative` but is always `null`, and no `Image` composable renders it. Need to determine: what image source should be used? (Lottie assets, placeholder icons, or network images?) [AlternativeCard.kt]
+
+**patch**
+
+- [ ] [Review][Patch] API key can be empty string with no validation — `EquipmentReroutingModule` falls back to empty string if `FITLIFE_GEMINI_API_KEY` is not set, causing silent 401/403 errors. Add fail-fast validation or clear error messaging. [EquipmentReroutingModule.kt:provideSessionGeminiConfiguration]
+- [ ] [Review][Patch] `parseAlternatives` silently returns `emptyList()` on parse failure — Malformed Gemini JSON is cached for 24 hours as a valid (but empty) result, poisoning the fallback path. Propagate error or cache failure state. [GeminiEquipmentReroutingRepository.kt:parseAlternatives]
+- [ ] [Review][Patch] Timeout vs retry logic conflict — Use case `withTimeout(5000)` kills the coroutine before the repository's 3-retry loop (1s+2s+4s backoff) completes, making retry logic dead code. Redesign timeout/retry interaction. [RerouteEquipmentUseCase.kt + GeminiEquipmentReroutingRepository.kt]
+- [ ] [Review][Patch] No empty-state UI when alternatives list is empty — When loading completes with zero alternatives, the bottom sheet shows title+description but blank content. Add "No alternatives found" message or retry option. [EquipmentUnavailableBottomSheet.kt]
+- [ ] [Review][Patch] `fallback_equipment_alternatives.json` missing — Spec requires a local JSON fallback file, but implementation only falls back to Room cache. If no prior cache exists, user gets `Result.Failure`. [session-ui/src/main/assets/]
+- [ ] [Review][Patch] No validation of exactly 3 alternatives from Gemini — AC2 says "presents 3 Gemini-generated alternatives" but the UI renders whatever count is returned. Truncate or pad to 3. [EquipmentUnavailableBottomSheet.kt]
+- [ ] [Review][Patch] Double-tap race condition on "Equipment Unavailable" button — Rapid taps launch multiple concurrent coroutines, each making API calls and updating state. Add `isLoading` guard. [ActiveSessionViewModel.kt:handleEquipmentUnavailable]
+- [ ] [Review][Patch] Dismiss while loading leaves stale data — `DismissEquipmentSheet` sets `isEquipmentSheetVisible = false` but the in-flight coroutine continues, potentially overwriting state on next open. Cancel coroutine on dismiss. [ActiveSessionViewModel.kt]
+- [ ] [Review][Patch] `SessionTtsManager` lifecycle issues — Created with `remember(context)` (survives recomposition but not config change), pending messages grow unbounded, multiple `speak()` calls before init produce garbled output, `shutdown()` is not thread-safe. [SessionTtsManager.kt + ActiveSessionCameraRoute.kt]
+- [ ] [Review][Patch] No debounce on "Equipment Unavailable" button — Each tap fires `handleEquipmentUnavailable()` unconditionally. Add debounce or disable button during loading. [ActiveSessionCameraRoute.kt]
+- [ ] [Review][Patch] `LazyColumn` inside `ModalBottomSheet` without height constraints — A lazy layout with 3 cards may push the sheet to full-screen or render incorrectly. Add max height constraint. [EquipmentUnavailableBottomSheet.kt]
+- [ ] [Review][Patch] Test constructor mismatch — `ActiveSessionViewModelTest` creates ViewModel without `rerouteEquipmentUseCase` parameter. Test won't compile. [ActiveSessionViewModelTest.kt]
+- [ ] [Review][Patch] Prompt injection in exercise name — `EquipmentReroutingPromptBuilder` interpolates exercise name directly into the prompt with no sanitization. A malicious name could manipulate LLM output. [EquipmentReroutingPromptBuilder.kt:buildPrompt]
+- [ ] [Review][Patch] Empty exercise name — If `exerciseName` is empty string, the prompt reads "Suggest 3 alternative exercises for '' that target..." producing arbitrary results. Add validation. [EquipmentReroutingPromptBuilder.kt:buildPrompt]
+- [ ] [Review][Patch] Empty response body cached as valid — HTTP 200 with empty body returns empty string, which `parseAlternatives` converts to `emptyList()` and caches for 24h. Guard against empty body. [HttpEquipmentGeminiApiService.kt + GeminiEquipmentReroutingRepository.kt]
+- [ ] [Review][Patch] DAO exception propagates unhandled — If `getAlternativesForExercise()` or `insertAlternatives()` throws (corrupt DB, disk full), the exception escapes the cache path. Wrap in try-catch. [GeminiEquipmentReroutingRepository.kt]
+- [ ] [Review][Patch] Gson exception on corrupt cache row — `gson.fromJson()` on a corrupt `alternativesJson` throws `JsonSyntaxException`, permanently poisoning that cache entry until TTL expiry. Invalidate corrupt rows. [GeminiEquipmentReroutingRepository.kt]
+- [ ] [Review][Patch] `Result.Failure` keeps bottom sheet visible — When API fails, `isEquipmentSheetLoading` is set false but `isEquipmentSheetVisible` remains true and `alternatives` stays empty. Sheet shows blank content. Either auto-dismiss or show error state. [ActiveSessionViewModel.kt:handleEquipmentUnavailable]
+
+**defer**
+
+- [x] [Review][Defer] `NetworkErrors` used as domain-layer error type — The domain use case returns `Result<..., NetworkErrors>`, coupling domain to network-specific errors. Pre-existing pattern in the codebase; refactor in a future story. [RerouteEquipmentUseCase.kt]
+- [x] [Review][Defer] `AudioOnlyOverlay` hardcodes `Color.Black` and `Color.White` — Same hardcoded colors bypass from session-005. Pre-existing issue, not introduced by this change. [AudioOnlyOverlay.kt]
+- [x] [Review][Defer] `LightingUseCase` emission timing — If `poseDataFlow` never emits, `PoseData.EMPTY` permanently biases the result. Pre-existing edge case in lighting module. [LightingUseCase.kt]
+- [x] [Review][Defer] `timeoutMillis` truncation risk — `Long.toInt()` could truncate if timeout exceeds `Int.MAX_VALUE`. Current default (5000L) is safe; defer until timeout becomes configurable. [HttpEquipmentGeminiApiService.kt]
+- [x] [Review][Defer] `isAudioOnlyMode` not persisted across config changes — Ephemeral state resets on ViewModel recreation. Pre-existing pattern; address with `SavedStateHandle` in a future story. [ActiveSessionViewModel.kt]

@@ -17,41 +17,53 @@ class SessionTtsManager(context: Context) {
     private val pendingMessages = mutableListOf<String>()
 
     init {
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.US
-                isInitialized = true
-                flushPendingMessages()
-            } else {
-                Log.e(TAG, "Initialization failed")
+        tts = TextToSpeech(context.applicationContext) { status ->
+            synchronized(this) {
+                if (status == TextToSpeech.SUCCESS) {
+                    tts?.language = Locale.US
+                    isInitialized = true
+                    flushPendingMessages()
+                } else {
+                    Log.e(TAG, "Initialization failed")
+                }
             }
         }
     }
 
     fun speak(text: String) {
-        if (isInitialized) {
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-        } else {
-            Log.d(TAG, "Buffering message: $text")
-            pendingMessages.add(text)
+        synchronized(this) {
+            if (isInitialized && tts != null) {
+                tts?.speak(text, TextToSpeech.QUEUE_ADD, null, null)
+            } else {
+                if (pendingMessages.size < 10) { // Limit buffer size
+                    Log.d(TAG, "Buffering message: $text")
+                    pendingMessages.add(text)
+                }
+            }
         }
     }
 
     private fun flushPendingMessages() {
         if (pendingMessages.isNotEmpty()) {
             val combined = pendingMessages.joinToString(". ")
-            tts?.speak(combined, TextToSpeech.QUEUE_FLUSH, null, null)
+            tts?.speak(combined, TextToSpeech.QUEUE_ADD, null, null)
             pendingMessages.clear()
         }
     }
 
     fun stop() {
-        tts?.stop()
+        synchronized(this) {
+            tts?.stop()
+        }
     }
 
     fun shutdown() {
-        tts?.shutdown()
-        tts = null
-        isInitialized = false
+        synchronized(this) {
+            tts?.stop()
+            tts?.shutdown()
+            tts = null
+            isInitialized = false
+            pendingMessages.clear()
+        }
     }
 }

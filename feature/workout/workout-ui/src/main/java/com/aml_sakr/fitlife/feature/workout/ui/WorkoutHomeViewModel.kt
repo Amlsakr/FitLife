@@ -5,8 +5,8 @@ import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.core.ui.mvi.BaseMviViewModel
 import com.aml_sakr.fitlife.feature.workout.domain.WorkoutPlanDefaults
 import com.aml_sakr.fitlife.feature.workout.domain.error.WorkoutGenerationError
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 import com.aml_sakr.fitlife.feature.workout.domain.usecase.GenerateWorkoutPlanUseCase
 import kotlinx.coroutines.launch
 

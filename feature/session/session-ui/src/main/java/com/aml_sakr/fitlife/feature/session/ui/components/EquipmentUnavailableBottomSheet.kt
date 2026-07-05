@@ -43,16 +43,30 @@ fun EquipmentUnavailableBottomSheet(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp),
+                        .height(240.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
+            } else if (alternatives.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(240.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No alternatives found for your equipment.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
             } else {
                 LazyColumn(
+                    modifier = Modifier.heightIn(max = 450.dp), // Prevent full-screen expansion
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(alternatives) { alternative ->
+                    items(alternatives.take(3)) { alternative -> // AC 2: Exactly 3
                         AlternativeCard(
                             alternative = alternative,
                             onSelect = { onAlternativeSelected(alternative) }

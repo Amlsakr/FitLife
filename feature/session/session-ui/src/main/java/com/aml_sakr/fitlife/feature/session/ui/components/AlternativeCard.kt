@@ -30,6 +30,25 @@ fun AlternativeCard(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // AC 6: Exercise Image Placeholder
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = alternative.name.firstOrNull()?.toString() ?: "",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
                 text = alternative.name,
                 style = MaterialTheme.typography.titleMedium,

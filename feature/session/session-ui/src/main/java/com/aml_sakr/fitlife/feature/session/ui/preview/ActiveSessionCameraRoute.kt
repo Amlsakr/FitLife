@@ -49,6 +49,7 @@ import com.aml_sakr.fitlife.feature.session.ui.ActiveSessionViewModel
 import com.aml_sakr.fitlife.feature.session.ui.R
 import com.aml_sakr.fitlife.feature.session.ui.components.AudioOnlyOverlay
 import com.aml_sakr.fitlife.feature.session.ui.components.EquipmentUnavailableBottomSheet
+import com.aml_sakr.fitlife.feature.session.ui.components.ExerciseDemo
 import com.aml_sakr.fitlife.feature.session.ui.components.FatigueWarningBanner
 import com.aml_sakr.fitlife.feature.session.ui.components.SkeletonOverlay
 import com.aml_sakr.fitlife.feature.session.ui.service.SessionAudioService
@@ -69,6 +70,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 @Composable
 fun ActiveSessionCameraRoute(
     onExitSession: () -> Unit,
+    onNavigateToSummary: (String) -> Unit,
     modifier: Modifier = Modifier,
     analyzePoseUseCase: AnalyzePoseUseCase? = null,
     viewModel: ActiveSessionViewModel = hiltViewModel(),
@@ -83,6 +85,7 @@ fun ActiveSessionCameraRoute(
         viewModel.actions.collect { action ->
             when (action) {
                 ActiveSessionAction.ExitSession -> onExitSession()
+                is ActiveSessionAction.NavigateToSummary -> onNavigateToSummary(action.sessionId)
                 is ActiveSessionAction.Announce -> ttsManager.speak(action.message)
             }
         }
@@ -177,8 +180,11 @@ fun ActiveSessionCameraRoute(
             isFatigued = state.isFatigued,
             isAudioOnly = state.isAudioOnlyMode,
             currentExerciseName = state.currentExerciseName,
+            currentExerciseLottiePath = state.currentExerciseLottiePath,
+            totalReps = state.totalReps,
             onDismissFatigue = { viewModel.onEvent(ActiveSessionEvent.DismissFatigue) },
             onExitSession = onExitSession,
+            onFinishSession = { viewModel.onEvent(ActiveSessionEvent.FinishSession) },
             onSwitchToAudioOnly = { viewModel.onEvent(ActiveSessionEvent.ToggleAudioOnlyMode) },
             onEquipmentUnavailable = { viewModel.onEvent(ActiveSessionEvent.OnEquipmentUnavailable) },
             onRetryCamera = {
@@ -204,8 +210,11 @@ private fun ActiveSessionOverlay(
     isFatigued: Boolean,
     isAudioOnly: Boolean,
     currentExerciseName: String?,
+    currentExerciseLottiePath: String?,
+    totalReps: Int,
     onDismissFatigue: () -> Unit,
     onExitSession: () -> Unit,
+    onFinishSession: () -> Unit,
     onSwitchToAudioOnly: () -> Unit,
     onEquipmentUnavailable: () -> Unit,
     onRetryCamera: () -> Unit,
@@ -240,6 +249,17 @@ private fun ActiveSessionOverlay(
             
             Spacer(modifier = Modifier.weight(1f))
 
+            Button(
+                onClick = onFinishSession,
+                modifier = Modifier.padding(end = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            ) {
+                Text("Finish")
+            }
+
             IconButton(
                 onClick = onSwitchToAudioOnly,
                 modifier = Modifier.size(48.dp)
@@ -253,6 +273,17 @@ private fun ActiveSessionOverlay(
         }
 
         // Center State (Loading or Error)
+        if (!isAudioOnly) {
+            ExerciseDemo(
+                lottiePath = currentExerciseLottiePath,
+                totalReps = totalReps,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 80.dp, end = 16.dp)
+                    .size(100.dp)
+            )
+        }
+
         when (previewState) {
             SessionCameraPreviewState.Loading -> {
                 CircularProgressIndicator(

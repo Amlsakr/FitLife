@@ -143,7 +143,14 @@ fun FitLifeApp(
                 )
 
                 registerSessionEntries(
-                    onExitSession = { backStack.removeLastOrNull() }
+                    onExitSession = { backStack.removeLastOrNull() },
+                    onNavigateToSummary = { sessionId ->
+                        sessionNavigator.navigateToSummary(sessionId)
+                    },
+                    onNavigateHome = {
+                        backStack.clear()
+                        backStack.add(AppRoute.Shell)
+                    }
                 )
 
                 entry<AppRoute.Onboarding> {

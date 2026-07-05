@@ -21,3 +21,17 @@
 - Sign-up success no-ops because onboarding callback expects Splash on top. MainActivity’s onboarding replacement path still assumes the splash/root stack shape.
 - Story docs now promise Home-only auth despite onboarding routing. The story narrative and the runtime onboarding flow are drifting apart and should be reconciled in a separate doc/update pass.
 ## Deferred from: code review of session-005-skeleton-overlay-canvas.md (2026-06-28)\n\n- Potential pose data leak in state [feature/session/session-ui/src/main/java/com/aml_sakr/fitlife/feature/session/ui/ActiveSessionViewModel.kt] — deferred, pre-existing
+
+## Deferred from: code review of session-006-equipment-rerouting-bottom-sheet-gemini-api.md (2026-06-30)
+
+- `NetworkErrors` used as domain-layer error type — The domain use case returns `Result<..., NetworkErrors>`, coupling domain to network-specific errors. Pre-existing pattern in the codebase; refactor in a future story.
+- `AudioOnlyOverlay` hardcodes `Color.Black` and `Color.White` — Same hardcoded colors bypass from session-005. Pre-existing issue, not introduced by this change.
+- `LightingUseCase` emission timing — If `poseDataFlow` never emits, `PoseData.EMPTY` permanently biases the result. Pre-existing edge case in lighting module.
+- `timeoutMillis` truncation risk — `Long.toInt()` could truncate if timeout exceeds `Int.MAX_VALUE`. Current default (5000L) is safe; defer until timeout becomes configurable.
+- `isAudioOnlyMode` not persisted across config changes — Ephemeral state resets on ViewModel recreation. Pre-existing pattern; address with `SavedStateHandle` in a future story.
+
+## Deferred from: code review of session-007-guided-session-ui-with-lottie-demos.md (2026-06-30)
+
+- Fatigue detection without baseline guard [ActiveSessionViewModel.kt:handleRepCompleted] — The algorithm (Section 8 of Arch Doc) requires a baseline from the first two reps, but currently calls `analyzeRep` for every rep; deferred as pre-existing logic exposed here.
+- Temporary Lottie Mapping Tech Debt [ActiveSessionViewModel.kt] — The hardcoded asset path logic is acknowledged as "temporary" in comments. This should be addressed in the planned Exercise Library migration; deferred as pre-existing pattern.
+- Potential safety risk in fatigue warning suppression [ActiveSessionViewModel.kt] — The hardcoded 5-rep suppression after dismissal is pre-existing logic. While risky, it is out of scope for the Lottie UI story; deferred as pre-existing logic.

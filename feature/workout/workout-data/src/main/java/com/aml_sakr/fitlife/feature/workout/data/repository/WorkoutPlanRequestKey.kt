@@ -1,7 +1,7 @@
 package com.aml_sakr.fitlife.feature.workout.data.repository
 
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 
 internal fun WorkoutGenerationRequest.toRequestKey(): String =
     buildRequestKey(

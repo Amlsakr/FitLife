@@ -1,0 +1,54 @@
+[
+  {
+    "exerciseName": "Barbell Squat",
+    "alternatives": [
+      {
+        "name": "Dumbbell Goblet Squat",
+        "description": "Hold a dumbbell at chest height and squat.",
+        "muscle_groups": ["Quadriceps", "Glutes"],
+        "equipment_required": "Dumbbell",
+        "difficulty": "BEGINNER"
+      },
+      {
+        "name": "Bodyweight Squat",
+        "description": "Standard air squat using only your body weight.",
+        "muscle_groups": ["Quadriceps", "Glutes"],
+        "equipment_required": "Bodyweight",
+        "difficulty": "BEGINNER"
+      },
+      {
+        "name": "Resistance Band Squat",
+        "description": "Step on a band and hold the handles at shoulder height while squatting.",
+        "muscle_groups": ["Quadriceps", "Glutes"],
+        "equipment_required": "Resistance Band",
+        "difficulty": "INTERMEDIATE"
+      }
+    ]
+  },
+  {
+    "exerciseName": "Bench Press",
+    "alternatives": [
+      {
+        "name": "Push Up",
+        "description": "Classic bodyweight chest exercise.",
+        "muscle_groups": ["Pectorals", "Triceps"],
+        "equipment_required": "Bodyweight",
+        "difficulty": "BEGINNER"
+      },
+      {
+        "name": "Dumbbell Chest Press",
+        "description": "Press dumbbells while lying on the floor or a bench.",
+        "muscle_groups": ["Pectorals", "Triceps"],
+        "equipment_required": "Dumbbell",
+        "difficulty": "INTERMEDIATE"
+      },
+      {
+        "name": "Resistance Band Chest Press",
+        "description": "Anchor a band behind you and press forward.",
+        "muscle_groups": ["Pectorals", "Triceps"],
+        "equipment_required": "Resistance Band",
+        "difficulty": "INTERMEDIATE"
+      }
+    ]
+  }
+]

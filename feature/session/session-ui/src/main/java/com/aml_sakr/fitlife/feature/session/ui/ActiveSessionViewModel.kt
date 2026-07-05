@@ -12,10 +12,18 @@ import com.aml_sakr.fitlife.feature.session.domain.pose.LightingUseCase
 import com.aml_sakr.fitlife.feature.session.domain.pose.PoseData
 import com.aml_sakr.fitlife.feature.session.domain.equipment.RerouteEquipmentUseCase
 import com.aml_sakr.fitlife.feature.session.domain.equipment.ExerciseAlternative
+import com.aml_sakr.fitlife.feature.session.domain.usecase.SaveSessionUseCase
+import com.aml_sakr.fitlife.core.domain.usecase.GetWorkoutPlanUseCase
+import com.aml_sakr.fitlife.feature.session.domain.model.Session
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 import com.aml_sakr.fitlife.core.domain.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 /**
@@ -35,16 +43,18 @@ class ActiveSessionViewModel @Inject constructor(
     private val detectRepUseCase: DetectRepUseCase,
     private val lightingUseCase: LightingUseCase,
     private val analyticsLogger: AnalyticsLogger,
-    private val rerouteEquipmentUseCase: RerouteEquipmentUseCase
+    private val rerouteEquipmentUseCase: RerouteEquipmentUseCase,
+    private val saveSessionUseCase: SaveSessionUseCase,
+    private val getWorkoutPlanUseCase: GetWorkoutPlanUseCase
 ) : BaseMviViewModel<ActiveSessionState, ActiveSessionEvent, ActiveSessionAction>(
     ActiveSessionState()
 ) {
     private var repsSinceDismissal = -1
-    private var totalReps = 0
     private val poseDataFlow = MutableSharedFlow<PoseData>(extraBufferCapacity = 1)
+    private var equipmentJob: kotlinx.coroutines.Job? = null
+    private val isSavingSession = AtomicBoolean(false)
 
     init {
-        setState { copy(currentExerciseName = "Barbell Squat") }
         viewModelScope.launch {
             lightingUseCase(poseDataFlow).collect { status ->
                 if (!state.value.isManualLightingOverride) {
@@ -86,8 +96,8 @@ class ActiveSessionViewModel @Inject constructor(
             }
             ActiveSessionEvent.FatigueDetected -> {
                 if (!state.value.isFatigued) {
-                    setState { copy(isFatigued = true) }
-                    analyticsLogger.logEvent("fatigue_detected", mapOf("rep_number" to totalReps))
+                    setState { copy(isFatigued = true, fatigueEventCount = state.value.fatigueEventCount + 1) }
+                    analyticsLogger.logEvent("fatigue_detected", mapOf("rep_number" to state.value.totalReps))
                 }
             }
             ActiveSessionEvent.DismissFatigue -> {
@@ -120,11 +130,101 @@ class ActiveSessionViewModel @Inject constructor(
             }
             ActiveSessionEvent.OnEquipmentUnavailable -> handleEquipmentUnavailable()
             is ActiveSessionEvent.OnAlternativeSelected -> handleAlternativeSelected(event.alternative)
-            ActiveSessionEvent.DismissEquipmentSheet -> setState { copy(isEquipmentSheetVisible = false) }
+            ActiveSessionEvent.DismissEquipmentSheet -> {
+                equipmentJob?.cancel()
+                setState { copy(isEquipmentSheetVisible = false, isEquipmentSheetLoading = false) }
+            }
+            is ActiveSessionEvent.Initialize -> {
+                setState {
+                    copy(
+                        userId = event.userId,
+                        planId = event.planId,
+                        workoutDayId = event.workoutDayId
+                    )
+                }
+                loadInitialExercise(event.planId, event.workoutDayId)
+            }
+            ActiveSessionEvent.FinishSession -> handleFinishSession()
+        }
+    }
+
+    private fun loadInitialExercise(planId: String, workoutDayId: String) {
+        viewModelScope.launch {
+            when (val result = getWorkoutPlanUseCase(planId)) {
+                is Result.Success<WorkoutPlan?> -> {
+                    val plan = result.value ?: return@launch
+                    val dayNum = workoutDayId.toIntOrNull() ?: 1
+                    val day = plan.days.find { it.day == dayNum } ?: plan.days.firstOrNull()
+                    val exercise = day?.exercises?.firstOrNull()
+                    
+                    if (exercise != null) {
+                        setState {
+                            copy(
+                                currentExerciseName = exercise.name,
+                                currentExerciseLottiePath = mapExerciseToLottiePath(exercise.name)
+                            )
+                        }
+                    }
+                }
+                is Result.Failure<*> -> {
+                    setState { copy(error = Exception("Failed to load workout plan")) }
+                }
+            }
+        }
+    }
+
+    private fun mapExerciseToLottiePath(exerciseName: String): String? {
+        // Temporary mapping until Exercise Library is implemented in Room
+        val normalized = exerciseName.lowercase().trim().replace(Regex("[^a-z0-9]"), "_")
+        return "lottie/$normalized.json"
+    }
+
+    private fun handleFinishSession() {
+        if (state.value.isFinishing || isSavingSession.getAndSet(true)) return
+        setState { copy(isFinishing = true) }
+
+        val currentState = state.value
+        val endTime = System.currentTimeMillis()
+        val durationSeconds = ((endTime - currentState.startTime) / 1000).toInt()
+        val sessionId = UUID.randomUUID().toString()
+
+        val session = Session(
+            sessionId = sessionId,
+            userId = currentState.userId,
+            planId = currentState.planId,
+            workoutDayId = currentState.workoutDayId,
+            startTime = currentState.startTime,
+            endTime = endTime,
+            durationSeconds = durationSeconds,
+            totalReps = currentState.totalReps,
+            totalSets = currentState.totalSets,
+            fatigueEventCount = currentState.fatigueEventCount,
+            audioFallbackUsed = currentState.isAudioOnlyMode,
+            completionPercentage = 1.0f,
+            whatsAppShared = false
+        )
+
+        viewModelScope.launch {
+            when (val result = saveSessionUseCase(session)) {
+                is Result.Success<Unit> -> {
+                    analyticsLogger.logEvent("session_completed", mapOf(
+                        "duration_secs" to durationSeconds,
+                        "total_reps" to currentState.totalReps,
+                        "fatigue_events" to currentState.fatigueEventCount
+                    ))
+                    sendAction(ActiveSessionAction.NavigateToSummary(sessionId))
+                }
+                is Result.Failure<*> -> {
+                    isSavingSession.set(false)
+                    setState { copy(error = Exception("Save failed"), isFinishing = false) }
+                }
+            }
         }
     }
 
     private fun handleEquipmentUnavailable() {
+        if (state.value.isEquipmentSheetLoading) return
+        
         setState { 
             copy(
                 isEquipmentSheetVisible = true, 
@@ -132,21 +232,22 @@ class ActiveSessionViewModel @Inject constructor(
                 alternatives = emptyList() 
             ) 
         }
-        viewModelScope.launch {
+        equipmentJob?.cancel()
+        equipmentJob = viewModelScope.launch {
             // In a real implementation, equipment would be fetched from a repository/preferences
             val result = rerouteEquipmentUseCase(
                 exerciseName = state.value.currentExerciseName ?: "Current Exercise",
                 availableEquipment = emptySet()
             )
             when (result) {
-                is Result.Success -> {
+                is Result.Success<List<ExerciseAlternative>> -> {
                     setState { copy(isEquipmentSheetLoading = false, alternatives = result.value) }
                 }
-                is Result.Failure -> {
+                is Result.Failure<*> -> {
                     setState { 
                         copy(
                             isEquipmentSheetLoading = false, 
-                            error = Exception(result.error.message) 
+                            error = Exception("Failed to load alternatives")
                         ) 
                     }
                 }
@@ -156,9 +257,12 @@ class ActiveSessionViewModel @Inject constructor(
 
     private fun handleAlternativeSelected(alternative: ExerciseAlternative) {
         val original = state.value.currentExerciseName ?: "Unknown"
+        val nextLottiePath = alternative.lottieAssetPath?.takeIf { it.isNotBlank() }
+        
         setState { 
             copy(
                 currentExerciseName = alternative.name,
+                currentExerciseLottiePath = nextLottiePath,
                 isEquipmentSheetVisible = false,
                 alternatives = emptyList()
             ) 
@@ -167,15 +271,22 @@ class ActiveSessionViewModel @Inject constructor(
             "equipment_rerouted", 
             mapOf("original" to original, "alternative" to alternative.name)
         )
+        
+        val sanitizedName = alternative.name.replace("_", " ")
+        val muscles = if (alternative.muscleGroups.isNotEmpty()) {
+            ". Target muscles: ${alternative.muscleGroups.joinToString()}."
+        } else "."
+        
         sendAction(
             ActiveSessionAction.Announce(
-                "Alternative selected: ${alternative.name}. Target muscles: ${alternative.muscleGroups.joinToString()}."
+                "Alternative selected: $sanitizedName$muscles"
             )
         )
     }
 
     private fun handleRepCompleted(event: ActiveSessionEvent.RepCompleted) {
-        totalReps++
+        val newTotalReps = state.value.totalReps + 1
+        setState { copy(totalReps = newTotalReps) }
         
         // Cooldown logic: Re-triggers only if fatigue is detected in next 5 reps, not immediately.
         // We interpret this as: don't show the warning for at least 5 reps after dismissal.

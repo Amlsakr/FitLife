@@ -37,6 +37,9 @@ interface WorkoutPlanDao {
         nowEpochMillis: Long
     ): WorkoutPlanEntity?
 
+    @Query("SELECT * FROM workout_plans WHERE planId = :planId LIMIT 1")
+    suspend fun getPlanById(planId: String): WorkoutPlanEntity?
+
     @Query("DELETE FROM workout_plans WHERE expiresAtEpochMillis <= :nowEpochMillis")
     suspend fun clearOld(nowEpochMillis: Long): Int
 }

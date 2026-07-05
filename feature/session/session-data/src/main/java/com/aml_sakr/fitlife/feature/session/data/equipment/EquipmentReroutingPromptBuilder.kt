@@ -10,8 +10,11 @@ class EquipmentReroutingPromptBuilder @Inject constructor(
         exerciseName: String,
         availableEquipment: Set<String>
     ): EquipmentGeminiRequest {
+        val sanitizedName = exerciseName.filter { it.isLetterOrDigit() || it.isWhitespace() }
+            .takeIf { it.isNotBlank() } ?: "Current Exercise"
+
         val promptText = """
-            Suggest 3 alternative exercises for '$exerciseName' that target similar muscle groups 
+            Suggest 3 alternative exercises for '$sanitizedName' that target similar muscle groups
             using only the following available equipment: ${availableEquipment.joinToString(", ")}.
             Provide the response in JSON format.
         """.trimIndent()

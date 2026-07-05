@@ -2,9 +2,12 @@ package com.aml_sakr.fitlife.feature.session.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.aml_sakr.fitlife.feature.session.data.database.SessionDao
 import com.aml_sakr.fitlife.feature.session.data.database.SessionDatabase
 import com.aml_sakr.fitlife.feature.session.data.equipment.*
+import com.aml_sakr.fitlife.feature.session.data.repository.SessionRepositoryImpl
 import com.aml_sakr.fitlife.feature.session.domain.equipment.IEquipmentReroutingRepository
+import com.aml_sakr.fitlife.feature.session.domain.repository.ISessionRepository
 import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
@@ -24,16 +27,18 @@ abstract class EquipmentReroutingModule {
         impl: GeminiEquipmentReroutingRepository
     ): IEquipmentReroutingRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindSessionRepository(
+        impl: SessionRepositoryImpl
+    ): ISessionRepository
+
     companion object {
         @Provides
         @Singleton
         fun provideApiService(gson: Gson): EquipmentGeminiApiService {
             return HttpEquipmentGeminiApiService(gson)
         }
-
-        @Provides
-        @Singleton
-        fun provideGson(): Gson = Gson()
 
         @Provides
         @Singleton
@@ -51,12 +56,15 @@ abstract class EquipmentReroutingModule {
         }
 
         @Provides
+        fun provideSessionDao(database: SessionDatabase): SessionDao {
+            return database.sessionDao()
+        }
+
+        @Provides
         @Singleton
         fun provideSessionGeminiConfiguration(): SessionGeminiConfiguration {
             return SessionGeminiConfiguration(
-                apiKey = System.getProperty("FITLIFE_GEMINI_API_KEY") 
-                    ?: System.getenv("FITLIFE_GEMINI_API_KEY") 
-                    ?: ""
+                apiKey = com.aml_sakr.fitlife.feature.session.data.BuildConfig.GEMINI_API_KEY
             )
         }
     }

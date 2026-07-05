@@ -1,10 +1,10 @@
 package com.aml_sakr.fitlife.feature.workout.domain.usecase
 
 import com.aml_sakr.fitlife.core.domain.Result
-import com.aml_sakr.fitlife.feature.workout.domain.error.WorkoutGenerationError
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 import com.aml_sakr.fitlife.feature.workout.domain.repository.WorkoutPlanRepository
+import com.aml_sakr.fitlife.feature.workout.domain.error.WorkoutGenerationError
 import javax.inject.Inject
 
 class GenerateWorkoutPlanUseCase @Inject constructor(

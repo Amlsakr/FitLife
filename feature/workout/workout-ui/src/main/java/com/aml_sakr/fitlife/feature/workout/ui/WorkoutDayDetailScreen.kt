@@ -30,8 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.aml_sakr.fitlife.core.ui.theme.FitLifeDimens
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutDay
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutExercise
+import com.aml_sakr.fitlife.core.domain.model.WorkoutDay
+import com.aml_sakr.fitlife.core.domain.model.WorkoutExercise
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,7 +1,7 @@
 package com.aml_sakr.fitlife.feature.workout.data.fallback
 
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutFitnessLevel
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutLocation
+import com.aml_sakr.fitlife.core.domain.model.WorkoutFitnessLevel
+import com.aml_sakr.fitlife.core.domain.model.WorkoutLocation
 
 data class WorkoutPlanFallbackCatalog(
     val templates: List<WorkoutPlanFallbackTemplate>?

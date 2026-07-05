@@ -1,7 +1,7 @@
 package com.aml_sakr.fitlife.feature.workout.ui
 
 import com.aml_sakr.fitlife.core.ui.mvi.UIState
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutPlan
+import com.aml_sakr.fitlife.core.domain.model.WorkoutPlan
 
 sealed interface WorkoutHomeState : UIState {
     val renderBranch: WorkoutHomeRenderBranch

@@ -15,6 +15,11 @@ android {
     defaultConfig {
         minSdk = 30
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "GEMINI_API_KEY", "\"${System.getenv("FITLIFE_GEMINI_API_KEY") ?: ""}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     compileOptions {

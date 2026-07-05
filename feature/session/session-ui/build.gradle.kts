@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+    implementation(libs.lottie.compose)
     implementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

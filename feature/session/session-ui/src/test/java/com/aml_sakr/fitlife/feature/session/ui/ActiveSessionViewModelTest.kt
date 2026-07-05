@@ -8,6 +8,11 @@ import com.aml_sakr.fitlife.feature.session.domain.pose.FatigueStatus
 import com.aml_sakr.fitlife.feature.session.domain.pose.LightingStatus
 import com.aml_sakr.fitlife.feature.session.domain.pose.LightingUseCase
 import com.aml_sakr.fitlife.feature.session.domain.pose.PoseData
+import com.aml_sakr.fitlife.feature.session.domain.equipment.RerouteEquipmentUseCase
+import com.aml_sakr.fitlife.feature.session.domain.equipment.ExerciseAlternative
+import com.aml_sakr.fitlife.feature.session.domain.usecase.SaveSessionUseCase
+import com.aml_sakr.fitlife.feature.session.domain.model.ExerciseDifficulty
+import com.aml_sakr.fitlife.core.domain.usecase.GetWorkoutPlanUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
@@ -36,6 +41,9 @@ class ActiveSessionViewModelTest {
     private val detectRepUseCase: DetectRepUseCase = mock()
     private val lightingUseCase: LightingUseCase = mock()
     private val analyticsLogger: AnalyticsLogger = mock()
+    private val rerouteEquipmentUseCase: RerouteEquipmentUseCase = mock()
+    private val saveSessionUseCase: SaveSessionUseCase = mock()
+    private val getWorkoutPlanUseCase: GetWorkoutPlanUseCase = mock()
 
     @Before
     fun setUp() {
@@ -46,7 +54,10 @@ class ActiveSessionViewModelTest {
             detectFatigueUseCase,
             detectRepUseCase,
             lightingUseCase,
-            analyticsLogger
+            analyticsLogger,
+            rerouteEquipmentUseCase,
+            saveSessionUseCase,
+            getWorkoutPlanUseCase
         )
     }
 
@@ -115,6 +126,43 @@ class ActiveSessionViewModelTest {
         // 4. 6th rep after dismissal - should trigger fatigue again
         viewModel.onEvent(ActiveSessionEvent.RepCompleted(peakPose))
         assertTrue("Fatigue should be re-triggered at 6th rep", viewModel.state.value.isFatigued)
+    }
+
+    @Test
+    fun `initial state - has null lottie path until initialized`() {
+        assertEquals(null, viewModel.state.value.currentExerciseLottiePath)
+    }
+
+    @Test
+    fun `OnAlternativeSelected - updates lottie path`() {
+        val alternative = ExerciseAlternative(
+            exerciseId = "1",
+            name = "Dumbbell Squat",
+            description = "...",
+            muscleGroups = listOf("Quads"),
+            equipmentRequired = "Dumbbells",
+            difficulty = ExerciseDifficulty.BEGINNER,
+            lottieAssetPath = "lottie/db_squat.json",
+            defaultSets = 3,
+            defaultReps = 12
+        )
+
+        viewModel.onEvent(ActiveSessionEvent.OnAlternativeSelected(alternative))
+
+        assertEquals("Dumbbell Squat", viewModel.state.value.currentExerciseName)
+        assertEquals("lottie/db_squat.json", viewModel.state.value.currentExerciseLottiePath)
+    }
+
+    @Test
+    fun `RepCompleted - increments totalReps`() {
+        val peakPose = createPoseData()
+        whenever(detectFatigueUseCase.analyzeRep(peakPose)).thenReturn(FatigueStatus.HEALTHY)
+
+        assertEquals(0, viewModel.state.value.totalReps)
+        
+        viewModel.onEvent(ActiveSessionEvent.RepCompleted(peakPose))
+        
+        assertEquals(1, viewModel.state.value.totalReps)
     }
 
     private fun createPoseData() = PoseData(

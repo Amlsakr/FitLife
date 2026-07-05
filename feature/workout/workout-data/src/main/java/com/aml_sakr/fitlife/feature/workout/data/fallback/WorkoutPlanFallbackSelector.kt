@@ -2,7 +2,7 @@ package com.aml_sakr.fitlife.feature.workout.data.fallback
 
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.feature.workout.domain.error.WorkoutGenerationError
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
 
 class WorkoutPlanFallbackSelector(
     private val logger: WorkoutPlanFallbackLogger = NoOpWorkoutPlanFallbackLogger
