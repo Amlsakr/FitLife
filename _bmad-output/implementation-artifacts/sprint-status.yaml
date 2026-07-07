@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review
 
 generated: 2026-06-01T13:15:32+03:00
-last_updated: 2026-06-30T13:00:00+03:00
+last_updated: 2026-07-05T13:00:00+03:00
 project: FitnessApp
 project_key: NOKEY
 tracking_system: file-system
@@ -84,8 +84,8 @@ development_status:
   session-007-guided-session-ui-with-lottie-demos: done
   session-008-session-persistence-summary-screen: done
   epic-4-retrospective: optional
-  epic-5: backlog
-  prog-001-progress-room-queries-use-cases: backlog
+  epic-5: in-progress
+  prog-001-progress-room-queries-use-cases: done
   prog-002-mpandroidchart-integration: backlog
   prog-003-progress-ui-metric-cards-history-list: backlog
   epic-5-retrospective: optional

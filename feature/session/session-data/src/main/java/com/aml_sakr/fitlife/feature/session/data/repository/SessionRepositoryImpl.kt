@@ -2,8 +2,8 @@ package com.aml_sakr.fitlife.feature.session.data.repository
 
 import com.aml_sakr.fitlife.core.domain.DomainError
 import com.aml_sakr.fitlife.core.domain.Result
-import com.aml_sakr.fitlife.feature.session.data.database.SessionDao
-import com.aml_sakr.fitlife.feature.session.data.database.SessionEntity
+import com.aml_sakr.fitlife.core.data.database.SessionDao
+import com.aml_sakr.fitlife.core.data.database.SessionEntity
 import com.aml_sakr.fitlife.feature.session.domain.model.Session
 import com.aml_sakr.fitlife.feature.session.domain.repository.ISessionRepository
 import kotlinx.coroutines.CancellationException

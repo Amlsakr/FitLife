@@ -2,7 +2,6 @@ package com.aml_sakr.fitlife.feature.session.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.aml_sakr.fitlife.feature.session.data.database.SessionDao
 import com.aml_sakr.fitlife.feature.session.data.database.SessionDatabase
 import com.aml_sakr.fitlife.feature.session.data.equipment.*
 import com.aml_sakr.fitlife.feature.session.data.repository.SessionRepositoryImpl
@@ -53,11 +52,6 @@ abstract class EquipmentReroutingModule {
         @Provides
         fun provideEquipmentReroutingDao(database: SessionDatabase): EquipmentReroutingDao {
             return database.equipmentReroutingDao()
-        }
-
-        @Provides
-        fun provideSessionDao(database: SessionDatabase): SessionDao {
-            return database.sessionDao()
         }
 
         @Provides

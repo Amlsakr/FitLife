@@ -190,15 +190,20 @@ class BeginnerOnboardingViewModelTest {
         var completedUserId: String? = null
         var markCompletionResult: Result<Unit, OnboardingError> = Result.Success(Unit)
 
-        override suspend fun getSelectedFitnessLevel() = Result.Success(null)
+        override suspend fun getSelectedFitnessLevel(userId: String) = Result.Success(null)
 
-        override suspend fun saveSelectedFitnessLevel(level: com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessLevel) =
-            Result.Success(Unit)
+        override suspend fun saveSelectedFitnessLevel(
+            userId: String,
+            level: com.aml_sakr.fitlife.feature.onboarding.domain.model.FitnessLevel
+        ) = Result.Success(Unit)
 
-        override suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError> =
+        override suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> =
             readResult?.await() ?: Result.Success(BeginnerOnboardingDraft())
 
-        override suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> {
+        override suspend fun saveBeginnerDraft(
+            userId: String,
+            draft: BeginnerOnboardingDraft
+        ): Result<Unit, OnboardingError> {
             savedDrafts += draft
             if (blockFirstSave && savedDrafts.size == 1) {
                 firstSaveStarted.complete(Unit)
@@ -229,10 +234,11 @@ class BeginnerOnboardingViewModelTest {
             }
         }
 
-        override suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError> =
+        override suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError> =
             Result.Success(IntermediateOnboardingDraft())
 
         override suspend fun saveIntermediateDraft(
+            userId: String,
             draft: IntermediateOnboardingDraft
         ): Result<Unit, OnboardingError> = Result.Success(Unit)
 

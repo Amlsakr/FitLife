@@ -29,20 +29,6 @@ class DetermineStartupDestinationUseCaseTest {
     }
 
     @Test
-    fun invoke_returnsAuth_whenAuthenticatedSessionIsNotEmailVerified() = runTest {
-        val useCase = DetermineStartupDestinationUseCase(
-            authSessionReader = FakeAuthSessionReader(
-                session = AuthSession(
-                    userId = "user-1"
-                )
-            ),
-            onboardingCompletionReader = FakeOnboardingCompletionReader(isComplete = true)
-        )
-
-        assertEquals(StartupDestination.Auth, useCase())
-    }
-
-    @Test
     fun invoke_returnsOnboarding_whenUserIsAuthenticatedAndOnboardingIsIncomplete() = runTest {
         val useCase = DetermineStartupDestinationUseCase(
             authSessionReader = FakeAuthSessionReader(

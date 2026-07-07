@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -23,5 +25,9 @@ android {
 dependencies {
     implementation(project(":core:core-data"))
     implementation(project(":feature:progress:progress-domain"))
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.javax.inject)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
 }

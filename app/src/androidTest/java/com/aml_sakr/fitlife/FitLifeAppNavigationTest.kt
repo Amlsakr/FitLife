@@ -445,7 +445,7 @@ class FitLifeAppNavigationTest {
                     backStack = backStack,
                     authRepository = VerifiedAuthRepository,
                     authSessionReader = FakeAuthSessionReader(
-                        AuthSession(userId = "beginner-user", isEmailVerified = true)
+                        AuthSession(userId = "beginner-user")
                     ),
                     onboardingRepository = InMemoryOnboardingRepository(),
                     startupRouteErrorLogger = NoOpStartupRouteErrorLogger
@@ -473,7 +473,7 @@ class FitLifeAppNavigationTest {
                     backStack = backStack,
                     authRepository = VerifiedAuthRepository,
                     authSessionReader = FakeAuthSessionReader(
-                        AuthSession(userId = "intermediate-user", isEmailVerified = true)
+                        AuthSession(userId = "intermediate-user")
                     ),
                     onboardingRepository = InMemoryOnboardingRepository(),
                     startupRouteErrorLogger = NoOpStartupRouteErrorLogger
@@ -501,7 +501,7 @@ class FitLifeAppNavigationTest {
                     backStack = backStack,
                     authRepository = VerifiedAuthRepository,
                     authSessionReader = FakeAuthSessionReader(
-                        AuthSession(userId = "beginner-user", isEmailVerified = true)
+                        AuthSession(userId = "beginner-user")
                     ),
                     onboardingRepository = InMemoryOnboardingRepository(),
                     startupRouteErrorLogger = NoOpStartupRouteErrorLogger
@@ -539,7 +539,7 @@ class FitLifeAppNavigationTest {
                     backStack = backStack,
                     authRepository = VerifiedAuthRepository,
                     authSessionReader = FakeAuthSessionReader(
-                        AuthSession(userId = "intermediate-user", isEmailVerified = true)
+                        AuthSession(userId = "intermediate-user")
                     ),
                     onboardingRepository = InMemoryOnboardingRepository(),
                     startupRouteErrorLogger = NoOpStartupRouteErrorLogger
@@ -577,7 +577,7 @@ class FitLifeAppNavigationTest {
                     backStack = backStack,
                     authRepository = VerifiedAuthRepository,
                     authSessionReader = FakeAuthSessionReader(
-                        AuthSession(userId = "unverified-user", isEmailVerified = false)
+                        AuthSession(userId = "unverified-user")
                     ),
                     onboardingRepository = InMemoryOnboardingRepository(),
                     startupRouteErrorLogger = NoOpStartupRouteErrorLogger
@@ -916,8 +916,7 @@ class FitLifeAppNavigationTest {
     private object VerifiedAuthRepository : AuthRepository {
         private val user = AuthUser(
             id = "verified-user",
-            email = "verified@example.com",
-            isEmailVerified = true
+            email = "verified@example.com"
         )
 
         override suspend fun signUp(
@@ -957,18 +956,24 @@ class FitLifeAppNavigationTest {
         private var intermediateDraft: IntermediateOnboardingDraft = IntermediateOnboardingDraft()
         private var onboardingComplete: Boolean = false
 
-        override suspend fun getSelectedFitnessLevel(): Result<FitnessLevel?, OnboardingError> =
+        override suspend fun getSelectedFitnessLevel(userId: String): Result<FitnessLevel?, OnboardingError> =
             Result.Success(selectedLevel)
 
-        override suspend fun saveSelectedFitnessLevel(level: FitnessLevel): Result<Unit, OnboardingError> {
+        override suspend fun saveSelectedFitnessLevel(
+            userId: String,
+            level: FitnessLevel
+        ): Result<Unit, OnboardingError> {
             selectedLevel = level
             return Result.Success(Unit)
         }
 
-        override suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError> =
+        override suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> =
             Result.Success(beginnerDraft)
 
-        override suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> {
+        override suspend fun saveBeginnerDraft(
+            userId: String,
+            draft: BeginnerOnboardingDraft
+        ): Result<Unit, OnboardingError> {
             beginnerDraft = draft
             return Result.Success(Unit)
         }
@@ -992,10 +997,11 @@ class FitLifeAppNavigationTest {
             return Result.Success(Unit)
         }
 
-        override suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError> =
+        override suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError> =
             Result.Success(intermediateDraft)
 
         override suspend fun saveIntermediateDraft(
+            userId: String,
             draft: IntermediateOnboardingDraft
         ): Result<Unit, OnboardingError> {
             intermediateDraft = draft
@@ -1037,8 +1043,7 @@ class FitLifeAppNavigationTest {
     private object GoogleAuthRepository : AuthRepository {
         private val user = AuthUser(
             id = "verified-user",
-            email = "google@example.com",
-            isEmailVerified = true
+            email = "google@example.com"
         )
 
         override suspend fun signUp(
@@ -1075,8 +1080,7 @@ class FitLifeAppNavigationTest {
     private object UnverifiedAuthRepository : AuthRepository {
         private val user = AuthUser(
             id = "unverified-user",
-            email = "unverified@example.com",
-            isEmailVerified = false
+            email = "unverified@example.com"
         )
 
         override suspend fun signUp(
@@ -1113,8 +1117,7 @@ class FitLifeAppNavigationTest {
     private object PendingGoogleAuthRepository : AuthRepository {
         private val user = AuthUser(
             id = "pending-user",
-            email = "pending@example.com",
-            isEmailVerified = true
+            email = "pending@example.com"
         )
 
         override suspend fun signUp(

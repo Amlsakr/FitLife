@@ -3,9 +3,9 @@ package com.aml_sakr.fitlife.feature.session.ui.summary
 import androidx.lifecycle.viewModelScope
 import com.aml_sakr.fitlife.core.domain.AnalyticsLogger
 import com.aml_sakr.fitlife.core.domain.Result
+import com.aml_sakr.fitlife.core.domain.usecase.CalculateCaloriesUseCase
 import com.aml_sakr.fitlife.core.ui.mvi.BaseMviViewModel
 import com.aml_sakr.fitlife.feature.session.domain.usecase.GetSessionUseCase
-import com.aml_sakr.fitlife.feature.session.domain.usecase.CalculateCaloriesUseCase
 import com.aml_sakr.fitlife.feature.session.domain.model.Session
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
