@@ -311,19 +311,24 @@ class IntermediateOnboardingViewModelTest {
         var completedUserId: String? = null,
         var markCompletionResult: Result<Unit, OnboardingError> = Result.Success(Unit)
     ) : OnboardingRepository {
-        override suspend fun getSelectedFitnessLevel(): Result<FitnessLevel?, OnboardingError> =
+        override suspend fun getSelectedFitnessLevel(userId: String): Result<FitnessLevel?, OnboardingError> =
             Result.Success(selectedLevel)
 
-        override suspend fun saveSelectedFitnessLevel(level: FitnessLevel): Result<Unit, OnboardingError> {
+        override suspend fun saveSelectedFitnessLevel(
+            userId: String,
+            level: FitnessLevel
+        ): Result<Unit, OnboardingError> {
             selectedLevel = level
             return Result.Success(Unit)
         }
 
-        override suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError> =
+        override suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> =
             Result.Success(beginnerDraft)
 
-        override suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> =
-            Result.Success(Unit)
+        override suspend fun saveBeginnerDraft(
+            userId: String,
+            draft: BeginnerOnboardingDraft
+        ): Result<Unit, OnboardingError> = Result.Success(Unit)
 
         override suspend fun syncBeginnerProfile(
             userId: String,
@@ -347,10 +352,11 @@ class IntermediateOnboardingViewModelTest {
             }
         }
 
-        override suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError> =
+        override suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError> =
             intermediateDraftResult
 
         override suspend fun saveIntermediateDraft(
+            userId: String,
             draft: IntermediateOnboardingDraft
         ): Result<Unit, OnboardingError> {
             intermediateDraft = draft

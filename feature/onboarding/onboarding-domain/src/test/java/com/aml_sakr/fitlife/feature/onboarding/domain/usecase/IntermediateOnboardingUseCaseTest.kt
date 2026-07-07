@@ -29,7 +29,7 @@ class IntermediateOnboardingUseCaseTest {
         val repository = FakeOnboardingRepository(intermediateDraft = draft)
         val useCase = ReadIntermediateDraftUseCase(repository)
 
-        assertEquals(Result.Success(draft), useCase())
+        assertEquals(Result.Success(draft), useCase("user-123"))
     }
 
     @Test
@@ -52,7 +52,7 @@ class IntermediateOnboardingUseCaseTest {
         val repository = FakeOnboardingRepository()
         val useCase = SaveIntermediateProfileUseCase(repository)
 
-        assertEquals(Result.Success(Unit), useCase(IntermediateOnboardingDraft()))
+        assertEquals(Result.Success(Unit), useCase(IntermediateOnboardingDraft(), userId = ""))
         assertEquals(null, repository.syncedIntermediateUserId)
         assertEquals(IntermediateOnboardingDraft(), repository.intermediateDraft)
     }
@@ -66,18 +66,24 @@ class IntermediateOnboardingUseCaseTest {
         var syncedIntermediateUserId: String? = null,
         var syncedIntermediateDraft: IntermediateOnboardingDraft? = null
     ) : OnboardingRepository {
-        override suspend fun getSelectedFitnessLevel(): Result<FitnessLevel?, OnboardingError> =
+        override suspend fun getSelectedFitnessLevel(userId: String): Result<FitnessLevel?, OnboardingError> =
             Result.Success(selectedLevel)
 
-        override suspend fun saveSelectedFitnessLevel(level: FitnessLevel): Result<Unit, OnboardingError> {
+        override suspend fun saveSelectedFitnessLevel(
+            userId: String,
+            level: FitnessLevel
+        ): Result<Unit, OnboardingError> {
             selectedLevel = level
             return Result.Success(Unit)
         }
 
-        override suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError> =
+        override suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> =
             Result.Success(beginnerDraft)
 
-        override suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> {
+        override suspend fun saveBeginnerDraft(
+            userId: String,
+            draft: BeginnerOnboardingDraft
+        ): Result<Unit, OnboardingError> {
             beginnerDraft = draft
             return Result.Success(Unit)
         }
@@ -99,10 +105,11 @@ class IntermediateOnboardingUseCaseTest {
             userId: String
         ): Result<Unit, OnboardingError> = Result.Success(Unit)
 
-        override suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError> =
+        override suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError> =
             Result.Success(intermediateDraft)
 
         override suspend fun saveIntermediateDraft(
+            userId: String,
             draft: IntermediateOnboardingDraft
         ): Result<Unit, OnboardingError> {
             intermediateDraft = draft

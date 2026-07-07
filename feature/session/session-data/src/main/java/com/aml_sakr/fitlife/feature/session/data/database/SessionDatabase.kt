@@ -7,13 +7,11 @@ import com.aml_sakr.fitlife.feature.session.data.equipment.EquipmentReroutingEnt
 
 @Database(
     entities = [
-        EquipmentReroutingEntity::class,
-        SessionEntity::class
+        EquipmentReroutingEntity::class
     ],
     version = 1,
     exportSchema = false
 )
 abstract class SessionDatabase : RoomDatabase() {
     abstract fun equipmentReroutingDao(): EquipmentReroutingDao
-    abstract fun sessionDao(): SessionDao
 }

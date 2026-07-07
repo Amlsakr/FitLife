@@ -7,6 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.aml_sakr.fitlife.core.data.connectivity.AndroidConnectivityMonitor
 import com.aml_sakr.fitlife.core.data.connectivity.ConnectivityMonitor
+import com.aml_sakr.fitlife.core.data.database.SessionDao
 import com.aml_sakr.fitlife.core.data.preferences.DataStorePreferencesDataSource
 import com.aml_sakr.fitlife.core.data.preferences.PreferencesDataSource
 import com.aml_sakr.fitlife.core.data.workout.WorkoutPlanDao
@@ -66,4 +67,8 @@ object CoreDataModule {
     @Provides
     fun provideWorkoutPlanDao(database: WorkoutPlanDatabase): WorkoutPlanDao =
         database.workoutPlanDao()
+
+    @Provides
+    fun provideSessionDao(database: WorkoutPlanDatabase): SessionDao =
+        database.sessionDao()
 }

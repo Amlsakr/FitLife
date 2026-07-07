@@ -120,6 +120,7 @@ class WelcomeLevelViewModelTest {
 
     private fun buildViewModel(repository: FakeOnboardingRepository): WelcomeLevelViewModel =
         WelcomeLevelViewModel(
+            userId = "user-123",
             readSelectedFitnessLevel = ReadSelectedFitnessLevelUseCase(repository),
             saveSelectedFitnessLevel = SaveSelectedFitnessLevelUseCase(repository)
         )
@@ -129,19 +130,24 @@ class WelcomeLevelViewModelTest {
         private val readResult: Result<FitnessLevel?, OnboardingError>? = null,
         private val saveResult: Result<Unit, OnboardingError>? = null
     ) : OnboardingRepository {
-        override suspend fun getSelectedFitnessLevel(): Result<FitnessLevel?, OnboardingError> =
+        override suspend fun getSelectedFitnessLevel(userId: String): Result<FitnessLevel?, OnboardingError> =
             readResult ?: Result.Success(selectedLevel)
 
-        override suspend fun saveSelectedFitnessLevel(level: FitnessLevel): Result<Unit, OnboardingError> {
+        override suspend fun saveSelectedFitnessLevel(
+            userId: String,
+            level: FitnessLevel
+        ): Result<Unit, OnboardingError> {
             selectedLevel = level
             return saveResult ?: Result.Success(Unit)
         }
 
-        override suspend fun getBeginnerDraft(): Result<BeginnerOnboardingDraft, OnboardingError> =
+        override suspend fun getBeginnerDraft(userId: String): Result<BeginnerOnboardingDraft, OnboardingError> =
             Result.Success(BeginnerOnboardingDraft())
 
-        override suspend fun saveBeginnerDraft(draft: BeginnerOnboardingDraft): Result<Unit, OnboardingError> =
-            Result.Success(Unit)
+        override suspend fun saveBeginnerDraft(
+            userId: String,
+            draft: BeginnerOnboardingDraft
+        ): Result<Unit, OnboardingError> = Result.Success(Unit)
 
         override suspend fun syncBeginnerProfile(
             userId: String,
@@ -156,10 +162,11 @@ class WelcomeLevelViewModelTest {
             userId: String
         ): Result<Unit, OnboardingError> = Result.Success(Unit)
 
-        override suspend fun getIntermediateDraft(): Result<IntermediateOnboardingDraft, OnboardingError> =
+        override suspend fun getIntermediateDraft(userId: String): Result<IntermediateOnboardingDraft, OnboardingError> =
             Result.Success(IntermediateOnboardingDraft())
 
         override suspend fun saveIntermediateDraft(
+            userId: String,
             draft: IntermediateOnboardingDraft
         ): Result<Unit, OnboardingError> = Result.Success(Unit)
 
