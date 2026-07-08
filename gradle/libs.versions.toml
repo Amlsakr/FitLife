@@ -31,6 +31,7 @@ mockitoKotlin = "5.4.0"
 turbine = "1.2.1"
 mockwebserver = "4.12.0"
 lottie = "6.7.1"
+mpAndroidChart = "v3.1.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
@@ -90,6 +91,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
+mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpAndroidChart" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

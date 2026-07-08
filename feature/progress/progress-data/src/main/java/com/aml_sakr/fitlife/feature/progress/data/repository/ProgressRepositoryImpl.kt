@@ -5,9 +5,8 @@ import com.aml_sakr.fitlife.core.domain.AnalyticsLogger
 import com.aml_sakr.fitlife.core.domain.DomainError
 import com.aml_sakr.fitlife.core.domain.Result
 import com.aml_sakr.fitlife.feature.progress.domain.repository.IProgressRepository
+import com.aml_sakr.fitlife.feature.progress.domain.model.SessionBasicInfo
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ProgressRepositoryImpl @Inject constructor(
@@ -16,23 +15,26 @@ class ProgressRepositoryImpl @Inject constructor(
 ) : IProgressRepository {
 
     override suspend fun getSessionCount(userId: String, startTime: Long): Result<Int, DomainError> =
-        withContext(Dispatchers.IO) {
-            safeCall { sessionDao.getSessionCountInRange(userId, startTime) }
-        }
+        safeCall { sessionDao.getSessionCountInRange(userId, startTime) }
 
     override suspend fun getTotalReps(userId: String, startTime: Long): Result<Int, DomainError> =
-        withContext(Dispatchers.IO) {
-            safeCall { sessionDao.getTotalRepsInRange(userId, startTime) ?: 0 }
-        }
+        safeCall { sessionDao.getTotalRepsInRange(userId, startTime) ?: 0 }
 
     override suspend fun getTotalFatigueEvents(userId: String, startTime: Long): Result<Int, DomainError> =
-        withContext(Dispatchers.IO) {
-            safeCall { sessionDao.getTotalFatigueEventsInRange(userId, startTime) ?: 0 }
-        }
+        safeCall { sessionDao.getTotalFatigueEventsInRange(userId, startTime) ?: 0 }
 
     override suspend fun getTotalDuration(userId: String, startTime: Long): Result<Int, DomainError> =
-        withContext(Dispatchers.IO) {
-            safeCall { sessionDao.getTotalDurationInRange(userId, startTime) ?: 0 }
+        safeCall { sessionDao.getTotalDurationInRange(userId, startTime) ?: 0 }
+
+    override suspend fun getSessionsSince(userId: String, startTime: Long): Result<List<SessionBasicInfo>, DomainError> =
+        safeCall {
+            sessionDao.getSessionsSince(userId, startTime).map { entity ->
+                SessionBasicInfo(
+                    sessionId = entity.sessionId,
+                    startTime = entity.startTime,
+                    durationSeconds = entity.durationSeconds
+                )
+            }
         }
 
     private suspend fun <T> safeCall(call: suspend () -> T): Result<T, DomainError> {
