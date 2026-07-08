@@ -13,6 +13,9 @@ interface SessionDao {
     @Query("SELECT * FROM sessions WHERE userId = :userId ORDER BY startTime DESC")
     suspend fun getSessionsForUser(userId: String): List<SessionEntity>
 
+    @Query("SELECT * FROM sessions WHERE userId = :userId ORDER BY startTime DESC LIMIT :limit")
+    suspend fun getRecentSessions(userId: String, limit: Int): List<SessionEntity>
+
     @Query("SELECT * FROM sessions WHERE userId = :userId AND startTime >= :startTime ORDER BY startTime ASC")
     suspend fun getSessionsSince(userId: String, startTime: Long): List<SessionEntity>
 

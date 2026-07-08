@@ -35,3 +35,12 @@
 - Fatigue detection without baseline guard [ActiveSessionViewModel.kt:handleRepCompleted] — The algorithm (Section 8 of Arch Doc) requires a baseline from the first two reps, but currently calls `analyzeRep` for every rep; deferred as pre-existing logic exposed here.
 - Temporary Lottie Mapping Tech Debt [ActiveSessionViewModel.kt] — The hardcoded asset path logic is acknowledged as "temporary" in comments. This should be addressed in the planned Exercise Library migration; deferred as pre-existing pattern.
 - Potential safety risk in fatigue warning suppression [ActiveSessionViewModel.kt] — The hardcoded 5-rep suppression after dismissal is pre-existing logic. While risky, it is out of scope for the Lottie UI story; deferred as pre-existing logic.
+
+## Deferred from: code review of prog-003-progress-ui-metric-cards-history-list.md (2026-07-08)
+
+- Hardcoded Placeholder for User ID [ProgressDashboardViewModel.kt] — deferred, pre-existing intent
+- Potential Lifecycle Issue with AndroidView in LazyColumn [FitLifeLineChart.kt] — deferred, pre-existing component
+
+## Deferred from: code review of prog-003-progress-ui-metric-cards-history-list.md (2026-07-08) - Round 2
+
+- Timezone inconsistency in history formatting [SessionHistoryItem.kt:17] — deferred, project-wide pattern

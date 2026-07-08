@@ -37,6 +37,17 @@ class ProgressRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun getSessionHistory(userId: String, limit: Int): Result<List<SessionBasicInfo>, DomainError> =
+        safeCall {
+            sessionDao.getRecentSessions(userId, limit).map { entity ->
+                SessionBasicInfo(
+                    sessionId = entity.sessionId,
+                    startTime = entity.startTime,
+                    durationSeconds = entity.durationSeconds
+                )
+            }
+        }
+
     private suspend fun <T> safeCall(call: suspend () -> T): Result<T, DomainError> {
         return try {
             Result.Success(call())
