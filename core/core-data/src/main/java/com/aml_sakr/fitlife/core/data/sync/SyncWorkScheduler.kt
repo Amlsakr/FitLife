@@ -1,11 +1,8 @@
 package com.aml_sakr.fitlife.core.data.sync
 
 import android.content.Context
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
+import java.util.concurrent.TimeUnit
 
 object SyncWorkScheduler {
     const val UNIQUE_WORK_NAME = "fitlife_sync_work"
@@ -16,14 +13,19 @@ object SyncWorkScheduler {
             .build()
 
     internal fun buildRequest() =
-        OneTimeWorkRequestBuilder<SyncWorker>()
+        PeriodicWorkRequestBuilder<SyncWorker>(6, TimeUnit.HOURS)
             .setConstraints(buildConstraints())
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                WorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
             .build()
 
     fun schedule(context: Context) {
-        WorkManager.getInstance(context).enqueueUniqueWork(
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             UNIQUE_WORK_NAME,
-            ExistingWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.KEEP,
             buildRequest()
         )
     }

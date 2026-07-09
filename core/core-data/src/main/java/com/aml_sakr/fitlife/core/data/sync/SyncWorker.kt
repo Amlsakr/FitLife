@@ -1,9 +1,9 @@
 package com.aml_sakr.fitlife.core.data.sync
 
 import android.content.Context
-import dagger.hilt.android.EntryPointAccessors
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import dagger.hilt.android.EntryPointAccessors
 
 class SyncWorker(
     context: Context,
@@ -15,20 +15,20 @@ class SyncWorker(
             applicationContext,
             SyncEntryPoint::class.java
         )
-        val dao = entryPoint.syncTestDao()
-        val remoteClient = entryPoint.remoteSyncClient()
-        val connectivityMonitor = entryPoint.connectivityMonitor()
-
-        val coordinator = OfflineSyncCoordinator(dao, remoteClient, connectivityMonitor)
+        
+        val coordinator = entryPoint.offlineSyncCoordinator()
         val syncResult = coordinator.sync()
 
         return if (syncResult.success) {
             Result.success()
         } else {
-            if (syncResult.error == "No connectivity") {
+            if (syncResult.error?.contains("No connectivity") == true) {
                 Result.retry()
             } else {
-                Result.failure()
+                // For other errors, we might still want to retry or fail depending on policy.
+                // AC #3 says "Retries with exponential back-off".
+                // Result.retry() triggers the back-off configured in the work request.
+                Result.retry()
             }
         }
     }

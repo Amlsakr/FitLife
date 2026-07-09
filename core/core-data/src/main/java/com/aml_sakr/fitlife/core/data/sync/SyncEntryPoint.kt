@@ -7,7 +7,5 @@ import dagger.hilt.components.SingletonComponent
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface SyncEntryPoint {
-    fun syncTestDao(): SyncTestDao
-    fun remoteSyncClient(): RemoteSyncClient
-    fun connectivityMonitor(): com.aml_sakr.fitlife.core.data.connectivity.ConnectivityMonitor
+    fun offlineSyncCoordinator(): OfflineSyncCoordinator
 }

@@ -82,6 +82,15 @@ private class InMemoryWorkoutPlanDao : WorkoutPlanDao {
         rows[entity.planId] = entity
     }
 
+    override suspend fun update(entity: WorkoutPlanEntity) {
+        rows[entity.planId] = entity
+    }
+
+    override suspend fun getById(id: String): WorkoutPlanEntity? = rows[id]
+
+    override suspend fun getUnsyncedRecords(): List<WorkoutPlanEntity> =
+        rows.values.filter { it.syncStatus == com.aml_sakr.fitlife.core.data.sync.SyncStatus.NOT_SYNCED }
+
     override suspend fun getLatestByRequestKey(
         requestKey: String,
         nowEpochMillis: Long

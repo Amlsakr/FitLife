@@ -10,7 +10,7 @@ import org.junit.Test
 class OfflineSyncBenchmarkTest {
 
     private lateinit var dao: FakeSyncTestDao
-    private lateinit var remoteClient: FakeRemoteSyncClient
+    private lateinit var remoteClient: FakeRemoteSyncClient<SyncTestEntity>
     private lateinit var connectivityMonitor: MutableConnectivityMonitor
     private lateinit var coordinator: OfflineSyncCoordinator
 
@@ -19,7 +19,8 @@ class OfflineSyncBenchmarkTest {
         dao = FakeSyncTestDao()
         remoteClient = FakeRemoteSyncClient()
         connectivityMonitor = MutableConnectivityMonitor(isOnline = true)
-        coordinator = OfflineSyncCoordinator(dao, remoteClient, connectivityMonitor)
+        val agent = DefaultSyncAgent(dao, remoteClient)
+        coordinator = OfflineSyncCoordinator(listOf(agent), connectivityMonitor)
     }
 
     @Test
@@ -35,12 +36,12 @@ class OfflineSyncBenchmarkTest {
             val recordId = "record_$i"
             val payload = "payload_content_for_record_$i"
             val start = System.nanoTime()
-            dao.insert(SyncTestEntity(recordId, payload, System.currentTimeMillis(), SyncStatus.PENDING))
+            dao.insert(SyncTestEntity(recordId, payload, System.currentTimeMillis(), SyncStatus.NOT_SYNCED))
             val end = System.nanoTime()
             writeTimes.add(end - start)
         }
         
-        // Assert all local writes are PENDING and 0 remote writes
+        // Assert all local writes are NOT_SYNCED and 0 remote writes
         assertEquals(numRecords, dao.getUnsyncedRecords().size)
         for (i in 1..numRecords) {
             assertTrue(remoteClient.getRecord("record_$i") == null)
@@ -68,11 +69,11 @@ class OfflineSyncBenchmarkTest {
         // Record 11-20: Remote is newer
         val now = System.currentTimeMillis()
         for (i in 1..10) {
-            dao.insert(SyncTestEntity("record_$i", "Locally Updated $i", now + 10000L, SyncStatus.PENDING))
+            dao.insert(SyncTestEntity("record_$i", "Locally Updated $i", now + 10000L, SyncStatus.NOT_SYNCED))
             remoteClient.simulateRemoteWrite(SyncTestEntity("record_$i", "Remotely Outdated $i", now - 10000L, SyncStatus.SYNCED))
         }
         for (i in 11..20) {
-            dao.insert(SyncTestEntity("record_$i", "Locally Outdated $i", now - 10000L, SyncStatus.PENDING))
+            dao.insert(SyncTestEntity("record_$i", "Locally Outdated $i", now - 10000L, SyncStatus.NOT_SYNCED))
             remoteClient.simulateRemoteWrite(SyncTestEntity("record_$i", "Remotely Updated $i", now + 10000L, SyncStatus.SYNCED))
         }
 

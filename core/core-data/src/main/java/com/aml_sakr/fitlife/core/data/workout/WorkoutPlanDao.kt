@@ -1,14 +1,21 @@
 package com.aml_sakr.fitlife.core.data.workout
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import com.aml_sakr.fitlife.core.data.sync.SyncableDao
 
 @Dao
-interface WorkoutPlanDao {
+interface WorkoutPlanDao : SyncableDao<WorkoutPlanEntity> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: WorkoutPlanEntity)
+
+    @Update
+    override suspend fun update(entity: WorkoutPlanEntity)
+
+    @Query("SELECT * FROM workout_plans WHERE planId = :id")
+    override suspend fun getById(id: String): WorkoutPlanEntity?
+    
+    @Query("SELECT * FROM workout_plans WHERE syncStatus = 'NOT_SYNCED'")
+    override suspend fun getUnsyncedRecords(): List<WorkoutPlanEntity>
 
     @Query(
         """
@@ -36,9 +43,6 @@ interface WorkoutPlanDao {
         requestKey: String,
         nowEpochMillis: Long
     ): WorkoutPlanEntity?
-
-    @Query("SELECT * FROM workout_plans WHERE planId = :planId LIMIT 1")
-    suspend fun getPlanById(planId: String): WorkoutPlanEntity?
 
     @Query("DELETE FROM workout_plans WHERE expiresAtEpochMillis <= :nowEpochMillis")
     suspend fun clearOld(nowEpochMillis: Long): Int
