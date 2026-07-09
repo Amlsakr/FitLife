@@ -62,7 +62,7 @@ class WorkoutPlanRepositoryImpl(
 
     override suspend fun getPlanById(planId: String): Result<WorkoutPlan?, WorkoutGenerationError> {
         return try {
-            val entity = workoutPlanDao.getPlanById(planId) ?: return Result.Success(null)
+            val entity = workoutPlanDao.getById(planId) ?: return Result.Success(null)
             Result.Success(roomMapper.toDomain(entity))
         } catch (cancellation: CancellationException) {
             throw cancellation

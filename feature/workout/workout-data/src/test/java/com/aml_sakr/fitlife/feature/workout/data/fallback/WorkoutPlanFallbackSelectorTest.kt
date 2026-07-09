@@ -1,10 +1,10 @@
 package com.aml_sakr.fitlife.feature.workout.data.fallback
 
 import com.aml_sakr.fitlife.core.domain.Result
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutFitnessLevel
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGoal
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutLocation
+import com.aml_sakr.fitlife.core.domain.model.WorkoutFitnessLevel
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGoal
+import com.aml_sakr.fitlife.core.domain.model.WorkoutLocation
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

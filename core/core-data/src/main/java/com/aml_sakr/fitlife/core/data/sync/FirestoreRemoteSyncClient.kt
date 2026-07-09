@@ -8,39 +8,36 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-class FirestoreRemoteSyncClient(
-    private val firestore: FirebaseFirestore
-) : RemoteSyncClient {
+abstract class FirestoreRemoteSyncClient<T : SyncableEntity<T>>(
+    protected val firestore: FirebaseFirestore,
+    protected val collectionPath: String
+) : RemoteSyncClient<T> {
 
-    private val collection = firestore.collection("sync_test_records")
+    protected val collection = firestore.collection(collectionPath)
 
-    override suspend fun getRecord(id: String): SyncTestEntity? {
+    override suspend fun getRecord(id: String): T? {
         val snapshot = collection.document(id).get().await()
         return if (snapshot.exists()) {
-            val payload = snapshot.getString("payload") ?: ""
-            val lastModified = snapshot.getLong("lastModified")
-                ?: snapshot.getTimestampMillis("lastModified")
-                ?: snapshot.getTimestampMillis("serverUpdatedAt")
-                ?: 0L
-            SyncTestEntity(id, payload, lastModified, SyncStatus.SYNCED)
+            mapSnapshotToEntity(snapshot)
         } else {
             null
         }
     }
 
-    override suspend fun saveRecord(record: SyncTestEntity): Boolean {
-        val data = mapOf(
-            "id" to record.id,
-            "payload" to record.payload,
-            "lastModified" to record.lastModified,
-            "syncStatus" to SyncStatus.SYNCED.name,
-            "serverUpdatedAt" to FieldValue.serverTimestamp()
-        )
-        collection.document(record.id).set(data).await()
-        return true
+    override suspend fun saveRecord(record: T): Long? {
+        val data = mapEntityToMap(record).toMutableMap()
+        data["serverUpdatedAt"] = FieldValue.serverTimestamp()
+        collection.document(record.syncId).set(data).await()
+        
+        // Fetch back to get the server timestamp for reconciliation (AC #4)
+        val snapshot = collection.document(record.syncId).get().await()
+        return snapshot.getTimestampMillis("serverUpdatedAt") ?: snapshot.getTimestampMillis("lastModified")
     }
 
-    private fun com.google.firebase.firestore.DocumentSnapshot.getTimestampMillis(
+    protected abstract fun mapSnapshotToEntity(snapshot: com.google.firebase.firestore.DocumentSnapshot): T?
+    protected abstract fun mapEntityToMap(entity: T): Map<String, Any?>
+
+    protected fun com.google.firebase.firestore.DocumentSnapshot.getTimestampMillis(
         field: String
     ): Long? = when (val value = get(field)) {
         is Timestamp -> value.toDate().time
@@ -48,7 +45,7 @@ class FirestoreRemoteSyncClient(
         else -> null
     }
 
-    private suspend fun <T> Task<T>.await(): T = suspendCancellableCoroutine { continuation ->
+    protected suspend fun <R> Task<R>.await(): R = suspendCancellableCoroutine { continuation ->
         addOnCompleteListener { task ->
             if (!continuation.isActive) {
                 return@addOnCompleteListener

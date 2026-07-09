@@ -25,7 +25,7 @@ class SessionRepositoryImpl @Inject constructor(
 
     override suspend fun getSession(sessionId: String): Result<Session?, DomainError> {
         return try {
-            val entity = sessionDao.getSessionById(sessionId)
+            val entity = sessionDao.getById(sessionId)
             Result.Success(entity?.toDomain())
         } catch (e: Exception) {
             if (e is CancellationException) throw e

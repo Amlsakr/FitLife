@@ -430,6 +430,7 @@ private class RecordingWorkoutPlanDao : WorkoutPlanDao {
     var insertedEntity: WorkoutPlanEntity? = null
     var latestByRequestKey: WorkoutPlanEntity? = null
     var latestByUserId: WorkoutPlanEntity? = null
+    var latestById: WorkoutPlanEntity? = null
     var latestRequestKey: String? = null
     var latestRequestNowEpochMillis: Long? = null
     var latestUserId: String? = null
@@ -440,6 +441,14 @@ private class RecordingWorkoutPlanDao : WorkoutPlanDao {
     override suspend fun insert(entity: WorkoutPlanEntity) {
         insertedEntity = entity
     }
+
+    override suspend fun update(entity: WorkoutPlanEntity) {
+        insertedEntity = entity
+    }
+
+    override suspend fun getById(id: String): WorkoutPlanEntity? = latestById
+
+    override suspend fun getUnsyncedRecords(): List<WorkoutPlanEntity> = emptyList()
 
     override suspend fun getLatestByRequestKey(
         requestKey: String,

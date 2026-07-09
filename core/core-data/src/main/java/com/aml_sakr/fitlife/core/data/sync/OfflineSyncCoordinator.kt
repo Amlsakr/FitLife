@@ -5,8 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class OfflineSyncCoordinator(
-    private val dao: SyncTestDao,
-    private val remoteClient: RemoteSyncClient,
+    private val agents: List<SyncAgent>,
     private val connectivityMonitor: ConnectivityMonitor
 ) {
     suspend fun sync(): SyncResult = withContext(Dispatchers.IO) {
@@ -17,65 +16,26 @@ class OfflineSyncCoordinator(
         var successCount = 0
         var failureCount = 0
         var conflictResolvedCount = 0
+        var totalError: String? = null
 
-        try {
-            val unsynced = dao.getUnsyncedRecords()
-            for (staleLocal in unsynced) {
-                val local = dao.getById(staleLocal.id) ?: continue
-                if (local.syncStatus == SyncStatus.SYNCED) {
-                    continue
-                }
-
-                val remote = remoteClient.getRecord(local.id)
-                if (remote == null) {
-                    val uploaded = remoteClient.saveRecord(local)
-                    if (uploaded) {
-                        dao.update(local.copy(syncStatus = SyncStatus.SYNCED))
-                        successCount++
-                    } else {
-                        failureCount++
-                    }
-                    continue
-                }
-
-                when {
-                    local.lastModified > remote.lastModified -> {
-                        val uploaded = remoteClient.saveRecord(local)
-                        if (uploaded) {
-                            dao.update(local.copy(syncStatus = SyncStatus.SYNCED))
-                            successCount++
-                        } else {
-                            failureCount++
-                        }
-                    }
-                    local.lastModified < remote.lastModified -> {
-                        dao.update(remote.copy(syncStatus = SyncStatus.SYNCED))
-                        conflictResolvedCount++
-                        successCount++
-                    }
-                    else -> {
-                        val uploaded = remoteClient.saveRecord(local)
-                        if (uploaded) {
-                            dao.update(local.copy(syncStatus = SyncStatus.SYNCED))
-                            conflictResolvedCount++
-                            successCount++
-                        } else {
-                            failureCount++
-                        }
-                    }
-                }
+        for (agent in agents) {
+            val result = agent.sync()
+            successCount += result.successCount
+            failureCount += result.failureCount
+            conflictResolvedCount += result.conflictResolvedCount
+            if (!result.success) {
+                totalError = if (totalError == null) result.error else "$totalError; ${result.error}"
             }
-            val overallSuccess = failureCount == 0
-            SyncResult(
-                success = overallSuccess,
-                successCount = successCount,
-                failureCount = failureCount,
-                conflictResolvedCount = conflictResolvedCount,
-                error = if (overallSuccess) null else "Partial sync failure"
-            )
-        } catch (e: Exception) {
-            SyncResult(success = false, error = e.message ?: "Unknown error")
         }
+
+        val overallSuccess = failureCount == 0
+        SyncResult(
+            success = overallSuccess,
+            successCount = successCount,
+            failureCount = failureCount,
+            conflictResolvedCount = conflictResolvedCount,
+            error = if (overallSuccess) null else (totalError ?: "Partial sync failure")
+        )
     }
 }
 

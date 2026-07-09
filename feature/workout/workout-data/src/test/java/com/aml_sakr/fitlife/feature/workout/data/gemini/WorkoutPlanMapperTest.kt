@@ -3,10 +3,10 @@ package com.aml_sakr.fitlife.feature.workout.data.gemini
 import com.aml_sakr.fitlife.feature.workout.data.fallback.WorkoutPlanFallbackDay
 import com.aml_sakr.fitlife.feature.workout.data.fallback.WorkoutPlanFallbackExercise
 import com.aml_sakr.fitlife.feature.workout.data.fallback.WorkoutPlanFallbackTemplate
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutFitnessLevel
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGenerationRequest
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutGoal
-import com.aml_sakr.fitlife.feature.workout.domain.model.WorkoutLocation
+import com.aml_sakr.fitlife.core.domain.model.WorkoutFitnessLevel
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGenerationRequest
+import com.aml_sakr.fitlife.core.domain.model.WorkoutGoal
+import com.aml_sakr.fitlife.core.domain.model.WorkoutLocation
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
